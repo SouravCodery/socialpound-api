@@ -5,7 +5,9 @@
   "main": "server.ts",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "build": "tsc",
+    "prod": "npm run build && NODE_ENV=production node dist/server.js"
   },
   "author": "Sourav Choudhary | @SouravCodery",
   "license": "ISC",
