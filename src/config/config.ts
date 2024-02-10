@@ -1,21 +1,49 @@
 import "dotenv/config";
 
-interface Config {
-  MONGODB_URI: string;
-}
+type TypeMap = {
+  string: string;
+  number: number;
+  boolean: boolean;
+};
 
-const getEnvVariable = (key: string, defaultValue?: string): string => {
-  const value = process.env[key] || defaultValue;
+const getEnvironmentVariable = <TKey extends keyof TypeMap>(
+  key: string,
+  type: TKey,
+  defaultValue?: TypeMap[TKey]
+): TypeMap[TKey] => {
+  const value = String(process.env[key] ?? defaultValue);
 
   if (value === undefined) {
     throw new Error(`Environment variable ${key} is not set!`);
   }
 
-  return value;
+  switch (type) {
+    case "string":
+      return value as TypeMap[TKey];
+
+    case "number":
+      const parsedNumber = Number(value);
+      if (isNaN(parsedNumber)) {
+        throw new Error(`Environment variable ${key} is not a valid number`);
+      }
+      return parsedNumber as TypeMap[TKey];
+
+    case "boolean":
+      return (value.toLowerCase() === "true") as TypeMap[TKey];
+
+    default:
+      return value as TypeMap[TKey];
+  }
 };
 
+interface Config {
+  MONGODB_URI: string;
+  PORT: number;
+}
+
 const config: Readonly<Config> = Object.freeze({
-  MONGODB_URI: getEnvVariable("MONGODB_URI"),
+  MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
+  PORT: getEnvironmentVariable("PORT", "number"),
 });
 
 export default config;
