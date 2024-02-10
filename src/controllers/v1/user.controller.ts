@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
+import { logger } from "../../logger/index.logger";
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("Triggered!", req.body);
+    logger.info("Triggered!", req.body);
     return res.json("Hey from signIn!");
   } catch (error) {
-    console.log(error);
+    logger.error("Something went wrong in the signIn", error);
   }
 };
 
