@@ -1,20 +1,48 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import {
+  UserInterface,
+  GoogleAuthInterface,
+} from "../interfaces/user.interface";
 
-interface IUser extends Document {
-  username: string;
-  email: string;
-  fullName?: string;
-  profilePicture?: string;
-  bio?: string;
-  postsCount?: number;
-  followersCount?: number;
-  followingCount?: number;
-  isPrivate: boolean;
-  isDeleted: boolean;
-  deletedAt?: Date;
-}
+const GoogleAuthSchema: Schema<GoogleAuthInterface> = new Schema(
+  {
+    user: {
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      image: { type: String, required: true },
+    },
+    account: {
+      access_token: { type: String, required: true },
+      expires_in: { type: Number, required: true },
+      scope: { type: String, required: true },
+      token_type: { type: String, required: true },
+      id_token: { type: String, required: true },
+      expires_at: { type: Number, required: true },
+      provider: { type: String, required: true },
+      type: { type: String, required: true },
+      providerAccountId: { type: String, required: true },
+    },
+    profile: {
+      iss: { type: String, required: true },
+      azp: { type: String, required: true },
+      aud: { type: String, required: true },
+      sub: { type: String, required: true },
+      email: { type: String, required: true },
+      email_verified: { type: Boolean, required: true },
+      at_hash: { type: String, required: true },
+      name: { type: String, required: true },
+      picture: { type: String, required: true },
+      given_name: { type: String, required: true },
+      family_name: { type: String, required: true },
+      iat: { type: Number, required: true },
+      exp: { type: Number, required: true },
+    },
+  },
+  { _id: false }
+);
 
-const UserSchema: Schema<IUser> = new Schema(
+const UserSchema: Schema<UserInterface> = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
@@ -24,6 +52,7 @@ const UserSchema: Schema<IUser> = new Schema(
     postsCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
+    googleAuth: GoogleAuthSchema,
     isPrivate: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
@@ -54,6 +83,6 @@ UserSchema.plugin(uniqueValidator, {
   message: "Error, expected {PATH} to be unique.",
 });
 
-const UserModel = mongoose.model<IUser>("User", UserSchema);
+const UserModel = mongoose.model<UserInterface>("User", UserSchema);
 
 export default UserModel;
