@@ -1,8 +1,16 @@
 import express from "express";
 
 import * as userController from "./../../controllers/v1/user.controller";
+import * as userValidationSchemas from "../../schemas/user-routes.validators";
+
+import { validate } from "../../helpers/joi.helper";
 
 const userRouter = express.Router();
-userRouter.post("/signIn", userController.signIn);
+
+userRouter.post(
+  "/sign-in",
+  validate(userValidationSchemas.signInSchema),
+  userController.signIn
+);
 
 export default userRouter;
