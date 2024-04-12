@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import {
   UserInterface,
   GoogleAuthInterface,
-} from "../interfaces/user.interface";
+} from "../interfaces/user.interfaces";
 
 const GoogleAuthSchema: Schema<GoogleAuthInterface> = new Schema(
   {
