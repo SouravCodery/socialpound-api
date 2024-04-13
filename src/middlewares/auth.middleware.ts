@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 import { logger } from "../logger/index.logger";
-import { UserInterface } from "../interfaces/user.interfaces";
 
 import { HttpError } from "../classes/http-error.class";
+import { OAuthUserInterface } from "../interfaces/user.interfaces";
 
 declare global {
   namespace Express {
@@ -34,7 +34,7 @@ export const authMiddleware = (
     const decodedAuthToken = jwt.verify(
       token,
       process.env.AUTH_JWT_SECRET_KEY || ""
-    ) as UserInterface;
+    ) as OAuthUserInterface;
 
     req.decodedAuthToken = decodedAuthToken;
 
