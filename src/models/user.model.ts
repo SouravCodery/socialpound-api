@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 import {
-  UserInterface,
-  GoogleAuthInterface,
+  UserDocumentInterface,
+  GoogleAuthDocumentInterface,
 } from "../interfaces/user.interfaces";
 
-const GoogleAuthSchema: Schema<GoogleAuthInterface> = new Schema(
+const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
   {
     user: {
       id: { type: String, required: true },
@@ -42,7 +42,7 @@ const GoogleAuthSchema: Schema<GoogleAuthInterface> = new Schema(
   { _id: false }
 );
 
-const UserSchema: Schema<UserInterface> = new Schema(
+const UserSchema: Schema<UserDocumentInterface> = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
@@ -83,6 +83,6 @@ UserSchema.plugin(uniqueValidator, {
   message: "Error, expected {PATH} to be unique.",
 });
 
-const UserModel = mongoose.model<UserInterface>("User", UserSchema);
+const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
 
 export default UserModel;
