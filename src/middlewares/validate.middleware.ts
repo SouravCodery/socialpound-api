@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
+import { HttpError } from "../classes/http-error.class";
+import { logger } from "../logger/index.logger";
 
 export const validate = ({
   bodySchema,
@@ -11,27 +13,36 @@ export const validate = ({
   querySchema?: Joi.ObjectSchema;
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (headersSchema) {
-      const { error } = headersSchema.validate(req.headers);
+    try {
+      if (headersSchema) {
+        const { error } = headersSchema.validate(req.headers);
 
-      if (error)
-        return res.status(422).json({ error: error.details[0].message });
+        if (error) {
+          return next(new HttpError(422, error.details[0].message));
+        }
+      }
+
+      if (bodySchema) {
+        const { error } = bodySchema.validate(req.body);
+
+        if (error) {
+          return next(new HttpError(422, error.details[0].message));
+        }
+      }
+
+      if (querySchema) {
+        const { error } = querySchema.validate(req.query);
+
+        if (error) {
+          return next(new HttpError(422, error.details[0].message));
+        }
+      }
+
+      next();
+    } catch (error) {
+      logger.error("Something went wrong in validate middleware", error);
+
+      return next(new HttpError(500, "Internal Server Error"));
     }
-
-    if (bodySchema) {
-      const { error } = bodySchema.validate(req.body);
-
-      if (error)
-        return res.status(422).json({ error: error.details[0].message });
-    }
-
-    if (querySchema) {
-      const { error } = querySchema.validate(req.query);
-
-      if (error)
-        return res.status(422).json({ error: error.details[0].message });
-    }
-
-    next();
   };
 };
