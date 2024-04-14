@@ -1,9 +1,13 @@
 import { HttpError } from "../../classes/http-error.class";
 import { decodeSignedUserDataJWT } from "../../helpers/jwt.helpers";
-import { OAuthUserInterface } from "../../interfaces/user.interfaces";
+
 import { logger } from "../../logger/index.logger";
 
-import UserModel, { GoogleAuthModel } from "../../models/user.model";
+import { OAuthUserInterface } from "../../interfaces/oauth.interface";
+import { GitHubAuthUserInterface } from "../../interfaces/github-auth-user.interface";
+import { GoogleAuthUserInterface } from "./../../interfaces/google-auth-user.interface";
+
+import UserModel from "../../models/user.model";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -15,40 +19,63 @@ export const signIn = async ({
   try {
     const userDataOAuth = decodeSignedUserDataJWT({ signedUserDataJWT });
 
+    const userDataGoogle =
+      userDataOAuth.account.provider === "google"
+        ? (userDataOAuth as GoogleAuthUserInterface)
+        : null;
+
+    const userDataGitHub =
+      userDataOAuth.account.provider === "github"
+        ? (userDataOAuth as GitHubAuthUserInterface)
+        : null;
+
     if (decodedAuthToken.email !== userDataOAuth.user.email) {
       throw new HttpError(401, "User is not authorized");
     }
 
-    const userAlreadyExists = await UserModel.findOne({
+    const existingUser = await UserModel.findOne({
       email: decodedAuthToken.email,
     }).select("");
 
-    if (
-      userAlreadyExists &&
-      userDataOAuth.user.email &&
-      userDataOAuth.profile.email &&
-      userDataOAuth.account.providerAccountId
-    ) {
-      if (userAlreadyExists.googleAuth) {
-        userAlreadyExists.googleAuth.user = userDataOAuth.user;
-        userAlreadyExists.googleAuth.account = userDataOAuth.account;
-        userAlreadyExists.googleAuth.profile = userDataOAuth.profile;
-      } else {
-        userAlreadyExists.set({ googleAuth: userDataOAuth });
-      }
+    //creating a new user if the user does not exist
+    if (!existingUser) {
+      const newUser = new UserModel({
+        username: decodedAuthToken.email,
+        email: decodedAuthToken.email,
+        fullName: decodedAuthToken.name,
+        profilePicture: decodedAuthToken.image,
 
-      return await userAlreadyExists.save();
+        googleAuthUser: userDataGoogle,
+        githubAuthUser: userDataGitHub,
+      });
+
+      return await newUser.save();
     }
 
-    const newUser = new UserModel({
-      username: decodedAuthToken.email,
-      email: decodedAuthToken.email,
-      fullName: decodedAuthToken.name,
-      profilePicture: decodedAuthToken.image,
-      googleAuth: new GoogleAuthModel(userDataOAuth),
-    });
+    //updating the existing user with the new auth data
+    if (
+      userDataGoogle &&
+      userDataGoogle.user.email &&
+      userDataGoogle.profile.email &&
+      userDataGoogle.account.providerAccountId
+    ) {
+      existingUser.profilePicture = userDataGoogle.profile.picture;
+      existingUser.googleAuthUser = userDataGoogle;
 
-    return await newUser.save();
+      return await existingUser.save();
+    }
+
+    if (
+      userDataGitHub &&
+      userDataGitHub.user.email &&
+      userDataGitHub.profile.email &&
+      userDataGitHub.account.providerAccountId
+    ) {
+      existingUser.profilePicture = userDataGitHub.profile.avatar_url;
+      existingUser.githubAuthUser = userDataGitHub;
+
+      return await existingUser.save();
+    }
   } catch (error) {
     logger.error("Something went wrong in the signIn service", error);
 
