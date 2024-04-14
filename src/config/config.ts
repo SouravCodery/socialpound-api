@@ -39,11 +39,18 @@ const getEnvironmentVariable = <TKey extends keyof TypeMap>(
 interface Config {
   MONGODB_URI: string;
   PORT: number;
+
+  AUTH_JWT_SECRET_KEY: string;
+  USER_DATA_SECRET_KEY: string;
 }
 
-const config: Readonly<Config> = Object.freeze({
+export const Config: Readonly<Config> = Object.freeze({
   MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
   PORT: getEnvironmentVariable("PORT", "number"),
-});
 
-export default config;
+  AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
+  USER_DATA_SECRET_KEY: getEnvironmentVariable(
+    "USER_DATA_SECRET_KEY",
+    "string"
+  ),
+});
