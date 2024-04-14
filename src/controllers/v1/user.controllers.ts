@@ -9,12 +9,14 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     const { decodedAuthToken } = req;
     const { signedUserDataJWT } = req.body;
 
-    const signInResult = await userServices.signIn({
+    const signInResponse = await userServices.signIn({
       decodedAuthToken,
       signedUserDataJWT,
     });
 
-    return res.json({ message: "User Signed In Successfully", signInResult });
+    return res
+      .status(signInResponse.getStatus())
+      .json(signInResponse.getResponse());
   } catch (error) {
     logger.error("Something went wrong in the signIn controller", error);
 
