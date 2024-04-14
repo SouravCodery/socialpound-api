@@ -19,6 +19,10 @@ export const signIn = async ({
   try {
     const userDataOAuth = decodeSignedUserDataJWT({ signedUserDataJWT });
 
+    if (decodedAuthToken.email !== userDataOAuth.user.email) {
+      throw new HttpError(401, "User is not authorized");
+    }
+
     const userDataGoogle =
       userDataOAuth.account.provider === "google"
         ? (userDataOAuth as GoogleAuthUserInterface)
@@ -29,13 +33,9 @@ export const signIn = async ({
         ? (userDataOAuth as GitHubAuthUserInterface)
         : null;
 
-    if (decodedAuthToken.email !== userDataOAuth.user.email) {
-      throw new HttpError(401, "User is not authorized");
-    }
-
     const existingUser = await UserModel.findOne({
       email: decodedAuthToken.email,
-    }).select("");
+    });
 
     //creating a new user if the user does not exist
     if (!existingUser) {
@@ -59,7 +59,7 @@ export const signIn = async ({
       userDataGoogle.profile.email &&
       userDataGoogle.account.providerAccountId
     ) {
-      existingUser.profilePicture = userDataGoogle.profile.picture;
+      existingUser.profilePicture = userDataGoogle.user.image;
       existingUser.googleAuthUser = userDataGoogle;
 
       return await existingUser.save();
@@ -71,7 +71,7 @@ export const signIn = async ({
       userDataGitHub.profile.email &&
       userDataGitHub.account.providerAccountId
     ) {
-      existingUser.profilePicture = userDataGitHub.profile.avatar_url;
+      existingUser.profilePicture = userDataGitHub.user.image;
       existingUser.githubAuthUser = userDataGitHub;
 
       return await existingUser.save();

@@ -1,9 +1,10 @@
 import app from "./app";
 import connectToDatabase from "./src/config/database.config";
-import config from "./src/config/config";
+import { Config } from "./src/config/config";
+
 import { logger } from "./src/logger/index.logger";
 
-const port = config.PORT;
+const port = Config.PORT;
 
 connectToDatabase().then(() => {
   app.listen(port, () => {
