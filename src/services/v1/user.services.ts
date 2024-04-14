@@ -8,6 +8,8 @@ import { GitHubAuthUserInterface } from "../../interfaces/github-auth-user.inter
 import { GoogleAuthUserInterface } from "./../../interfaces/google-auth-user.interface";
 
 import UserModel from "../../models/user.model";
+import { HttpResponse } from "../../classes/http-response.class";
+import { UserDocumentInterface } from "../../interfaces/user.interfaces";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -33,7 +35,7 @@ export const signIn = async ({
         ? (userDataOAuth as GitHubAuthUserInterface)
         : null;
 
-    const existingUser = await UserModel.findOne({
+    const existingUser: UserDocumentInterface | null = await UserModel.findOne({
       email: decodedAuthToken.email,
     });
 
@@ -49,7 +51,16 @@ export const signIn = async ({
         githubAuthUser: userDataGitHub,
       });
 
-      return await newUser.save();
+      await newUser.save();
+
+      const message = userDataGoogle
+        ? "Google SignUp Successful"
+        : "GitHub SignUp Successful";
+
+      return new HttpResponse({
+        status: 201,
+        message,
+      });
     }
 
     //updating the existing user with the new auth data
@@ -62,7 +73,13 @@ export const signIn = async ({
       existingUser.profilePicture = userDataGoogle.user.image;
       existingUser.googleAuthUser = userDataGoogle;
 
-      return await existingUser.save();
+      await existingUser.save();
+
+      return new HttpResponse({
+        status: 200,
+        message: "Google SignIn Successful",
+        data: { user: existingUser },
+      });
     }
 
     if (
@@ -74,8 +91,19 @@ export const signIn = async ({
       existingUser.profilePicture = userDataGitHub.user.image;
       existingUser.githubAuthUser = userDataGitHub;
 
-      return await existingUser.save();
+      await existingUser.save();
+
+      return new HttpResponse({
+        status: 200,
+        message: "GitHub SignIn Successful",
+        data: { user: existingUser },
+      });
     }
+
+    return new HttpResponse({
+      status: 200,
+      message: "SignIn Successful",
+    });
   } catch (error) {
     logger.error("Something went wrong in the signIn service", error);
 
