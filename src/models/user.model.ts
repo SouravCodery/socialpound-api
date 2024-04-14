@@ -4,7 +4,7 @@ import {
   GoogleAuthDocumentInterface,
 } from "../interfaces/user.interfaces";
 
-const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
+export const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
   {
     user: {
       id: { type: String, required: true },
@@ -19,7 +19,12 @@ const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
       token_type: { type: String, required: true },
       id_token: { type: String, required: true },
       expires_at: { type: Number, required: true },
-      provider: { type: String, required: true },
+      provider: {
+        type: String,
+        required: true,
+        default: "google",
+        enum: ["google"],
+      },
       type: { type: String, required: true },
       providerAccountId: { type: String, required: true },
     },
@@ -39,7 +44,7 @@ const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
       exp: { type: Number, required: true },
     },
   },
-  { _id: false }
+  { timestamps: true }
 );
 
 const UserSchema: Schema<UserDocumentInterface> = new Schema(
@@ -47,8 +52,8 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     username: { type: String, required: true },
     email: { type: String, required: true },
     fullName: { type: String },
-    profilePicture: { type: String },
-    bio: { type: String },
+    profilePicture: { type: String, required: true },
+    bio: { type: String, default: "" },
     postsCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
@@ -84,5 +89,10 @@ UserSchema.plugin(uniqueValidator, {
 });
 
 const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
+
+export const GoogleAuthModel = mongoose.model<GoogleAuthDocumentInterface>(
+  "GoogleAuthModel",
+  GoogleAuthSchema
+);
 
 export default UserModel;

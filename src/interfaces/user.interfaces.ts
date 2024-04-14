@@ -16,7 +16,7 @@ export interface GoogleAuthInterface {
     token_type: string;
     id_token: string;
     expires_at: number;
-    provider: string;
+    provider: "google";
     type: string;
     providerAccountId: string;
   };
