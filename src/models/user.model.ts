@@ -1,51 +1,8 @@
 import mongoose, { Schema } from "mongoose";
-import {
-  UserDocumentInterface,
-  GoogleAuthDocumentInterface,
-} from "../interfaces/user.interfaces";
+import { UserDocumentInterface } from "../interfaces/user.interfaces";
 
-export const GoogleAuthSchema: Schema<GoogleAuthDocumentInterface> = new Schema(
-  {
-    user: {
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      image: { type: String, required: true },
-    },
-    account: {
-      access_token: { type: String, required: true },
-      expires_in: { type: Number, required: true },
-      scope: { type: String, required: true },
-      token_type: { type: String, required: true },
-      id_token: { type: String, required: true },
-      expires_at: { type: Number, required: true },
-      provider: {
-        type: String,
-        required: true,
-        default: "google",
-        enum: ["google"],
-      },
-      type: { type: String, required: true },
-      providerAccountId: { type: String, required: true },
-    },
-    profile: {
-      iss: { type: String, required: true },
-      azp: { type: String, required: true },
-      aud: { type: String, required: true },
-      sub: { type: String, required: true },
-      email: { type: String, required: true },
-      email_verified: { type: Boolean, required: true },
-      at_hash: { type: String, required: true },
-      name: { type: String, required: true },
-      picture: { type: String, required: true },
-      given_name: { type: String, required: true },
-      family_name: { type: String, required: true },
-      iat: { type: Number, required: true },
-      exp: { type: Number, required: true },
-    },
-  },
-  { timestamps: true }
-);
+import { GoogleAuthUserSchema } from "./google-auth-user.model";
+import { GitHubAuthUserSchema } from "./github-auth-user.model";
 
 const UserSchema: Schema<UserDocumentInterface> = new Schema(
   {
@@ -57,7 +14,8 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     postsCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
-    googleAuth: GoogleAuthSchema,
+    googleAuthUser: { type: GoogleAuthUserSchema, default: null },
+    githubAuthUser: { type: GitHubAuthUserSchema, default: null },
     isPrivate: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
@@ -89,10 +47,5 @@ UserSchema.plugin(uniqueValidator, {
 });
 
 const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
-
-export const GoogleAuthModel = mongoose.model<GoogleAuthDocumentInterface>(
-  "GoogleAuthModel",
-  GoogleAuthSchema
-);
 
 export default UserModel;

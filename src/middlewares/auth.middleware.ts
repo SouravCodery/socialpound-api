@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { logger } from "../logger/index.logger";
 
 import { HttpError } from "../classes/http-error.class";
-import { OAuthUserInterface } from "../interfaces/user.interfaces";
+import { OAuthUserInterface } from "../interfaces/oauth.interface";
 
 declare global {
   namespace Express {
