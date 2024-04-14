@@ -17,8 +17,8 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     googleAuthUser: { type: GoogleAuthUserSchema, default: null },
     githubAuthUser: { type: GitHubAuthUserSchema, default: null },
     isPrivate: { type: Boolean, default: false },
-    isDeleted: { type: Boolean, default: false },
-    deletedAt: { type: Date },
+    isDeleted: { type: Boolean, default: false, select: false },
+    deletedAt: { type: Date, select: false },
   },
   { timestamps: true }
 );
