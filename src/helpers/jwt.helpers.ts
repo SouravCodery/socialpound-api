@@ -5,6 +5,8 @@ import { HttpError } from "../classes/http-error.class";
 import { GoogleAuthUserInterface } from "./../interfaces/google-auth-user.interface";
 import { GitHubAuthUserInterface } from "../interfaces/github-auth-user.interface";
 
+import { Config } from "../config/config";
+
 export const decodeSignedUserDataJWT = ({
   signedUserDataJWT,
 }: {
@@ -13,7 +15,8 @@ export const decodeSignedUserDataJWT = ({
   try {
     const decodedSignedUserData = jwt.verify(
       signedUserDataJWT,
-      process.env.USER_DATA_SECRET_KEY || ""
+
+      Config.USER_DATA_SECRET_KEY || ""
     ) as GoogleAuthUserInterface | GitHubAuthUserInterface;
 
     if (decodedSignedUserData.account.provider === "github") {

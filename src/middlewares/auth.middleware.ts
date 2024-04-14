@@ -7,6 +7,8 @@ import { logger } from "../logger/index.logger";
 import { HttpError } from "../classes/http-error.class";
 import { OAuthUserInterface } from "../interfaces/oauth.interface";
 
+import { Config } from "../config/config";
+
 declare global {
   namespace Express {
     interface Request {
@@ -33,7 +35,7 @@ export const authMiddleware = (
 
     const decodedAuthToken = jwt.verify(
       token,
-      process.env.AUTH_JWT_SECRET_KEY || ""
+      Config.AUTH_JWT_SECRET_KEY || ""
     ) as OAuthUserInterface;
 
     req.decodedAuthToken = decodedAuthToken;
