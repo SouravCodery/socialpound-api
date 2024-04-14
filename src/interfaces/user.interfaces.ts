@@ -1,12 +1,14 @@
 import { Document } from "mongoose";
 
-export interface GoogleAuthInterface extends Document {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    image: string;
-  };
+export interface OAuthUserInterface {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+}
+
+export interface GoogleAuthInterface {
+  user: OAuthUserInterface;
   account: {
     access_token: string;
     expires_in: number;
@@ -14,7 +16,7 @@ export interface GoogleAuthInterface extends Document {
     token_type: string;
     id_token: string;
     expires_at: number;
-    provider: string;
+    provider: "google";
     type: string;
     providerAccountId: string;
   };
@@ -35,7 +37,7 @@ export interface GoogleAuthInterface extends Document {
   };
 }
 
-export interface UserInterface extends Document {
+export interface UserInterface {
   username: string;
   email: string;
   fullName?: string;
@@ -48,4 +50,12 @@ export interface UserInterface extends Document {
   isPrivate: boolean;
   isDeleted: boolean;
   deletedAt?: Date;
+}
+
+export interface GoogleAuthDocumentInterface
+  extends Document,
+    GoogleAuthInterface {}
+
+export interface UserDocumentInterface extends Document, UserInterface {
+  googleAuth?: GoogleAuthDocumentInterface;
 }
