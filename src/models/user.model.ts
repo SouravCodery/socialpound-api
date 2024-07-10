@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { UserDocumentInterface } from "../interfaces/user.interfaces";
+import { UserDocumentInterface } from "../interfaces/user.interface";
 
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
 import { GitHubAuthUserSchema } from "./github-auth-user.model";
