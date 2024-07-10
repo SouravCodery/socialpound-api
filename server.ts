@@ -8,6 +8,6 @@ const port = Config.PORT;
 
 connectToDatabase().then(() => {
   app.listen(port, () => {
-    logger.info(`Instagram Clone API listening on: ${port}`);
+    logger.info(`Socialpound API listening on: ${port}`);
   });
 });

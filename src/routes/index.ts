@@ -5,7 +5,7 @@ import { HttpError } from "../classes/http-error.class";
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  return res.json({ message: "Instagram Clone API | @SouravCodery" });
+  return res.json({ message: "Socialpound API | @SouravCodery" });
 });
 
 router.use("/v1", v1Router);

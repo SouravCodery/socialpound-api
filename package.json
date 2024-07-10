@@ -1,7 +1,7 @@
 {
-  "name": "ig-clone-api",
+  "name": "socialpound-api",
   "version": "1.0.0",
-  "description": "Instagram Clone API written in ExpressJs",
+  "description": "Socialpound API written in ExpressJs",
   "main": "server.ts",
   "scripts": {
     "test": "jest",
