@@ -7,14 +7,18 @@ export interface UserInterface {
   username: string;
   email: string;
   fullName?: string;
+  isPrivate: boolean;
+
   profilePicture?: string;
   bio?: string;
+
   postsCount?: number;
   followersCount?: number;
   followingCount?: number;
+
   googleAuthUser?: GoogleAuthUserInterface;
   githubAuthUser?: GitHubAuthUserInterface;
-  isPrivate: boolean;
+
   isDeleted: boolean;
   deletedAt?: Date;
 }
