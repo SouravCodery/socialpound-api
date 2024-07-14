@@ -1,7 +1,9 @@
 import { Schema, model } from "mongoose";
-import baseSchemaOptions from "./base-schema-options";
 
+import baseSchemaOptions from "./base-schema-options";
 import { CommentDocumentInterface } from "./../interfaces/comment.interface";
+
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
 const commentSchema: Schema<CommentDocumentInterface> = new Schema(
   {
@@ -20,9 +22,6 @@ const commentSchema: Schema<CommentDocumentInterface> = new Schema(
 
     likesCount: { type: Number, default: 0, required: true },
     repliesCount: { type: Number, default: 0, required: true },
-
-    isDeleted: { type: Boolean, default: false, select: false, required: true },
-    deletedAt: { type: Date, default: null, select: false },
   },
   baseSchemaOptions
 );
@@ -34,6 +33,8 @@ commentSchema.pre("validate", function (next) {
     next();
   }
 });
+
+commentSchema.plugin(softDeletePlugin);
 
 const Comment = model("Comment", commentSchema);
 export default Comment;

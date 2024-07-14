@@ -6,6 +6,8 @@ import { UserDocumentInterface } from "../interfaces/user.interface";
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
 import { GitHubAuthUserSchema } from "./github-auth-user.model";
 
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+
 const UserSchema: Schema<UserDocumentInterface> = new Schema(
   {
     username: { type: String, required: true },
@@ -23,9 +25,6 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     githubAuthUser: { type: GitHubAuthUserSchema, default: null },
 
     isPrivate: { type: Boolean, default: false, required: true },
-
-    isDeleted: { type: Boolean, default: false, select: false, required: true },
-    deletedAt: { type: Date, default: null, select: false },
   },
   { timestamps: true }
 );
@@ -50,13 +49,8 @@ UserSchema.plugin(uniqueValidator, {
   message: "{PATH} must be unique.",
 });
 
-interface UserModelInterface extends Model<UserDocumentInterface> {
-  softDelete: () => Promise<UserDocumentInterface>;
-}
+UserSchema.plugin(softDeletePlugin);
 
-const UserModel = mongoose.model<UserDocumentInterface, UserModelInterface>(
-  "User",
-  UserSchema
-);
+const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
 
 export default UserModel;

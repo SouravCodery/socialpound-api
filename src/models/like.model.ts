@@ -1,7 +1,9 @@
 import { Schema, model } from "mongoose";
-import baseSchemaOptions from "./base-schema-options";
 
+import baseSchemaOptions from "./base-schema-options";
 import { LikeDocumentInterface } from "./../interfaces/like.interface";
+
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
 const likeSchema: Schema<LikeDocumentInterface> = new Schema(
   {
@@ -11,9 +13,6 @@ const likeSchema: Schema<LikeDocumentInterface> = new Schema(
     comment: { type: Schema.Types.ObjectId, ref: "Comment", default: null },
 
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
-    isDeleted: { type: Boolean, default: false, select: false, required: true },
-    deletedAt: { type: Date, default: null, select: false },
   },
   baseSchemaOptions
 );
@@ -25,6 +24,8 @@ likeSchema.pre("validate", function (next) {
     next();
   }
 });
+
+likeSchema.plugin(softDeletePlugin);
 
 const Like = model("Like", likeSchema);
 export default Like;
