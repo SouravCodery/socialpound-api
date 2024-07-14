@@ -16,12 +16,12 @@ const postSchema = new Schema(
       },
     ],
 
-    caption: { type: String, maxLength: 2200, default: "" },
+    caption: { type: String, maxLength: 2200, default: "", required: true },
 
-    likesCount: { type: Number, default: 0 },
-    commentsCount: { type: Number, default: 0 },
+    likesCount: { type: Number, default: 0, required: true },
+    commentsCount: { type: Number, default: 0, required: true },
 
-    isDeleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false, required: true },
     deletedAt: { type: Date, default: null },
   },
   baseSchemaOptions
