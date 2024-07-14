@@ -1,4 +1,5 @@
 import { ObjectId } from "mongoose";
+import { SoftDeleteInterface } from "./soft-delete.interface";
 
 interface CommentInterface {
   commentOn: "Post" | "Comment";
@@ -12,9 +13,9 @@ interface CommentInterface {
 
   likesCount: number;
   repliesCount: number;
-
-  isDeleted: boolean;
-  deletedAt: Date | null;
 }
 
-export interface CommentDocumentInterface extends Document, CommentInterface {}
+export interface CommentDocumentInterface
+  extends Document,
+    CommentInterface,
+    SoftDeleteInterface {}

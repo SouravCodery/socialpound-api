@@ -2,6 +2,7 @@ import { Document } from "mongoose";
 
 import { GoogleAuthUserInterface } from "./google-auth-user.interface";
 import { GitHubAuthUserInterface } from "./github-auth-user.interface";
+import { SoftDeleteInterface } from "./soft-delete.interface";
 
 export interface UserInterface {
   username: string;
@@ -19,9 +20,9 @@ export interface UserInterface {
   githubAuthUser: GitHubAuthUserInterface | null;
 
   isPrivate: boolean;
-
-  isDeleted: boolean;
-  deletedAt: Date | null;
 }
 
-export interface UserDocumentInterface extends Document, UserInterface {}
+export interface UserDocumentInterface
+  extends Document,
+    UserInterface,
+    SoftDeleteInterface {}

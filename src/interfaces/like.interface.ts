@@ -1,4 +1,5 @@
 import { ObjectId, Document } from "mongoose";
+import { SoftDeleteInterface } from "./soft-delete.interface";
 
 interface LikeInterface {
   likeOn: "Post" | "Comment";
@@ -7,9 +8,9 @@ interface LikeInterface {
   comment: ObjectId | null;
 
   user: ObjectId;
-
-  isDeleted: boolean;
-  deletedAt: Date | null;
 }
 
-export interface LikeDocumentInterface extends Document, LikeInterface {}
+export interface LikeDocumentInterface
+  extends Document,
+    LikeInterface,
+    SoftDeleteInterface {}
