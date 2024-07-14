@@ -6,6 +6,7 @@ import { UserDocumentInterface } from "../interfaces/user.interface";
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
 import { GitHubAuthUserSchema } from "./github-auth-user.model";
 
+import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
 const UserSchema: Schema<UserDocumentInterface> = new Schema(
@@ -26,7 +27,7 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
 
     isPrivate: { type: Boolean, default: false, required: true },
   },
-  { timestamps: true }
+  baseSchemaOptions
 );
 
 UserSchema.methods.softDelete = function () {
