@@ -5,6 +5,7 @@ import { logger } from "../logger/index.logger";
 
 import { HttpError } from "../classes/http-error.class";
 import { OAuthUserInterface } from "../interfaces/oauth.interface";
+import { UserInterface } from "./../interfaces/user.interface";
 
 import { Config } from "../config/config";
 
@@ -12,6 +13,7 @@ declare global {
   namespace Express {
     interface Request {
       decodedAuthToken?: any;
+      user?: UserInterface;
     }
   }
 }
