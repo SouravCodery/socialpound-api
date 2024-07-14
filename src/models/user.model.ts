@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
 import { UserDocumentInterface } from "../interfaces/user.interface";

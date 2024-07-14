@@ -1,7 +1,7 @@
 import { OAuthUserInterface } from "./oauth.interface";
 import { GitHubAccountInterface } from "./oauth.interface";
 
-export interface GitHubProfileInterface {
+interface GitHubProfileInterface {
   login: string;
   id: number;
   node_id: string;
