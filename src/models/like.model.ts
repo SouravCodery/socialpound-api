@@ -13,7 +13,7 @@ const likeSchema: Schema<LikeDocumentInterface> = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
     isDeleted: { type: Boolean, default: false },
-    deletedAt: { type: Date },
+    deletedAt: { type: Date, default: null },
   },
   baseSchemaOptions
 );
