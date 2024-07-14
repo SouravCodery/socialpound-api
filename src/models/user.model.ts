@@ -1,36 +1,42 @@
-import mongoose, { Schema } from "mongoose";
-import { UserDocumentInterface } from "../interfaces/user.interfaces";
+import { Schema, model } from "mongoose";
+import uniqueValidator from "mongoose-unique-validator";
+
+import { UserDocumentInterface } from "../interfaces/user.interface";
 
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
 import { GitHubAuthUserSchema } from "./github-auth-user.model";
+
+import baseSchemaOptions from "./base-schema-options";
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
 const UserSchema: Schema<UserDocumentInterface> = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
-    fullName: { type: String },
+    fullName: { type: String, default: "", required: true },
+
     profilePicture: { type: String, required: true },
-    bio: { type: String, default: "" },
-    postsCount: { type: Number, default: 0 },
-    followersCount: { type: Number, default: 0 },
-    followingCount: { type: Number, default: 0 },
+    bio: { type: String, default: "", required: true },
+
+    postsCount: { type: Number, default: 0, required: true },
+    followersCount: { type: Number, default: 0, required: true },
+    followingCount: { type: Number, default: 0, required: true },
+
     googleAuthUser: { type: GoogleAuthUserSchema, default: null },
     githubAuthUser: { type: GitHubAuthUserSchema, default: null },
-    isPrivate: { type: Boolean, default: false },
-    isDeleted: { type: Boolean, default: false, select: false },
-    deletedAt: { type: Date, select: false },
+
+    isPrivate: { type: Boolean, default: false, required: true },
   },
-  { timestamps: true }
+  baseSchemaOptions
 );
 
-// Soft delete method
 UserSchema.methods.softDelete = function () {
   this.isDeleted = true;
   this.deletedAt = new Date();
+
   return this.save();
 };
 
-// Ensure unique username and email only for active users
 UserSchema.index(
   { username: 1 },
   { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
@@ -40,12 +46,12 @@ UserSchema.index(
   { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
 );
 
-// Apply the uniqueValidator plugin to user schema.
-import uniqueValidator from "mongoose-unique-validator";
 UserSchema.plugin(uniqueValidator, {
-  message: "Error, expected {PATH} to be unique.",
+  message: "{PATH} must be unique.",
 });
 
-const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
+UserSchema.plugin(softDeletePlugin);
+
+const UserModel = model<UserDocumentInterface>("User", UserSchema);
 
 export default UserModel;

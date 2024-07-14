@@ -9,7 +9,7 @@ import { GoogleAuthUserInterface } from "./../../interfaces/google-auth-user.int
 
 import UserModel from "../../models/user.model";
 import { HttpResponse } from "../../classes/http-response.class";
-import { UserDocumentInterface } from "../../interfaces/user.interfaces";
+import { UserDocumentInterface } from "../../interfaces/user.interface";
 
 export const signIn = async ({
   decodedAuthToken,

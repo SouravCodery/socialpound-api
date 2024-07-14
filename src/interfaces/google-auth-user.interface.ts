@@ -1,7 +1,7 @@
 import { OAuthUserInterface } from "./oauth.interface";
 import { GoogleAccountInterface } from "./oauth.interface";
 
-export interface GoogleProfileInterface {
+interface GoogleProfileInterface {
   aud: string;
   azp: string;
   email: string;
