@@ -21,8 +21,8 @@ const postSchema = new Schema(
     likesCount: { type: Number, default: 0, required: true },
     commentsCount: { type: Number, default: 0, required: true },
 
-    isDeleted: { type: Boolean, default: false, required: true },
-    deletedAt: { type: Date, default: null },
+    isDeleted: { type: Boolean, default: false, select: false, required: true },
+    deletedAt: { type: Date, default: null, select: false },
   },
   baseSchemaOptions
 );
