@@ -16,7 +16,7 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     fullName: { type: String, default: "", required: true },
 
     profilePicture: { type: String, required: true },
-    bio: { type: String, default: "", required: true },
+    bio: { type: String, default: "" },
 
     postsCount: { type: Number, default: 0, required: true },
     followersCount: { type: Number, default: 0, required: true },
@@ -25,7 +25,7 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     googleAuthUser: { type: GoogleAuthUserSchema, default: null },
     githubAuthUser: { type: GitHubAuthUserSchema, default: null },
 
-    isPrivate: { type: Boolean, default: false, required: true },
+    isPrivate: { type: Boolean, default: true, required: true },
   },
   baseSchemaOptions
 );
