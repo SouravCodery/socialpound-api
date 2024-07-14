@@ -36,5 +36,5 @@ commentSchema.pre("validate", function (next) {
 
 commentSchema.plugin(softDeletePlugin);
 
-const Comment = model("Comment", commentSchema);
+const Comment = model<CommentDocumentInterface>("Comment", commentSchema);
 export default Comment;

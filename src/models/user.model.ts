@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
 import { UserDocumentInterface } from "../interfaces/user.interface";
@@ -51,6 +51,6 @@ UserSchema.plugin(uniqueValidator, {
 
 UserSchema.plugin(softDeletePlugin);
 
-const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
+const UserModel = model<UserDocumentInterface>("User", UserSchema);
 
 export default UserModel;

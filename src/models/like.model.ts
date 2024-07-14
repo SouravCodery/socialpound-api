@@ -27,5 +27,5 @@ likeSchema.pre("validate", function (next) {
 
 likeSchema.plugin(softDeletePlugin);
 
-const Like = model("Like", likeSchema);
+const Like = model<LikeDocumentInterface>("Like", likeSchema);
 export default Like;
