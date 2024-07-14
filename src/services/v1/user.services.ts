@@ -45,6 +45,7 @@ export const signIn = async ({
         username: decodedAuthToken.email,
         email: decodedAuthToken.email,
         fullName: decodedAuthToken.name,
+
         profilePicture: decodedAuthToken.image,
 
         googleAuthUser: userDataGoogle,
