@@ -1,4 +1,6 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
+import uniqueValidator from "mongoose-unique-validator";
+
 import { UserDocumentInterface } from "../interfaces/user.interface";
 
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
@@ -44,11 +46,17 @@ UserSchema.index(
   { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
 );
 
-import uniqueValidator from "mongoose-unique-validator";
 UserSchema.plugin(uniqueValidator, {
-  message: "Error, expected {PATH} to be unique.",
+  message: "{PATH} must be unique.",
 });
 
-const UserModel = mongoose.model<UserDocumentInterface>("User", UserSchema);
+interface UserModelInterface extends Model<UserDocumentInterface> {
+  softDelete: () => Promise<UserDocumentInterface>;
+}
+
+const UserModel = mongoose.model<UserDocumentInterface, UserModelInterface>(
+  "User",
+  UserSchema
+);
 
 export default UserModel;
