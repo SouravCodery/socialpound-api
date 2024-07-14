@@ -7,9 +7,12 @@ import { OAuthUserInterface } from "../../interfaces/oauth.interface";
 import { GitHubAuthUserInterface } from "../../interfaces/github-auth-user.interface";
 import { GoogleAuthUserInterface } from "./../../interfaces/google-auth-user.interface";
 
-import UserModel from "../../models/user.model";
+import { UserModel } from "../../models/user.model";
 import { HttpResponse } from "../../classes/http-response.class";
-import { UserDocumentInterface } from "../../interfaces/user.interface";
+import {
+  UserDocumentInterface,
+  UserInterface,
+} from "../../interfaces/user.interface";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -45,6 +48,7 @@ export const signIn = async ({
         username: decodedAuthToken.email,
         email: decodedAuthToken.email,
         fullName: decodedAuthToken.name,
+
         profilePicture: decodedAuthToken.image,
 
         googleAuthUser: userDataGoogle,
@@ -112,5 +116,24 @@ export const signIn = async ({
     }
 
     throw new HttpError(500, "Something went wrong in signIn");
+  }
+};
+
+export const getUserByEmail = async ({ email }: { email: string }) => {
+  try {
+    if (!email) {
+      throw new Error("[Service: getUserByEmail] - email is required");
+    }
+
+    const user = await UserModel.findOne({ email }).lean<UserInterface>();
+    if (!user) {
+      throw new Error("[Service: getUserByEmail] - User not found");
+    }
+
+    return user;
+  } catch (error) {
+    logger.error("[Service: getUserByEmail] - Something went wrong", error);
+
+    throw error;
   }
 };
