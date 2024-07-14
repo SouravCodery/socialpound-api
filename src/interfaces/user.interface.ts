@@ -4,7 +4,7 @@ import { GoogleAuthUserInterface } from "./google-auth-user.interface";
 import { GitHubAuthUserInterface } from "./github-auth-user.interface";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
-interface UserInterface {
+export interface UserInterface {
   username: string;
   email: string;
   fullName: string;

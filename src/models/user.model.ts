@@ -52,6 +52,4 @@ UserSchema.plugin(uniqueValidator, {
 
 UserSchema.plugin(softDeletePlugin);
 
-const UserModel = model<UserDocumentInterface>("User", UserSchema);
-
-export default UserModel;
+export const UserModel = model<UserDocumentInterface>("User", UserSchema);
