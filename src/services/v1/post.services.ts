@@ -3,19 +3,19 @@ import { HttpResponse } from "../../classes/http-response.class";
 
 import { logger } from "../../logger/index.logger";
 
-export const addPost = async ({}: {}) => {
+export const createPost = async ({}: {}) => {
   try {
     return new HttpResponse({
       status: 200,
       message: "Post creation Successful",
     });
   } catch (error) {
-    logger.error("Something went wrong in the addPost service", error);
+    logger.error("[Service: createPost] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in addPost");
+    throw new HttpError(500, "Something went wrong in post creation");
   }
 };

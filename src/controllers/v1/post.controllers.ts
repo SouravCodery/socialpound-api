@@ -4,22 +4,24 @@ import { logger } from "../../logger/index.logger";
 import * as postServices from "../../services/v1/post.services";
 import { HttpError } from "../../classes/http-error.class";
 
-const addPost = async (req: Request, res: Response, next: NextFunction) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const addPostResponse = await postServices.addPost({});
+    const createPostResponse = await postServices.createPost({});
 
     return res
-      .status(addPostResponse.getStatus())
-      .json(addPostResponse.getResponse());
+      .status(createPostResponse.getStatus())
+      .json(createPostResponse.getResponse());
   } catch (error) {
-    logger.error("Something went wrong in the addPost controller", error);
+    logger.error("[Controller: createPost] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in addPost"));
+    return next(
+      new HttpError(500, "[Controller: createPost] - Something went wrong")
+    );
   }
 };
 
-export { addPost };
+export { createPost };
