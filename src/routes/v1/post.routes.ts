@@ -9,6 +9,6 @@ const postRouter = express.Router();
 postRouter.use(authMiddleware);
 postRouter.use(userMiddleware);
 
-postRouter.post("/", authMiddleware, postController.createPost);
+postRouter.post("/", postController.createPost);
 
 export default postRouter;
