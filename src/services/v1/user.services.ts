@@ -58,8 +58,8 @@ export const signIn = async ({
       await newUser.save();
 
       const message = userDataGoogle
-        ? "Google SignUp Successful"
-        : "GitHub SignUp Successful";
+        ? "Google Sign-Up Successful"
+        : "GitHub Sign-Up Successful";
 
       return new HttpResponse({
         status: 201,
@@ -81,7 +81,7 @@ export const signIn = async ({
 
       return new HttpResponse({
         status: 200,
-        message: "Google SignIn Successful",
+        message: "Google Sign-In Successful",
         data: { user: existingUser },
       });
     }
@@ -99,23 +99,23 @@ export const signIn = async ({
 
       return new HttpResponse({
         status: 200,
-        message: "GitHub SignIn Successful",
+        message: "GitHub Sign-In Successful",
         data: { user: existingUser },
       });
     }
 
     return new HttpResponse({
       status: 200,
-      message: "SignIn Successful",
+      message: "Sign-In Successful",
     });
   } catch (error) {
-    logger.error("Something went wrong in the signIn service", error);
+    logger.error("[Service: signIn] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in signIn");
+    throw new HttpError(500, "Something went wrong in Sign-In");
   }
 };
 

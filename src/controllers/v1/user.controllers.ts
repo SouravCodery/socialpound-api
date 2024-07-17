@@ -18,13 +18,13 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
       .status(signInResponse.getStatus())
       .json(signInResponse.getResponse());
   } catch (error) {
-    logger.error("Something went wrong in the signIn controller", error);
+    logger.error("[Controller: signIn] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in signIn"));
+    return next(new HttpError(500, "Something went wrong in Sign-In"));
   }
 };
 
