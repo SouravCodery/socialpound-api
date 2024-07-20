@@ -18,7 +18,7 @@ const postSchema = new Schema(
       },
     ],
 
-    caption: { type: String, maxLength: 2200, default: "", required: true },
+    caption: { type: String, maxLength: 2200, default: "" },
 
     likesCount: { type: Number, default: 0, required: true },
     commentsCount: { type: Number, default: 0, required: true },
