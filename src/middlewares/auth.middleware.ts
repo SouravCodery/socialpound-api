@@ -1,3 +1,4 @@
+import { AuthenticatedRequestInterface } from "./../interfaces/extended-request.interface";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -5,18 +6,8 @@ import { logger } from "../logger/index.logger";
 
 import { HttpError } from "../classes/http-error.class";
 import { OAuthUserInterface } from "../interfaces/oauth.interface";
-import { UserInterface } from "./../interfaces/user.interface";
 
 import { Config } from "../config/config";
-
-declare global {
-  namespace Express {
-    interface Request {
-      decodedAuthToken?: any;
-      user?: UserInterface;
-    }
-  }
-}
 
 export const authMiddleware = (
   req: Request,
@@ -39,7 +30,7 @@ export const authMiddleware = (
       Config.AUTH_JWT_SECRET_KEY || ""
     ) as OAuthUserInterface;
 
-    req.decodedAuthToken = decodedAuthToken;
+    (req as AuthenticatedRequestInterface).decodedAuthToken = decodedAuthToken;
 
     next();
   } catch (error) {
