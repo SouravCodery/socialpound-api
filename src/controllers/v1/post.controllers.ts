@@ -4,9 +4,18 @@ import { logger } from "../../logger/index.logger";
 import * as postServices from "../../services/v1/post.services";
 import { HttpError } from "../../classes/http-error.class";
 
+import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
+
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const createPostResponse = await postServices.createPost({});
+    const user = (req as AuthenticatedUserRequestInterface).user._id;
+    const { content, caption } = req.body;
+
+    const createPostResponse = await postServices.createPost({
+      user,
+      content,
+      caption,
+    });
 
     return res
       .status(createPostResponse.getStatus())
