@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
 
