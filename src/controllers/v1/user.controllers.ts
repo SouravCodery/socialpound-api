@@ -1,12 +1,15 @@
 import { Request, Response, NextFunction } from "express";
+
 import { logger } from "../../logger/index.logger";
+import { HttpError } from "../../classes/http-error.class";
 
 import * as userServices from "../../services/v1/user.services";
-import { HttpError } from "../../classes/http-error.class";
+
+import { AuthenticatedRequestInterface } from "../../interfaces/extended-request.interface";
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { decodedAuthToken } = req;
+    const { decodedAuthToken } = req as AuthenticatedRequestInterface;
     const { signedUserDataJWT } = req.body;
 
     const signInResponse = await userServices.signIn({
