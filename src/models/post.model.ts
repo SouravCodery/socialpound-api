@@ -3,7 +3,9 @@ import { Schema, model } from "mongoose";
 import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
-const postSchema = new Schema(
+import { PostDocumentInterface } from "./../interfaces/post.interface";
+
+const postSchema: Schema<PostDocumentInterface> = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
@@ -28,5 +30,5 @@ const postSchema = new Schema(
 
 postSchema.plugin(softDeletePlugin);
 
-const Post = model("Post", postSchema);
+const Post = model<PostDocumentInterface>("Post", postSchema);
 export default Post;
