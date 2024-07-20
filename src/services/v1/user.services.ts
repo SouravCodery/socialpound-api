@@ -11,7 +11,7 @@ import { UserModel } from "../../models/user.model";
 import { HttpResponse } from "../../classes/http-response.class";
 import {
   UserDocumentInterface,
-  UserInterface,
+  UserWithIdInterface,
 } from "../../interfaces/user.interface";
 
 export const signIn = async ({
@@ -125,7 +125,7 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
       throw new Error("[Service: getUserByEmail] - email is required");
     }
 
-    const user = await UserModel.findOne({ email }).lean<UserInterface>();
+    const user = await UserModel.findOne({ email }).lean<UserWithIdInterface>();
     if (!user) {
       throw new Error("[Service: getUserByEmail] - User not found");
     }
