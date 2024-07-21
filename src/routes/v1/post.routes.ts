@@ -18,4 +18,6 @@ postRouter.post(
   postController.createPost
 );
 
+postRouter.get("/", postController.getAllPosts);
+
 export default postRouter;
