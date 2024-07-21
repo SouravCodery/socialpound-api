@@ -38,3 +38,27 @@ export const createPost = async ({
     throw new HttpError(500, "Something went wrong in post creation");
   }
 };
+
+export const getAllPosts = async () => {
+  try {
+    const posts = await Post.find()
+      .populate("user", "username profilePicture -_id")
+      .select("-createdAt -updatedAt -__v")
+      .lean();
+
+    return new HttpResponse({
+      status: 200,
+      message: "Posts fetched successfully",
+
+      data: posts,
+    });
+  } catch (error) {
+    logger.error("[Service: getAllPosts] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in fetching all the posts");
+  }
+};
