@@ -11,7 +11,7 @@ const userRouter = express.Router();
 userRouter.post(
   "/sign-in",
   authMiddleware,
-  validate(userValidationSchemas.signInSchema),
+  validate(userValidationSchemas.signInValidatorSchema),
   userController.signIn
 );
 
