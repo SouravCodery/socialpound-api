@@ -33,4 +33,24 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createPost };
+const getAllPosts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const getAllPostsResponse = await postServices.getAllPosts();
+
+    return res
+      .status(getAllPostsResponse.getStatus())
+      .json(getAllPostsResponse.getResponse());
+  } catch (error) {
+    logger.error("[Controller: getAllPosts] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(500, "[Controller: getAllPosts] - Something went wrong")
+    );
+  }
+};
+
+export { createPost, getAllPosts };

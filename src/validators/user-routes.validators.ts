@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const signInSchema = {
+export const signInValidatorSchema = {
   bodySchema: Joi.object({
     signedUserDataJWT: Joi.string().required(),
   }),
