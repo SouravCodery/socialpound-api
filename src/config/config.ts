@@ -13,7 +13,7 @@ const getEnvironmentVariable = <TKey extends keyof TypeMap>(
 ): TypeMap[TKey] => {
   const value = String(process.env[key] ?? defaultValue);
 
-  if (value === undefined) {
+  if (value === "undefined") {
     throw new Error(`Environment variable ${key} is not set!`);
   }
 
@@ -36,15 +36,7 @@ const getEnvironmentVariable = <TKey extends keyof TypeMap>(
   }
 };
 
-interface Config {
-  MONGODB_URI: string;
-  PORT: number;
-
-  AUTH_JWT_SECRET_KEY: string;
-  USER_DATA_SECRET_KEY: string;
-}
-
-export const Config: Readonly<Config> = Object.freeze({
+export const Config = {
   MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
   PORT: getEnvironmentVariable("PORT", "number"),
 
@@ -53,4 +45,10 @@ export const Config: Readonly<Config> = Object.freeze({
     "USER_DATA_SECRET_KEY",
     "string"
   ),
-});
+
+  REDIS_PERSISTENT_URL: getEnvironmentVariable(
+    "REDIS_PERSISTENT_URL",
+    "string"
+  ),
+  REDIS_CACHE_URL: getEnvironmentVariable("REDIS_CACHE_URL", "string"),
+} as const;
