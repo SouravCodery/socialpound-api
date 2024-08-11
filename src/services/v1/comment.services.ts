@@ -5,8 +5,52 @@ import { logger } from "../../logger/index.logger";
 
 import Comment from "../../models/comment.model";
 import Post from "../../models/post.model";
+import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 
 import { CommentInterface } from "./../../interfaces/comment.interface";
+
+export const addCommentToQueue = async ({
+  commentOn,
+
+  post,
+  parentComment,
+  user,
+
+  text,
+}: {
+  commentOn: CommentInterface["commentOn"];
+
+  post: CommentInterface["post"];
+  parentComment: CommentInterface["parentComment"];
+  user: CommentInterface["user"];
+
+  text: CommentInterface["text"];
+}) => {
+  try {
+    await commentQueue.add("add-comment", {
+      commentOn,
+
+      post,
+      parentComment,
+      user,
+
+      text,
+    });
+
+    return new HttpResponse({
+      status: 202,
+      message: "Comment creation request added to the queue",
+    });
+  } catch (error) {
+    logger.error("[Service: addComment] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in comment addition");
+  }
+};
 
 export const addComment = async ({
   commentOn,
