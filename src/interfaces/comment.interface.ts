@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
-interface CommentInterface {
+export interface CommentInterface {
   commentOn: "Post" | "Comment";
 
   post: ObjectId;
