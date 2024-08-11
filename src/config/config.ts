@@ -51,4 +51,7 @@ export const Config = {
     "string"
   ),
   REDIS_CACHE_URL: getEnvironmentVariable("REDIS_CACHE_URL", "string"),
+
+  REDIS_BULL_MQ_HOST: getEnvironmentVariable("REDIS_BULL_MQ_HOST", "string"),
+  REDIS_BULL_MQ_PORT: getEnvironmentVariable("REDIS_BULL_MQ_PORT", "number"),
 } as const;
