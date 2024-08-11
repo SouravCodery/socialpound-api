@@ -7,6 +7,8 @@ import { cacheRedisClient } from "./src/config/redis-cache.config";
 
 import { logger } from "./src/logger/index.logger";
 
+import "./src/mq/bull-mq/index.bull-mq";
+
 const port = Config.PORT;
 
 (async () => {
