@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Document, ObjectId } from "mongoose";
 
 import { GoogleAuthUserInterface } from "./google-auth-user.interface";
 import { GitHubAuthUserInterface } from "./github-auth-user.interface";
@@ -28,5 +28,5 @@ export interface UserDocumentInterface
     SoftDeleteInterface {}
 
 export interface UserWithIdInterface extends UserInterface {
-  _id: Types.ObjectId;
+  _id: ObjectId;
 }
