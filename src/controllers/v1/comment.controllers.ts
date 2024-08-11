@@ -12,7 +12,7 @@ const addComment = async (req: Request, res: Response, next: NextFunction) => {
     const user = (req as AuthenticatedUserRequestInterface).user._id;
     const { commentOn, post, parentComment, text } = req.body;
 
-    const addCommentResponse = await commentServices.addComment({
+    const addCommentResponse = await commentServices.addCommentToQueue({
       commentOn,
       post,
       parentComment,
