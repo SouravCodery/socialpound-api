@@ -6,12 +6,12 @@ export const createPostValidatorSchema = {
       .items(
         Joi.object({
           type: Joi.string().valid("image", "video").required(),
-          url: Joi.string().uri().required(),
+          url: Joi.string().trim().uri().required(),
         })
       )
       .required()
       .max(10),
 
-    caption: Joi.string().max(2200).default(""),
+    caption: Joi.string().trim().max(2200).default(""),
   }),
 };
