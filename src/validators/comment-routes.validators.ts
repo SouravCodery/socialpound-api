@@ -12,6 +12,6 @@ export const addCommentValidatorSchema = {
       otherwise: Joi.string().allow(null),
     }),
 
-    text: Joi.string().max(2200).required(),
+    text: Joi.string().trim().max(2200).required(),
   }),
 };
