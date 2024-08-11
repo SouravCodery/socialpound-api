@@ -36,5 +36,7 @@ commentSchema.pre("validate", function (next) {
 
 commentSchema.plugin(softDeletePlugin);
 
+//todo: Add compound index on commentOn, post and parentComment
+
 const Comment = model<CommentDocumentInterface>("Comment", commentSchema);
 export default Comment;
