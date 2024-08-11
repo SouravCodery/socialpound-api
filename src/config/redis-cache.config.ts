@@ -15,6 +15,10 @@ export const cacheRedisClient = createClient({
   url: Config.REDIS_CACHE_URL,
 });
 
-cacheRedisClient.on("error", (err) =>
-  logger.error("Cache Redis Client Error", err)
-);
+cacheRedisClient.on("error", (err) => {
+  logger.error("Cache Redis Client Error", err);
+
+  if (err.code === "ECONNREFUSED") {
+    process.exit(1);
+  }
+});

@@ -15,6 +15,10 @@ export const persistentRedisClient = createClient({
   url: Config.REDIS_PERSISTENT_URL,
 });
 
-persistentRedisClient.on("error", (err) =>
-  logger.error("Persistent Redis Client Error", err)
-);
+persistentRedisClient.on("error", (err) => {
+  logger.error("Persistent Redis Client Error", err);
+
+  if (err.code === "ECONNREFUSED") {
+    process.exit(1);
+  }
+});
