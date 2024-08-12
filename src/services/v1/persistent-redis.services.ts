@@ -11,7 +11,7 @@ export const incrementLikesCommentCount = async ({
   countType: "likesCount" | "commentsCount";
 }) => {
   try {
-    const hashKey = `${entity}:${id}`;
+    const hashKey = `${entity}:${id}:counter`;
     const result = await persistentRedisClient.hIncrBy(hashKey, countType, 1);
 
     return result;
@@ -28,7 +28,7 @@ export const getLikesCommentCount = async ({
   id: string;
 }) => {
   try {
-    const hashKey = `${entity}:${id}`;
+    const hashKey = `${entity}:${id}:counter`;
     const result = await persistentRedisClient.hGetAll(hashKey);
 
     return {
