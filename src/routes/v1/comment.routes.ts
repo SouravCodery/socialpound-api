@@ -18,4 +18,10 @@ commentRouter.post(
   commentController.addComment
 );
 
+commentRouter.post(
+  "/post/:postId",
+  validate(commentValidationSchemas.getCommentsByPostIdValidatorSchema),
+  commentController.getCommentsByPostId
+);
+
 export default commentRouter;
