@@ -15,3 +15,12 @@ export const addCommentValidatorSchema = {
     text: Joi.string().trim().max(2200).required(),
   }),
 };
+
+export const getCommentsByPostIdValidatorSchema = {
+  paramsSchema: Joi.object({
+    postId: Joi.string().alphanum().length(24).required(),
+  }),
+  querySchema: Joi.object({
+    cursor: Joi.string().alphanum().optional(),
+  }),
+};
