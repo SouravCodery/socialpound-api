@@ -10,9 +10,6 @@ export interface CommentInterface {
   user: ObjectId;
 
   text: string;
-
-  likesCount: number;
-  repliesCount: number;
 }
 
 export interface CommentDocumentInterface
