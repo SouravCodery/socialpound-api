@@ -1,3 +1,4 @@
+import { FilterQuery } from "mongoose";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
 
@@ -7,7 +8,10 @@ import Comment from "../../models/comment.model";
 import Post from "../../models/post.model";
 import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 
-import { CommentInterface } from "./../../interfaces/comment.interface";
+import {
+  CommentDocumentInterface,
+  CommentInterface,
+} from "./../../interfaces/comment.interface";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -113,5 +117,55 @@ export const addComment = async ({
     }
 
     throw new HttpError(500, "Something went wrong in comment addition");
+  }
+};
+
+export const getCommentsByPostId = async ({
+  postId,
+  cursor,
+}: {
+  postId: string;
+  cursor?: string;
+}) => {
+  try {
+    const query: FilterQuery<CommentInterface> = {
+      post: postId,
+      commentOn: "Post",
+      isDeleted: false,
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    const comments = await Comment.find(query)
+      .limit(10)
+      .sort({ _id: -1 })
+      .populate("user", "userName profilePicture")
+      .lean();
+
+    const nextCursor = comments.length
+      ? comments[comments.length - 1]._id.toString()
+      : null;
+
+    return new HttpResponse({
+      status: 200,
+      message: "Comments fetched successfully",
+      data: {
+        comments,
+        nextCursor,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: getCommentsByPostId] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in fetching comments");
   }
 };
