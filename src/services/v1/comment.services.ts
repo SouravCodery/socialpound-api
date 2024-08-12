@@ -9,9 +9,10 @@ import Post from "../../models/post.model";
 import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 
 import {
-  CommentDocumentInterface,
   CommentInterface,
+  CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
+import { persistentRedisClient } from "../../config/redis-persistent.config";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -120,6 +121,58 @@ export const addComment = async ({
   }
 };
 
+const getMultipleCommentsCounters = async ({
+  comments,
+}: {
+  comments: CommentWithIdInterface[];
+}) => {
+  try {
+    const multi = persistentRedisClient.multi();
+
+    comments.forEach((comment) => {
+      multi.hGetAll(`Comment:${comment?._id}:counter`);
+    });
+
+    let counters = await multi.exec();
+    return counters;
+  } catch (error) {
+    logger.error("[Service: getCommentCounters] - Something went wrong", error);
+
+    return [];
+  }
+};
+
+const getCommentsWithCounters = async ({
+  comments,
+}: {
+  comments: CommentWithIdInterface[];
+}) => {
+  try {
+    const counters = await getMultipleCommentsCounters({ comments });
+    const commentsWithCounters = comments.map((comment, index) => {
+      const count = (counters?.[index] ?? {}) as {
+        likesCount: string;
+        commentsCount: string;
+      };
+
+      return {
+        ...comment,
+        likesCount: Number(count?.likesCount ?? 0),
+        commentsCount: Number(count?.commentsCount ?? 0),
+      };
+    });
+
+    return commentsWithCounters;
+  } catch (error) {
+    logger.error(
+      "[Service: getCommentsWithCounters] - Something went wrong",
+      error
+    );
+
+    return null;
+  }
+};
+
 export const getCommentsByPostId = async ({
   postId,
   cursor,
@@ -128,6 +181,7 @@ export const getCommentsByPostId = async ({
   cursor?: string;
 }) => {
   try {
+    //todo: Caching and Bringing likesCount and repliesCount from Redis
     const query: FilterQuery<CommentInterface> = {
       post: postId,
       commentOn: "Post",
@@ -148,11 +202,14 @@ export const getCommentsByPostId = async ({
       ? comments[comments.length - 1]._id.toString()
       : null;
 
+    const commentsWithCounters =
+      (await getCommentsWithCounters({ comments })) ?? comments;
+
     return new HttpResponse({
       status: 200,
       message: "Comments fetched successfully",
       data: {
-        comments,
+        comments: commentsWithCounters,
         nextCursor,
       },
     });
