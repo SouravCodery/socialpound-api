@@ -7,10 +7,12 @@ export const validate = ({
   bodySchema,
   headersSchema,
   querySchema,
+  paramsSchema,
 }: {
   bodySchema?: Joi.ObjectSchema;
   headersSchema?: Joi.ObjectSchema;
   querySchema?: Joi.ObjectSchema;
+  paramsSchema?: Joi.ObjectSchema;
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -35,6 +37,15 @@ export const validate = ({
       if (querySchema) {
         const { error, value } = querySchema.validate(req.query);
         req.query = value;
+
+        if (error) {
+          return next(new HttpError(422, error.details[0].message));
+        }
+      }
+
+      if (paramsSchema) {
+        const { error, value } = paramsSchema.validate(req.params);
+        req.params = value;
 
         if (error) {
           return next(new HttpError(422, error.details[0].message));
