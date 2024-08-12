@@ -4,6 +4,7 @@ import { bullMQConnection } from "../../../config/bull-mq.config";
 import { addComment } from "../../../services/v1/comment.services";
 
 import { logger } from "../../../logger/index.logger";
+import { incrementLikesCommentCount } from "../../../services/v1/persistent-redis.services";
 
 export const commentWorker = new Worker(
   "comment",
@@ -24,6 +25,26 @@ export const commentWorker = new Worker(
         user,
         text,
       });
+
+      const redisOperations = [
+        incrementLikesCommentCount({
+          entity: "Post",
+          id: post,
+          countType: "commentsCount",
+        }),
+      ];
+
+      if (commentOn === "Comment") {
+        redisOperations.push(
+          incrementLikesCommentCount({
+            entity: "Comment",
+            id: parentComment,
+            countType: "commentsCount",
+          })
+        );
+      }
+
+      await Promise.all(redisOperations);
     } catch (error) {
       logger.error("Error in comment worker", error);
       throw error;
