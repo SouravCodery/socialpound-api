@@ -4,7 +4,7 @@ import { bullMQConnection } from "../../../config/bull-mq.config";
 import { addComment } from "../../../services/v1/comment.services";
 
 import { logger } from "../../../logger/index.logger";
-import { incrementLikesCommentCount } from "../../../services/v1/persistent-redis.services";
+import { incrementLikeOrCommentCount } from "../../../services/v1/persistent-redis.services";
 
 export const commentWorker = new Worker(
   "comment",
@@ -27,7 +27,7 @@ export const commentWorker = new Worker(
       });
 
       const redisOperations = [
-        incrementLikesCommentCount({
+        incrementLikeOrCommentCount({
           entity: "Post",
           id: post,
           countType: "commentsCount",
@@ -36,7 +36,7 @@ export const commentWorker = new Worker(
 
       if (commentOn === "Comment") {
         redisOperations.push(
-          incrementLikesCommentCount({
+          incrementLikeOrCommentCount({
             entity: "Comment",
             id: parentComment,
             countType: "commentsCount",

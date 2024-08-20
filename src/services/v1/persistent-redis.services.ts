@@ -1,7 +1,7 @@
 import { persistentRedisClient } from "../../config/redis-persistent.config";
 import { logger } from "../../logger/index.logger";
 
-export const incrementLikesCommentCount = async ({
+export const incrementLikeOrCommentCount = async ({
   entity,
   id,
   countType,
