@@ -176,9 +176,11 @@ const getCommentsWithCounters = async ({
 export const getCommentsByPostId = async ({
   postId,
   cursor,
+  limit = 10,
 }: {
   postId: string;
   cursor?: string;
+  limit?: number;
 }) => {
   try {
     //todo: Caching and Bringing likesCount and repliesCount from Redis
@@ -193,7 +195,7 @@ export const getCommentsByPostId = async ({
     }
 
     const comments = await Comment.find(query)
-      .limit(10)
+      .limit(limit)
       .sort({ _id: -1 })
       .populate("user", "userName profilePicture")
       .lean();
