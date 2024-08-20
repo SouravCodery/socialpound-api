@@ -13,13 +13,15 @@
   "license": "ISC",
   "dependencies": {
     "@types/mongoose": "^5.11.97",
+    "bullmq": "^5.12.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.19.2",
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
-    "mongoose-unique-validator": "^5.0.0"
+    "mongoose-unique-validator": "^5.0.0",
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

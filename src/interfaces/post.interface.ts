@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Document, ObjectId } from "mongoose";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
 interface ContentInterface {
@@ -7,7 +7,7 @@ interface ContentInterface {
 }
 
 export interface PostInterface {
-  user: Types.ObjectId;
+  user: ObjectId;
   content: ContentInterface[];
   caption: string;
   likesCount: number;
