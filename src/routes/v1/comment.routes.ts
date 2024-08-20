@@ -24,4 +24,11 @@ commentRouter.post(
   commentController.getCommentsByPostId
 );
 
+//todo: Add getCommentsByCommentId
+// commentRouter.post(
+//   "/replies/:commentId",
+//   validate(commentValidationSchemas.addCommentValidatorSchema),
+//   commentController.getCommentsByCommentId
+// );
+
 export default commentRouter;
