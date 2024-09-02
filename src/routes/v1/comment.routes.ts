@@ -18,7 +18,7 @@ commentRouter.post(
   commentController.addComment
 );
 
-commentRouter.post(
+commentRouter.get(
   "/post/:postId",
   validate(commentValidationSchemas.getCommentsByPostIdValidatorSchema),
   commentController.getCommentsByPostId
