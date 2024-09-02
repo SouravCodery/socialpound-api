@@ -197,12 +197,13 @@ export const getCommentsByPostId = async ({
     const comments = await Comment.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "userName profilePicture")
+      .populate("user", "username profilePicture")
       .lean();
 
-    const nextCursor = comments.length
-      ? comments[comments.length - 1]._id.toString()
-      : null;
+    const nextCursor =
+      comments.length >= limit
+        ? comments[comments.length - 1]._id.toString()
+        : null;
 
     const commentsWithCounters =
       (await getCommentsWithCounters({ comments })) ?? comments;
