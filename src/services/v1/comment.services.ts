@@ -200,9 +200,10 @@ export const getCommentsByPostId = async ({
       .populate("user", "username profilePicture")
       .lean();
 
-    const nextCursor = comments.length
-      ? comments[comments.length - 1]._id.toString()
-      : null;
+    const nextCursor =
+      comments.length >= limit
+        ? comments[comments.length - 1]._id.toString()
+        : null;
 
     const commentsWithCounters =
       (await getCommentsWithCounters({ comments })) ?? comments;
