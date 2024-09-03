@@ -54,4 +54,7 @@ export const Config = {
 
   REDIS_BULL_MQ_HOST: getEnvironmentVariable("REDIS_BULL_MQ_HOST", "string"),
   REDIS_BULL_MQ_PORT: getEnvironmentVariable("REDIS_BULL_MQ_PORT", "number"),
+
+  AWS_REGION: getEnvironmentVariable("AWS_REGION", "string"),
+  AWS_BUCKET_NAME: getEnvironmentVariable("AWS_BUCKET_NAME", "string"),
 } as const;
