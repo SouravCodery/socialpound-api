@@ -12,6 +12,8 @@
   "author": "Sourav Choudhary | @SouravCodery",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.637.0",
+    "@aws-sdk/s3-request-presigner": "^3.637.0",
     "@types/mongoose": "^5.11.97",
     "bullmq": "^5.12.3",
     "cors": "^2.8.5",

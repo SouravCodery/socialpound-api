@@ -6,7 +6,8 @@ export const createPostValidatorSchema = {
       .items(
         Joi.object({
           type: Joi.string().valid("image", "video").required(),
-          url: Joi.string().trim().uri().required(),
+          url: Joi.string().trim().required(),
+          aspectRatio: Joi.number().required().default(1).min(0.33).max(3),
         })
       )
       .required()

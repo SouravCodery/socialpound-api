@@ -4,6 +4,7 @@ import { SoftDeleteInterface } from "./soft-delete.interface";
 interface ContentInterface {
   type: "image" | "video";
   url: string;
+  aspectRatio: number;
 }
 
 export interface PostInterface {
