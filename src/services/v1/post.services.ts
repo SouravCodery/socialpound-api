@@ -1,10 +1,15 @@
+import { FilterQuery } from "mongoose";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
 
 import { logger } from "../../logger/index.logger";
 import Post from "../../models/post.model";
 
-import { PostInterface } from "./../../interfaces/post.interface";
+import {
+  PostInterface,
+  PostWithIdInterface,
+} from "./../../interfaces/post.interface";
+import { persistentRedisClient } from "../../config/redis-persistent.config";
 
 export const createPost = async ({
   user,
@@ -39,26 +44,108 @@ export const createPost = async ({
   }
 };
 
-export const getAllPosts = async () => {
+const getMultiplePostsCounters = async ({
+  posts,
+}: {
+  posts: PostWithIdInterface[];
+}) => {
   try {
-    const posts = await Post.find()
+    const multi = persistentRedisClient.multi();
+
+    posts.forEach((post) => {
+      multi.hGetAll(`Post:${post?._id}:counter`);
+    });
+
+    let counters = await multi.exec();
+    return counters;
+  } catch (error) {
+    logger.error("[Service: getCommentCounters] - Something went wrong", error);
+
+    return [];
+  }
+};
+
+const getPostsWithCounters = async ({
+  posts,
+}: {
+  posts: PostWithIdInterface[];
+}) => {
+  try {
+    const counters = await getMultiplePostsCounters({ posts });
+    const postsWithCounters = posts.map((post, index) => {
+      const count = (counters?.[index] ?? {}) as {
+        likesCount: string;
+        commentsCount: string;
+      };
+
+      return {
+        ...post,
+        likesCount: Number(count?.likesCount ?? 0),
+        commentsCount: Number(count?.commentsCount ?? 0),
+      };
+    });
+
+    return postsWithCounters;
+  } catch (error) {
+    logger.error(
+      "[Service: getPostsWithCounters] - Something went wrong",
+      error
+    );
+
+    return null;
+  }
+};
+
+export const getPosts = async ({
+  userId,
+  cursor,
+  limit = 10,
+}: {
+  userId?: string;
+  cursor?: string;
+  limit?: number;
+}) => {
+  try {
+    //todo: Caching
+    const query: FilterQuery<PostInterface> = {
+      isDeleted: false,
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    if (userId) {
+      query.user = userId;
+    }
+
+    const posts = await Post.find(query)
+      .limit(limit)
+      .sort({ _id: -1 })
       .populate("user", "username profilePicture -_id")
       .select("-createdAt -updatedAt -__v")
       .lean();
 
+    const nextCursor =
+      posts.length >= limit ? posts[posts.length - 1]._id.toString() : null;
+
+    const postsWithCounters = (await getPostsWithCounters({ posts })) ?? posts;
+
     return new HttpResponse({
       status: 200,
       message: "Posts fetched successfully",
-
-      data: posts,
+      data: {
+        posts: postsWithCounters,
+        nextCursor,
+      },
     });
   } catch (error) {
-    logger.error("[Service: getAllPosts] - Something went wrong", error);
+    logger.error("[Service: getPosts] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in fetching all the posts");
+    throw new HttpError(500, "Something went wrong in fetching posts");
   }
 };
