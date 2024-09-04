@@ -16,3 +16,9 @@ export const createPostValidatorSchema = {
     caption: Joi.string().trim().max(2200).default(""),
   }),
 };
+
+export const getUserFeedValidatorSchema = {
+  querySchema: Joi.object({
+    cursor: Joi.string().alphanum().optional(),
+  }),
+};
