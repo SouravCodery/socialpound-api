@@ -22,3 +22,12 @@ export const getUserFeedValidatorSchema = {
     cursor: Joi.string().alphanum().optional(),
   }),
 };
+
+export const getPostsByUserIdValidatorSchema = {
+  paramsSchema: Joi.object({
+    userId: Joi.string().alphanum().length(24).required(),
+  }),
+  querySchema: Joi.object({
+    cursor: Joi.string().alphanum().optional(),
+  }),
+};
