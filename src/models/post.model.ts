@@ -17,6 +17,7 @@ const postSchema: Schema<PostDocumentInterface> = new Schema(
           required: true,
         },
         url: { type: String, required: true },
+        aspectRatio: { type: Number, required: true, default: 1 },
       },
     ],
 
