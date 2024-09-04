@@ -24,4 +24,10 @@ postRouter.get(
   postController.getUserFeed
 );
 
+postRouter.get(
+  "/:userId",
+  validate(postValidationSchemas.getPostsByUserIdValidatorSchema),
+  postController.getPostsByUserId
+);
+
 export default postRouter;
