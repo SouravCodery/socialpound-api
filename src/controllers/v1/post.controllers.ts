@@ -56,4 +56,38 @@ const getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createPost, getUserFeed };
+const getPostsByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.params.userId;
+    const { cursor } = req.query;
+
+    const posts = await postServices.getPosts({
+      userId,
+      cursor: cursor?.toString(),
+    });
+
+    return res.status(posts.getStatus()).json(posts.getResponse());
+  } catch (error) {
+    logger.error(
+      "[Controller: getPostsByUserId] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(
+        500,
+        "[Controller: getPostsByUserId] - Something went wrong"
+      )
+    );
+  }
+};
+
+export { createPost, getUserFeed, getPostsByUserId };
