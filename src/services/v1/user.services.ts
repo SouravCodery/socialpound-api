@@ -137,3 +137,33 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
     throw error;
   }
 };
+
+export const getUserByUsername = async ({ username }: { username: string }) => {
+  try {
+    const user = await UserModel.findOne({
+      username,
+    })
+      .select(
+        "username email fullName bio profilePicture bio postsCount followersCount followingCount"
+      )
+      .lean<UserWithIdInterface>();
+
+    if (!user) {
+      throw new HttpError(404, "User not found");
+    }
+
+    return new HttpResponse({
+      status: 200,
+      data: { user },
+      message: "User fetched successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: getUserByUsername] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in getting user");
+  }
+};
