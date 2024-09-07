@@ -176,7 +176,7 @@ const getCommentsWithCounters = async ({
 export const getCommentsByPostId = async ({
   postId,
   cursor,
-  limit = 10,
+  limit = 20,
 }: {
   postId: string;
   cursor?: string;
