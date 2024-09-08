@@ -8,3 +8,9 @@ export const signInValidatorSchema = {
     authorization: Joi.string().required(),
   }).unknown(),
 };
+
+export const getUserValidatorSchema = {
+  paramsSchema: Joi.object({
+    username: Joi.string().required(),
+  }),
+};

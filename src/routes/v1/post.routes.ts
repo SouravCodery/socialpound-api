@@ -18,6 +18,16 @@ postRouter.post(
   postController.createPost
 );
 
-postRouter.get("/", postController.getAllPosts);
+postRouter.get(
+  "/",
+  validate(postValidationSchemas.getUserFeedValidatorSchema),
+  postController.getUserFeed
+);
+
+postRouter.get(
+  "/:userId",
+  validate(postValidationSchemas.getPostsByUserIdValidatorSchema),
+  postController.getPostsByUserId
+);
 
 export default postRouter;

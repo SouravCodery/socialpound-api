@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "mongoose";
+import { Document, ObjectId, Types } from "mongoose";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
 interface ContentInterface {
@@ -19,3 +19,7 @@ export interface PostDocumentInterface
   extends Document,
     PostInterface,
     SoftDeleteInterface {}
+
+export interface PostWithIdInterface extends PostInterface {
+  _id: Types.ObjectId;
+}
