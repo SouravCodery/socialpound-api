@@ -7,7 +7,8 @@ interface LikeInterface {
   post: ObjectId;
   comment: ObjectId | null;
 
-  user: ObjectId;
+  author: ObjectId;
+  liker: ObjectId;
 }
 
 export interface LikeDocumentInterface
