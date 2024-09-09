@@ -18,4 +18,10 @@ likeRouter.post(
   likeController.likePostOrComment
 );
 
+likeRouter.get(
+  "/post/:postId",
+  validate(likeValidationSchemas.getLikesByPostIdValidatorSchema),
+  likeController.getLikesByPostId
+);
+
 export default likeRouter;
