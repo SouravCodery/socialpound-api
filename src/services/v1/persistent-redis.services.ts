@@ -20,22 +20,56 @@ export const incrementLikeOrCommentCount = async ({
   }
 };
 
-export const getLikesCommentCount = async ({
-  entity,
-  id,
+export const incrementLikeOrCommentCountInBulk = async ({
+  entityType,
+  ids,
+  countType,
 }: {
-  entity: "Post" | "Comment";
-  id: string;
+  entityType: "Post" | "Comment";
+  ids: string[];
+  countType: "likesCount" | "commentsCount";
 }) => {
   try {
-    const hashKey = `${entity}:${id}:counter`;
-    const result = await persistentRedisClient.hGetAll(hashKey);
+    const multi = persistentRedisClient.multi();
 
-    return {
-      likesCount: Number(result.likesCount ?? 0),
-      commentsCount: Number(result.commentsCount ?? 0),
-    };
+    ids.forEach((id) => {
+      const hashKey = `${entityType}:${id}:counter`;
+      multi.hIncrBy(hashKey, countType, 1);
+    });
+
+    const incrementResult = await multi.exec();
+    return incrementResult;
   } catch (error) {
-    logger.error("[Service: getCount] - Something went wrong", error);
+    logger.error(
+      "[Service: incrementLikeOrCommentCountInBulk] - Something went wrong",
+      error
+    );
+  }
+};
+
+export const getLikeAndCommentsCountInBulk = async ({
+  entityType,
+  ids,
+}: {
+  entityType: "Post" | "Comment";
+  ids: string[];
+}) => {
+  try {
+    const multi = persistentRedisClient.multi();
+
+    ids.forEach((id) => {
+      const hashKey = `${entityType}:${id}:counter`;
+      multi.hGetAll(hashKey);
+    });
+
+    let counters = await multi.exec();
+    return counters;
+  } catch (error) {
+    logger.error(
+      "[Service: getLikeAndCommentsCountInBulk] - Something went wrong",
+      error
+    );
+
+    return [];
   }
 };
