@@ -1,10 +1,13 @@
 import { Worker } from "bullmq";
 
 import { bullMQConnection } from "../../../config/bull-mq.config";
-import { addComment } from "../../../services/v1/comment.services";
+import { addCommentsOnPosts } from "../../../services/v1/comment.services";
 
 import { logger } from "../../../logger/index.logger";
-import { incrementLikeOrCommentCount } from "../../../services/v1/persistent-redis.services";
+import { JobBatch } from "../../../classes/job-batch.class";
+import { CommentInterface } from "../../../interfaces/comment.interface";
+
+const commentOnPostBatch = new JobBatch<CommentInterface>({});
 
 export const commentWorker = new Worker(
   "comment",
@@ -12,39 +15,14 @@ export const commentWorker = new Worker(
     try {
       const jobName = job.name;
 
-      if (jobName !== "add-comment") {
-        return;
+      switch (jobName) {
+        case "comment-on-Post":
+          commentOnPostBatch.addJob({ job: job.data });
+          break;
+
+        default:
+          break;
       }
-
-      const { commentOn, post, parentComment, user, text } = job.data;
-
-      await addComment({
-        commentOn,
-        post,
-        parentComment,
-        user,
-        text,
-      });
-
-      const redisOperations = [
-        incrementLikeOrCommentCount({
-          entity: "Post",
-          id: post,
-          countType: "commentsCount",
-        }),
-      ];
-
-      if (commentOn === "Comment") {
-        redisOperations.push(
-          incrementLikeOrCommentCount({
-            entity: "Comment",
-            id: parentComment,
-            countType: "commentsCount",
-          })
-        );
-      }
-
-      await Promise.all(redisOperations);
     } catch (error) {
       logger.error("Error in comment worker", error);
       throw error;
@@ -54,6 +32,23 @@ export const commentWorker = new Worker(
     connection: bullMQConnection,
   }
 );
+
+export const commentOnPostBatchTimeout = setInterval(async () => {
+  try {
+    const jobsToBeProcessed = commentOnPostBatch.getJobs();
+
+    if (jobsToBeProcessed.length <= 0) {
+      console.log("Nothing to process: commentOnPostBatch");
+      commentOnPostBatch.processingEnd();
+      return;
+    }
+
+    await addCommentsOnPosts({ comments: jobsToBeProcessed });
+    commentOnPostBatch.processingEnd();
+  } catch (error) {
+    logger.error("Error in commentOnPostBatch processor", error);
+  }
+}, 2000);
 
 commentWorker.on("completed", (job) => {
   logger.info(`[Worker: commentWorker] - ${job.name} ${job.id} has completed!`);
