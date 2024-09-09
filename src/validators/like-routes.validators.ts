@@ -11,3 +11,12 @@ export const likePostOrCommentValidatorSchema = {
     }),
   }),
 };
+
+export const getLikesByPostIdValidatorSchema = {
+  paramsSchema: Joi.object({
+    postId: Joi.string().alphanum().length(24).required(),
+  }),
+  querySchema: Joi.object({
+    cursor: Joi.string().alphanum().length(24).optional(),
+  }),
+};
