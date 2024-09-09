@@ -12,7 +12,7 @@ import {
   CommentInterface,
   CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
-import { persistentRedisClient } from "../../config/redis-persistent.config";
+import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -121,34 +121,17 @@ export const addComment = async ({
   }
 };
 
-const getMultipleCommentsCounters = async ({
-  comments,
-}: {
-  comments: CommentWithIdInterface[];
-}) => {
-  try {
-    const multi = persistentRedisClient.multi();
-
-    comments.forEach((comment) => {
-      multi.hGetAll(`Comment:${comment?._id}:counter`);
-    });
-
-    let counters = await multi.exec();
-    return counters;
-  } catch (error) {
-    logger.error("[Service: getCommentCounters] - Something went wrong", error);
-
-    return [];
-  }
-};
-
 const getCommentsWithCounters = async ({
   comments,
 }: {
   comments: CommentWithIdInterface[];
 }) => {
   try {
-    const counters = await getMultipleCommentsCounters({ comments });
+    const counters = await getLikeAndCommentsCountInBulk({
+      entityType: "Comment",
+      ids: comments.map((comment) => comment._id.toString()),
+    });
+
     const commentsWithCounters = comments.map((comment, index) => {
       const count = (counters?.[index] ?? {}) as {
         likesCount: string;
