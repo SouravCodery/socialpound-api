@@ -12,6 +12,7 @@ import {
   LikeDocumentInterface,
   LikeInterface,
 } from "../../interfaces/like.interface";
+import { incrementLikeOrCommentCountInBulk } from "./persistent-redis.services";
 
 export const addLikeToQueue = async ({
   likeOn,
@@ -53,7 +54,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
   try {
     const postExists = await Post.find({
       _id: { $in: likes.map((like) => like.post) },
-      isDeleted: { $ne: true },
+      isDeleted: false,
     }).select("_id");
 
     const existingPostsSet = new Set(
@@ -70,7 +71,6 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
         ordered: false,
       });
     } catch (error: any) {
-      console.log(error);
       if (error?.insertedDocs) {
         successfullyInsertedLikes = error?.insertedDocs;
       }
@@ -80,10 +80,15 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
       like.post.toString()
     );
 
+    await incrementLikeOrCommentCountInBulk({
+      entityType: "Post",
+      ids: postIsForCounterIncrements,
+      countType: "likesCount",
+    });
+
     return new HttpResponse({
       status: 201,
       message: "Likes added successfully",
-      data: successfullyInsertedLikes,
     });
   } catch (error) {
     logger.error("[Service: likePosts] - Something went wrong", error);
