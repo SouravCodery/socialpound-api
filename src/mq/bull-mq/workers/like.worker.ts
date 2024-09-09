@@ -38,7 +38,7 @@ export const likePostBatchTimeout = setInterval(async () => {
     const jobsToBeProcessed = likePostBatch.getJobs();
 
     if (jobsToBeProcessed.length <= 0) {
-      console.log("Nothing to process");
+      console.log("Nothing to process: likePostBatch");
       likePostBatch.processingEnd();
       return;
     }
