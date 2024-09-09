@@ -9,7 +9,8 @@ import {
   PostInterface,
   PostWithIdInterface,
 } from "./../../interfaces/post.interface";
-import { persistentRedisClient } from "../../config/redis-persistent.config";
+
+import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
 
 export const createPost = async ({
   user,
@@ -44,34 +45,17 @@ export const createPost = async ({
   }
 };
 
-const getMultiplePostsCounters = async ({
-  posts,
-}: {
-  posts: PostWithIdInterface[];
-}) => {
-  try {
-    const multi = persistentRedisClient.multi();
-
-    posts.forEach((post) => {
-      multi.hGetAll(`Post:${post?._id}:counter`);
-    });
-
-    let counters = await multi.exec();
-    return counters;
-  } catch (error) {
-    logger.error("[Service: getCommentCounters] - Something went wrong", error);
-
-    return [];
-  }
-};
-
 const getPostsWithCounters = async ({
   posts,
 }: {
   posts: PostWithIdInterface[];
 }) => {
   try {
-    const counters = await getMultiplePostsCounters({ posts });
+    const counters = await getLikeAndCommentsCountInBulk({
+      entityType: "Post",
+      ids: posts.map((post) => post._id.toString()),
+    });
+
     const postsWithCounters = posts.map((post, index) => {
       const count = (counters?.[index] ?? {}) as {
         likesCount: string;
