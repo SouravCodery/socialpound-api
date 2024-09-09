@@ -12,7 +12,10 @@ import {
   CommentInterface,
   CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
-import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
+import {
+  getLikeAndCommentsCountInBulk,
+  incrementLikeOrCommentCountInBulk,
+} from "./persistent-redis.services";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -32,7 +35,7 @@ export const addCommentToQueue = async ({
   text: CommentInterface["text"];
 }) => {
   try {
-    await commentQueue.add("add-comment", {
+    await commentQueue.add(`comment-on-${commentOn}`, {
       commentOn,
 
       post,
@@ -57,67 +60,61 @@ export const addCommentToQueue = async ({
   }
 };
 
-export const addComment = async ({
-  commentOn,
-
-  post,
-  parentComment,
-  user,
-
-  text,
+export const addCommentsOnPosts = async ({
+  comments,
 }: {
-  commentOn: CommentInterface["commentOn"];
-
-  post: CommentInterface["post"];
-  parentComment: CommentInterface["parentComment"];
-  user: CommentInterface["user"];
-
-  text: CommentInterface["text"];
+  comments: CommentInterface[];
 }) => {
   try {
-    const postExists = await Post.exists({ _id: post, isDeleted: false });
+    const postExists = await Post.find({
+      _id: { $in: comments.map((comment) => comment.post) },
+      isDeleted: false,
+    }).select("_id");
 
-    if (!postExists) {
-      throw new HttpError(404, "Post not found");
+    const existingPostsSet = new Set(
+      postExists.map((post) => post._id.toString())
+    );
+
+    const commentsToBeInserted = comments.filter((comment) =>
+      existingPostsSet.has(comment.post.toString())
+    );
+
+    let successfullyInsertedComments: CommentInterface[] = [];
+    try {
+      successfullyInsertedComments = await Comment.insertMany(
+        commentsToBeInserted,
+        {
+          ordered: false,
+        }
+      );
+    } catch (error: any) {
+      if (error?.insertedDocs) {
+        successfullyInsertedComments = error?.insertedDocs;
+      }
     }
 
-    if (commentOn === "Comment") {
-      const parentCommentExists = await Comment.findOne({
-        _id: parentComment,
-        isDeleted: false,
-      }).select("commentOn");
+    const postIsForCounterIncrements = successfullyInsertedComments.map(
+      (comment) => comment.post.toString()
+    );
 
-      if (!parentCommentExists) {
-        throw new HttpError(404, "Parent comment not found");
-      }
-
-      if (parentCommentExists.commentOn !== "Post") {
-        throw new HttpError(400, "Reply to a comment reply is not allowed");
-      }
-    }
-
-    const newComment = new Comment({
-      commentOn,
-      post,
-      parentComment,
-      user,
-      text,
+    await incrementLikeOrCommentCountInBulk({
+      entityType: "Post",
+      ids: postIsForCounterIncrements,
+      countType: "commentsCount",
     });
-
-    await newComment.save();
 
     return new HttpResponse({
       status: 201,
-      message: "Comment added successfully",
+      message: "Comments added successfully",
     });
   } catch (error) {
-    logger.error("[Service: addComment] - Something went wrong", error);
+    logger.error("[Service: addCommentsOnPosts] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in comment addition");
+    throw new HttpError(500, "Something went wrong while adding comments");
   }
 };
 
