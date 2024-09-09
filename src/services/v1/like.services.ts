@@ -1,3 +1,4 @@
+import { FilterQuery } from "mongoose";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
 
@@ -92,5 +93,54 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
     }
 
     throw new HttpError(500, "Something went wrong in liking post");
+  }
+};
+
+export const getLikesByPostId = async ({
+  postId,
+  cursor,
+  limit = 20,
+}: {
+  postId: string;
+  cursor?: string;
+  limit?: number;
+}) => {
+  try {
+    const query: FilterQuery<LikeInterface> = {
+      post: postId,
+      likeOn: "Post",
+      isDeleted: false,
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    const likes = await Like.find(query)
+      .limit(limit)
+      .sort({ _id: -1 })
+      .populate("liker", "username profilePicture")
+      .select("liker")
+      .lean();
+
+    const nextCursor =
+      likes.length >= limit ? likes[likes.length - 1]._id.toString() : null;
+
+    return new HttpResponse({
+      status: 200,
+      message: "Likes fetched successfully",
+      data: {
+        likes,
+        nextCursor,
+      },
+    });
+  } catch (error) {
+    logger.error("[Service: getLikesByPostId] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in fetching comments");
   }
 };
