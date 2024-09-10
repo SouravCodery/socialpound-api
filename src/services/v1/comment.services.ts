@@ -177,7 +177,7 @@ export const getCommentsByPostId = async ({
     const comments = await Comment.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "username profilePicture")
+      .populate("user", "username fullName profilePicture -_id")
       .lean();
 
     const nextCursor =

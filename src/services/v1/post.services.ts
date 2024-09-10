@@ -106,7 +106,7 @@ export const getPosts = async ({
     const posts = await Post.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "username profilePicture -_id")
+      .populate("user", "username fullName profilePicture -_id")
       .select("-createdAt -updatedAt -__v")
       .lean();
 
