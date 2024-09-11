@@ -18,7 +18,7 @@
     "bullmq": "^5.12.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
-    "express": "^4.20.0",
+    "express": "^5.0.0",
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
