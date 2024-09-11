@@ -20,3 +20,9 @@ export const getLikesByPostIdValidatorSchema = {
     cursor: Joi.string().alphanum().length(24).optional(),
   }),
 };
+
+export const unlikePostValidatorSchema = {
+  paramsSchema: Joi.object({
+    postId: Joi.string().alphanum().length(24).required(),
+  }),
+};

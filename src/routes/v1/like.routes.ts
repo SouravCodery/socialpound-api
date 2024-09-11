@@ -26,4 +26,10 @@ likeRouter.get(
   likeController.getLikesByPostId
 );
 
+likeRouter.delete(
+  "/post/:postId",
+  validate(likeValidationSchemas.unlikePostValidatorSchema),
+  likeController.unlikePost
+);
+
 export default likeRouter;

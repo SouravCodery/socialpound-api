@@ -1,40 +1,23 @@
 import { persistentRedisClient } from "../../config/redis-persistent.config";
 import { logger } from "../../logger/index.logger";
 
-export const incrementLikeOrCommentCount = async ({
-  entity,
-  id,
-  countType,
-}: {
-  entity: "Post" | "Comment";
-  id: string;
-  countType: "likesCount" | "commentsCount";
-}) => {
-  try {
-    const hashKey = `${entity}:${id}:counter`;
-    const result = await persistentRedisClient.hIncrBy(hashKey, countType, 1);
-
-    return result;
-  } catch (error) {
-    logger.error("[Service: incrementCount] - Something went wrong", error);
-  }
-};
-
 export const incrementLikeOrCommentCountInBulk = async ({
   entityType,
   ids,
   countType,
+  incrementBy = 1,
 }: {
   entityType: "Post" | "Comment";
   ids: string[];
   countType: "likesCount" | "commentsCount";
+  incrementBy?: number;
 }) => {
   try {
     const multi = persistentRedisClient.multi();
 
     ids.forEach((id) => {
       const hashKey = `${entityType}:${id}:counter`;
-      multi.hIncrBy(hashKey, countType, 1);
+      multi.hIncrBy(hashKey, countType, incrementBy);
     });
 
     const incrementResult = await multi.exec();
