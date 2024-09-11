@@ -207,17 +207,19 @@ export const unlikePost = async ({
       likeOn: "Post",
     };
 
-    await Like.deleteOne(query);
+    const result = await Like.deleteOne(query);
 
-    await incrementLikeOrCommentCountInBulk({
-      entityType: "Post",
-      ids: [post],
-      countType: "likesCount",
-      incrementBy: -1,
-    });
+    if (result.deletedCount === 1) {
+      await incrementLikeOrCommentCountInBulk({
+        entityType: "Post",
+        ids: [post],
+        countType: "likesCount",
+        incrementBy: -1,
+      });
+    }
 
     return new HttpResponse({
-      status: 201,
+      status: 200,
       message: "Post unlike successful",
     });
   } catch (error) {
