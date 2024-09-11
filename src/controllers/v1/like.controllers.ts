@@ -108,3 +108,35 @@ export const getPostsLikedByUser = async (
     );
   }
 };
+
+export const unlikePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const liker = (
+      req as AuthenticatedUserRequestInterface
+    ).user._id.toString();
+    const { postId } = req.params;
+
+    const likePostResponse = await likeServices.unlikePost({
+      post: postId,
+      liker,
+    });
+
+    return res
+      .status(likePostResponse.getStatus())
+      .json(likePostResponse.getResponse());
+  } catch (error) {
+    logger.error("[Controller: unlikePost] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(500, "[Controller: unlikePost] - Something went wrong")
+    );
+  }
+};
