@@ -40,13 +40,16 @@ export const addLikeToQueue = async ({
       message: "Like addition request added to the queue",
     });
   } catch (error) {
-    logger.error("[Service: addLike] - Something went wrong", error);
+    logger.error("[Service: addLikeToQueue] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in comment addition");
+    throw new HttpError(
+      500,
+      "[Service: addLikeToQueue] - Something went wrong"
+    );
   }
 };
 
@@ -97,7 +100,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in liking post");
+    throw new HttpError(500, "[Service: likePosts] - Something went wrong");
   }
 };
 
@@ -146,7 +149,10 @@ export const getLikesByPostId = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in fetching comments");
+    throw new HttpError(
+      500,
+      "[Service: getLikesByPostId] - Something went wrong"
+    );
   }
 };
 
@@ -174,15 +180,53 @@ export const getPostLikedByUser = async ({ user }: { user: string }) => {
       },
     });
   } catch (error) {
-    logger.error(
-      "[Service: getPostLikesByUserId] - Something went wrong",
-      error
-    );
+    logger.error("[Service: getPostLikedByUser] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in fetching comments");
+    throw new HttpError(
+      500,
+      "[Service: getPostLikedByUser] - Something went wrong"
+    );
+  }
+};
+
+export const unlikePost = async ({
+  post,
+  liker,
+}: {
+  post: string;
+  liker: string;
+}) => {
+  try {
+    const query: FilterQuery<LikeInterface> = {
+      post,
+      liker,
+      likeOn: "Post",
+    };
+
+    await Like.deleteOne(query);
+
+    await incrementLikeOrCommentCountInBulk({
+      entityType: "Post",
+      ids: [post],
+      countType: "likesCount",
+      incrementBy: -1,
+    });
+
+    return new HttpResponse({
+      status: 201,
+      message: "Post unlike successful",
+    });
+  } catch (error) {
+    logger.error("[Service: unlikePost] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "[Service: unlikePost] - Something went wrong");
   }
 };
