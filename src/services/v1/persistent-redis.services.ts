@@ -5,17 +5,19 @@ export const incrementLikeOrCommentCountInBulk = async ({
   entityType,
   ids,
   countType,
+  incrementBy = 1,
 }: {
   entityType: "Post" | "Comment";
   ids: string[];
   countType: "likesCount" | "commentsCount";
+  incrementBy?: number;
 }) => {
   try {
     const multi = persistentRedisClient.multi();
 
     ids.forEach((id) => {
       const hashKey = `${entityType}:${id}:counter`;
-      multi.hIncrBy(hashKey, countType, 1);
+      multi.hIncrBy(hashKey, countType, incrementBy);
     });
 
     const incrementResult = await multi.exec();
