@@ -149,3 +149,40 @@ export const getLikesByPostId = async ({
     throw new HttpError(500, "Something went wrong in fetching comments");
   }
 };
+
+export const getPostLikedByUser = async ({ user }: { user: string }) => {
+  try {
+    const query: FilterQuery<LikeInterface> = {
+      liker: user,
+      likeOn: "Post",
+      isDeleted: false,
+    };
+
+    const likes = await Like.find(query)
+      .limit(1000)
+      .sort({ _id: -1 })
+      .select("post -_id")
+      .lean();
+
+    const postIds = likes.map((like) => like.post);
+
+    return new HttpResponse({
+      status: 200,
+      message: "Likes fetched successfully",
+      data: {
+        likes: postIds,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: getPostLikesByUserId] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "Something went wrong in fetching comments");
+  }
+};

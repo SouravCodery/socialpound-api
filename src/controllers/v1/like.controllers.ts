@@ -76,3 +76,35 @@ export const getLikesByPostId = async (
     );
   }
 };
+
+export const getPostsLikedByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+
+    const likes = await likeServices.getPostLikedByUser({
+      user,
+    });
+
+    return res.status(likes.getStatus()).json(likes.getResponse());
+  } catch (error) {
+    logger.error(
+      "[Controller: getPostsLikedByUser] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(
+        500,
+        "[Controller: getPostsLikedByUser] - Something went wrong"
+      )
+    );
+  }
+};
