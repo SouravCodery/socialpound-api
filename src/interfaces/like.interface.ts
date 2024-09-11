@@ -1,16 +1,20 @@
-import { ObjectId, Document } from "mongoose";
+import { ObjectId, Document, Types } from "mongoose";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
-interface LikeInterface {
+export interface LikeInterface {
   likeOn: "Post" | "Comment";
 
   post: ObjectId;
   comment: ObjectId | null;
 
-  user: ObjectId;
+  liker: ObjectId;
 }
 
 export interface LikeDocumentInterface
   extends Document,
     LikeInterface,
     SoftDeleteInterface {}
+
+export interface LikeWithIdInterface extends LikeInterface {
+  _id: Types.ObjectId;
+}
