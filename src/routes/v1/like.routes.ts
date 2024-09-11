@@ -18,12 +18,12 @@ likeRouter.post(
   likeController.likePostOrComment
 );
 
+likeRouter.get("/post/user", likeController.getPostsLikedByUser);
+
 likeRouter.get(
   "/post/:postId",
   validate(likeValidationSchemas.getLikesByPostIdValidatorSchema),
   likeController.getLikesByPostId
 );
-
-likeRouter.get("/post/user/:userId", likeController.getPostsLikedByUser);
 
 export default likeRouter;
