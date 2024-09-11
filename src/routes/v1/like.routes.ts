@@ -24,4 +24,6 @@ likeRouter.get(
   likeController.getLikesByPostId
 );
 
+likeRouter.get("/post/user/:userId", likeController.getPostsLikedByUser);
+
 export default likeRouter;
