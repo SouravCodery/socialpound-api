@@ -36,14 +36,13 @@ export const likeWorker = new Worker(
 export const likePostBatchTimeout = setInterval(async () => {
   try {
     const jobsToBeProcessed = likePostBatch.getJobs();
+    console.log("like batch", jobsToBeProcessed.length);
 
-    if (jobsToBeProcessed.length <= 0) {
-      console.log("Nothing to process: likePostBatch");
-      likePostBatch.processingEnd();
-      return;
+    if (jobsToBeProcessed.length > 0) {
+      await likePosts({ likes: jobsToBeProcessed });
+      likePostBatch.updateLastProcessed();
     }
 
-    await likePosts({ likes: jobsToBeProcessed });
     likePostBatch.processingEnd();
   } catch (error) {
     logger.error("Error in likePostBatch processor", error);

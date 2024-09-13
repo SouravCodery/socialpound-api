@@ -16,6 +16,8 @@ import {
   getLikeAndCommentsCountInBulk,
   incrementLikeOrCommentCountInBulk,
 } from "./persistent-redis.services";
+import { addNotificationsToQueue } from "./notification.services";
+import { NotificationJobInterface } from "../../interfaces/notification.interface";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -66,20 +68,23 @@ export const addCommentsOnPosts = async ({
   comments: CommentInterface[];
 }) => {
   try {
+    //db insert begins
     const postExists = await Post.find({
       _id: { $in: comments.map((comment) => comment.post) },
       isDeleted: false,
-    }).select("_id");
+    })
+      .select("_id user")
+      .lean();
 
-    const existingPostsSet = new Set(
-      postExists.map((post) => post._id.toString())
+    const existingPostsMap = new Map(
+      postExists.map((post) => [post._id.toString(), post])
     );
 
     const commentsToBeInserted = comments.filter((comment) =>
-      existingPostsSet.has(comment.post.toString())
+      existingPostsMap.has(comment.post.toString())
     );
 
-    let successfullyInsertedComments: CommentInterface[] = [];
+    let successfullyInsertedComments: CommentWithIdInterface[] = [];
     try {
       successfullyInsertedComments = await Comment.insertMany(
         commentsToBeInserted,
@@ -93,6 +98,7 @@ export const addCommentsOnPosts = async ({
       }
     }
 
+    //kv increment begins
     const postIsForCounterIncrements = successfullyInsertedComments.map(
       (comment) => comment.post.toString()
     );
@@ -101,6 +107,30 @@ export const addCommentsOnPosts = async ({
       entityType: "Post",
       ids: postIsForCounterIncrements,
       countType: "commentsCount",
+    });
+
+    //notification addition begins
+    const notificationJobs: NotificationJobInterface[] = [];
+
+    successfullyInsertedComments.forEach((comment) => {
+      const recipient = existingPostsMap.get(comment.post.toString())?.user;
+
+      if (recipient && comment.user !== recipient) {
+        notificationJobs.push({
+          name: "add-notification",
+          data: {
+            recipient,
+            sender: comment.user,
+            type: "comment",
+            post: comment.post,
+            comment: comment._id,
+          },
+        });
+      }
+    });
+
+    await addNotificationsToQueue({
+      jobs: notificationJobs,
     });
 
     return new HttpResponse({

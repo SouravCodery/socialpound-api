@@ -125,6 +125,7 @@ export const unlikePost = async (
       liker,
     });
 
+    //skipping notification removal of like for now
     return res
       .status(likePostResponse.getStatus())
       .json(likePostResponse.getResponse());
