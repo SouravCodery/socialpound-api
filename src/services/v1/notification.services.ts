@@ -130,8 +130,9 @@ export const getNotificationsByUser = async ({
     const notifications = await Notification.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("sender", "username profilePicture -_id")
+      .populate("sender", "username fullName profilePicture -_id")
       .populate("post", "content")
+      .populate("comment", "text")
       .select("sender type post comment read createdAt")
       .lean();
 
