@@ -36,14 +36,13 @@ export const commentWorker = new Worker(
 export const commentOnPostBatchTimeout = setInterval(async () => {
   try {
     const jobsToBeProcessed = commentOnPostBatch.getJobs();
+    console.log("comment batch", jobsToBeProcessed.length);
 
-    if (jobsToBeProcessed.length <= 0) {
-      console.log("Nothing to process: commentOnPostBatch");
-      commentOnPostBatch.processingEnd();
-      return;
+    if (jobsToBeProcessed.length > 0) {
+      await addCommentsOnPosts({ comments: jobsToBeProcessed });
+      commentOnPostBatch.updateLastProcessed();
     }
 
-    await addCommentsOnPosts({ comments: jobsToBeProcessed });
     commentOnPostBatch.processingEnd();
   } catch (error) {
     logger.error("Error in commentOnPostBatch processor", error);
