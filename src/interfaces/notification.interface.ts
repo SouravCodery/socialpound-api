@@ -14,7 +14,7 @@ export interface NotificationInterface {
   type: NotificationTypes;
 
   post: ObjectId | null;
-  comment: ObjectId | null;
+  comment: Types.ObjectId | null;
 
   read: boolean;
   createdAt: Date;
@@ -26,4 +26,20 @@ export interface NotificationDocumentInterface
 
 export interface NotificationWithIdInterface extends NotificationInterface {
   _id: Types.ObjectId;
+}
+
+export interface NotificationJobInterface {
+  name: "add-notification";
+  data: {
+    recipient: NotificationInterface["recipient"];
+    sender: NotificationInterface["sender"];
+    type: NotificationInterface["type"];
+    post?: NotificationInterface["post"];
+    comment?: NotificationInterface["comment"];
+  };
+}
+
+export interface MarkNotificationAsReadInterface {
+  notificationId: string;
+  recipient: string;
 }
