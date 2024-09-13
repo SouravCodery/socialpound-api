@@ -41,3 +41,39 @@ export const addNotificationsToQueue = async ({
     );
   }
 };
+
+export const addMarkNotificationAsReadToQueue = async ({
+  notificationId,
+  recipient,
+}: {
+  notificationId: string;
+  recipient: string;
+}) => {
+  try {
+    const addBulkResult = await notificationQueue.add("notification-read", {
+      notificationId,
+      recipient,
+    });
+    console.log({ addBulkResult });
+
+    return new HttpResponse({
+      status: 202,
+      message: "Notification addition request added to the queue",
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: addMarkNotificationAsReadToQueue] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: addMarkNotificationAsReadToQueue] - Something went wrong"
+    );
+  }
+};
+
