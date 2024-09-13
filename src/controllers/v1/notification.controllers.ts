@@ -43,3 +43,41 @@ export const addMarkNotificationAsRead = async (
     );
   }
 };
+
+export const getNotificationsByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const recipient = (
+      req as AuthenticatedUserRequestInterface
+    ).user._id.toString();
+    const { cursor } = req.query;
+
+    const notifications = await notificationServices.getNotificationsByUser({
+      recipient,
+      cursor: cursor?.toString(),
+    });
+
+    return res
+      .status(notifications.getStatus())
+      .json(notifications.getResponse());
+  } catch (error) {
+    logger.error(
+      "[Controller: getNotificationsByUser] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(
+        500,
+        "[Controller: getNotificationsByUser] - Something went wrong"
+      )
+    );
+  }
+};
