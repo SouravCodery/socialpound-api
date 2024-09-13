@@ -228,6 +228,7 @@ export const unlikePost = async ({
   liker: string;
 }) => {
   try {
+    //todo: unlikePost via queue
     const query: FilterQuery<LikeInterface> = {
       post,
       liker,

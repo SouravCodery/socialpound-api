@@ -1,5 +1,4 @@
 import { ObjectId, Document, Types } from "mongoose";
-import { SoftDeleteInterface } from "./soft-delete.interface";
 
 type NotificationTypes =
   | "like-on-post"
