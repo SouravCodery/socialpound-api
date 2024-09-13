@@ -1,3 +1,4 @@
+import { NotificationJobInterface } from "./../../interfaces/notification.interface";
 import { FilterQuery } from "mongoose";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
@@ -13,6 +14,7 @@ import {
   LikeInterface,
 } from "../../interfaces/like.interface";
 import { incrementLikeOrCommentCountInBulk } from "./persistent-redis.services";
+import { addNotificationsToQueue } from "./notification.services";
 
 export const addLikeToQueue = async ({
   likeOn,
@@ -55,17 +57,18 @@ export const addLikeToQueue = async ({
 
 export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
   try {
+    //db insert begins
     const postExists = await Post.find({
       _id: { $in: likes.map((like) => like.post) },
       isDeleted: false,
-    }).select("_id");
+    }).select("_id user");
 
-    const existingPostsSet = new Set(
-      postExists.map((post) => post._id.toString())
+    const existingPostsMap = new Map(
+      postExists.map((post) => [post._id.toString(), post])
     );
 
     const likesToBeInserted = likes.filter((like) =>
-      existingPostsSet.has(like.post.toString())
+      existingPostsMap.has(like.post.toString())
     );
 
     let successfullyInsertedLikes: LikeDocumentInterface[] = [];
@@ -79,6 +82,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
       }
     }
 
+    //kv increment begins
     const postIsForCounterIncrements = successfullyInsertedLikes.map((like) =>
       like.post.toString()
     );
@@ -87,6 +91,29 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
       entityType: "Post",
       ids: postIsForCounterIncrements,
       countType: "likesCount",
+    });
+
+    //notification addition begins
+    const notificationJobs: NotificationJobInterface[] = [];
+
+    successfullyInsertedLikes.forEach((like) => {
+      const recipient = existingPostsMap.get(like.post.toString())?.user;
+
+      if (recipient && like.liker !== recipient) {
+        notificationJobs.push({
+          name: "add-notification",
+          data: {
+            recipient,
+            sender: like.liker,
+            type: "like-on-post",
+            post: like.post,
+          },
+        });
+      }
+    });
+
+    await addNotificationsToQueue({
+      jobs: notificationJobs,
     });
 
     return new HttpResponse({
