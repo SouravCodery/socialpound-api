@@ -84,7 +84,7 @@ export const notificationBatchProcessor = setInterval(async () => {
   } catch (error) {
     logger.error("Error in notification batch processor", error);
   }
-}, 1000);
+}, 2000);
 
 notificationWorker.on("completed", (job) => {
   logger.info(
