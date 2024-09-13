@@ -108,3 +108,59 @@ export const createNotifications = async ({
     );
   }
 };
+
+export const getNotificationsByUser = async ({
+  recipient,
+  cursor,
+  limit = 20,
+}: {
+  recipient: string;
+  cursor?: string;
+  limit?: number;
+}) => {
+  try {
+    const query: FilterQuery<NotificationInterface> = {
+      recipient,
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    const notifications = await Notification.find(query)
+      .limit(limit)
+      .sort({ _id: -1 })
+      .populate("sender", "username profilePicture -_id")
+      .populate("post", "content")
+      .select("sender type post comment read createdAt")
+      .lean();
+
+    const nextCursor =
+      notifications.length >= limit
+        ? notifications[notifications.length - 1]._id.toString()
+        : null;
+
+    return new HttpResponse({
+      status: 200,
+      message: "Notifications fetched successfully",
+      data: {
+        notifications,
+        nextCursor,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: getNotificationsByUser] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: getNotificationsByUser] - Something went wrong"
+    );
+  }
+};
