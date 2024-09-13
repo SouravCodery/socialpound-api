@@ -49,3 +49,51 @@ export const notificationWorker = new Worker(
     connection: bullMQConnection,
   }
 );
+
+export const notificationBatchProcessor = setInterval(async () => {
+  try {
+    const jobsToBeProcessedForAdd = notificationAddBatch.getJobs();
+    if (jobsToBeProcessedForAdd.length > 0) {
+      await createNotifications({
+        notifications: jobsToBeProcessedForAdd,
+      });
+
+      notificationAddBatch.updateLastProcessed();
+    }
+    notificationAddBatch.processingEnd();
+
+    const jobsToBeProcessedForRead = notificationReadBatch.getJobs();
+
+    if (jobsToBeProcessedForRead.length > 0) {
+      await markNotificationsAsRead({
+        jobs: jobsToBeProcessedForRead,
+      });
+
+      notificationReadBatch.updateLastProcessed();
+    }
+    notificationReadBatch.processingEnd();
+
+    if (
+      jobsToBeProcessedForAdd.length === 0 &&
+      jobsToBeProcessedForRead.length === 0
+    ) {
+      console.log(
+        "Nothing to process for both notificationAddBatch and notificationReadBatch"
+      );
+    }
+  } catch (error) {
+    logger.error("Error in notification batch processor", error);
+  }
+}, 1000);
+
+notificationWorker.on("completed", (job) => {
+  logger.info(
+    `[Worker: notificationWorker] - ${job.name} ${job.id} has completed!`
+  );
+});
+
+notificationWorker.on("failed", (job, err) => {
+  logger.error(
+    `[Worker: notificationWorker] - ${job?.name} ${job?.id} has failed with ${err.message}`
+  );
+});
