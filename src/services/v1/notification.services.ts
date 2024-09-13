@@ -77,3 +77,34 @@ export const addMarkNotificationAsReadToQueue = async ({
   }
 };
 
+export const createNotifications = async ({
+  notifications,
+}: {
+  notifications: NotificationInterface[];
+}) => {
+  try {
+    const createdNotifications = await Notification.insertMany(notifications, {
+      ordered: false,
+    });
+
+    return new HttpResponse({
+      status: 201,
+      message: "Notifications created successfully",
+      data: createdNotifications,
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: createNotifications] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: createNotifications] - Something went wrong"
+    );
+  }
+};
