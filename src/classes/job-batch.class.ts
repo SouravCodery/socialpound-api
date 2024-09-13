@@ -1,5 +1,3 @@
-import { Job } from "bullmq";
-
 export class JobBatch<T> {
   private jobs: T[];
   private batchSize: number;
@@ -65,6 +63,9 @@ export class JobBatch<T> {
 
   processingEnd() {
     this.isProcessing = false;
+  }
+
+  updateLastProcessed() {
     this.lastProcessed = Date.now();
   }
 }
