@@ -164,3 +164,57 @@ export const getNotificationsByUser = async ({
     );
   }
 };
+
+export const markNotificationsAsRead = async ({
+  jobs,
+}: {
+  jobs: MarkNotificationAsReadInterface[];
+}) => {
+  try {
+    const notificationIds = jobs.map((job) => job.notificationId);
+    const notifications = await Notification.find({
+      _id: { $in: notificationIds },
+    })
+      .select("recipient")
+      .lean();
+
+    const notificationRecipientMap = new Map(
+      jobs.map((job) => [job.notificationId, job.recipient])
+    );
+
+    const notificationIdsToMarkAsRead = notifications
+      .filter(
+        (notification) =>
+          notification.recipient.toString() ===
+          notificationRecipientMap.get(notification._id.toString())
+      )
+      .map((notification) => notification._id);
+
+    const result = await Notification.updateMany(
+      {
+        _id: { $in: notificationIdsToMarkAsRead },
+        read: false,
+      },
+      { $set: { read: true } }
+    );
+
+    return new HttpResponse({
+      status: 200,
+      message: `${result.modifiedCount} notifications marked as read`,
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: markNotificationsAsRead] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: markNotificationsAsRead] - Something went wrong"
+    );
+  }
+};
