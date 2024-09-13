@@ -53,6 +53,8 @@ export const notificationWorker = new Worker(
 export const notificationBatchProcessor = setInterval(async () => {
   try {
     const jobsToBeProcessedForAdd = notificationAddBatch.getJobs();
+    console.log("add notification batch", jobsToBeProcessedForAdd.length);
+
     if (jobsToBeProcessedForAdd.length > 0) {
       await createNotifications({
         notifications: jobsToBeProcessedForAdd,
@@ -63,6 +65,7 @@ export const notificationBatchProcessor = setInterval(async () => {
     notificationAddBatch.processingEnd();
 
     const jobsToBeProcessedForRead = notificationReadBatch.getJobs();
+    console.log("read notification batch", jobsToBeProcessedForRead.length);
 
     if (jobsToBeProcessedForRead.length > 0) {
       await markNotificationsAsRead({
@@ -72,15 +75,6 @@ export const notificationBatchProcessor = setInterval(async () => {
       notificationReadBatch.updateLastProcessed();
     }
     notificationReadBatch.processingEnd();
-
-    if (
-      jobsToBeProcessedForAdd.length === 0 &&
-      jobsToBeProcessedForRead.length === 0
-    ) {
-      console.log(
-        "Nothing to process for both notificationAddBatch and notificationReadBatch"
-      );
-    }
   } catch (error) {
     logger.error("Error in notification batch processor", error);
   }
