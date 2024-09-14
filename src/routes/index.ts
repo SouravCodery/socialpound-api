@@ -16,6 +16,8 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof HttpError) {
     return res.status(err.status).json({
       message: err.message,
+      toastMessage:
+        "Something went wrong processing your request. Please try again later. 🤒",
     });
   }
 
@@ -23,6 +25,7 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
   return res.status(500).json({
     message: "Internal Server Error",
+    toastMessage: "Internal Server Error 🤒",
   });
 });
 
