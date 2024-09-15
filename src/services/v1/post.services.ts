@@ -159,7 +159,13 @@ export const deletePostById = async ({
         new: true,
         runValidators: true,
       }
-    ).lean();
+    )
+      .select("user")
+      .lean();
+
+    if (!post) {
+      throw new HttpError(404, "[Service: deletePostById] - Post not found");
+    }
 
     if (post?.user) {
       await incrementPostsCountForUser({
