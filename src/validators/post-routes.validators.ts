@@ -31,3 +31,9 @@ export const getPostsByUserIdValidatorSchema = {
     cursor: Joi.string().alphanum().optional(),
   }),
 };
+
+export const deletePostByIdValidatorSchema = {
+  paramsSchema: Joi.object({
+    postId: Joi.string().alphanum().length(24).required(),
+  }),
+};
