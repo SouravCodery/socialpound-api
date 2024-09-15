@@ -50,6 +50,7 @@ export const addCommentToQueue = async ({
     return new HttpResponse({
       status: 202,
       message: "Comment creation request added to the queue",
+      toastMessage: "Your comment will reflect soon",
     });
   } catch (error) {
     logger.error("[Service: addComment] - Something went wrong", error);

@@ -64,6 +64,7 @@ export const signIn = async ({
       return new HttpResponse({
         status: 201,
         message,
+        toastMessage: "Welcome to Socialpound",
       });
     }
 
@@ -83,6 +84,7 @@ export const signIn = async ({
         status: 200,
         message: "Google Sign-In Successful",
         data: { user: existingUser },
+        toastMessage: "Welcome back to Socialpound",
       });
     }
 
@@ -101,6 +103,7 @@ export const signIn = async ({
         status: 200,
         message: "GitHub Sign-In Successful",
         data: { user: existingUser },
+        toastMessage: "Welcome back to Socialpound",
       });
     }
 
