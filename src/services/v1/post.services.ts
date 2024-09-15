@@ -136,11 +136,18 @@ export const getPosts = async ({
   }
 };
 
-export const deletePost = async ({ postId }: { postId?: string }) => {
+export const deletePostById = async ({
+  user,
+  postId,
+}: {
+  user: string;
+  postId: string;
+}) => {
   try {
     const post = await Post.findOneAndUpdate(
       {
         _id: postId,
+        user,
         isDeleted: false,
       },
       {
@@ -166,12 +173,15 @@ export const deletePost = async ({ postId }: { postId?: string }) => {
       message: "Posts deleted successfully",
     });
   } catch (error) {
-    logger.error("[Service: deletePost] - Something went wrong", error);
+    logger.error("[Service: deletePostById] - Something went wrong", error);
 
     if (error instanceof HttpError) {
       throw error;
     }
 
-    throw new HttpError(500, "[Service: deletePost] - Something went wrong");
+    throw new HttpError(
+      500,
+      "[Service: deletePostById] - Something went wrong"
+    );
   }
 };
