@@ -11,6 +11,7 @@ import {
 } from "./../../interfaces/post.interface";
 
 import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
+import { incrementPostsCountForUser } from "./user.services";
 
 export const createPost = async ({
   user,
@@ -29,6 +30,7 @@ export const createPost = async ({
     });
 
     await newPost.save();
+    await incrementPostsCountForUser({ user: user.toString() });
 
     return new HttpResponse({
       status: 201,
@@ -41,7 +43,7 @@ export const createPost = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in post creation");
+    throw new HttpError(500, "[Service: createPost] - Something went wrong");
   }
 };
 
