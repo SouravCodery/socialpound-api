@@ -90,4 +90,29 @@ const getPostsByUserId = async (
   }
 };
 
-export { createPost, getUserFeed, getPostsByUserId };
+const deletePostById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const { postId } = req.params;
+
+    const result = await postServices.deletePost({ user, postId });
+
+    return res.status(result.getStatus()).json(result.getResponse());
+  } catch (error) {
+    logger.error("[Controller: deletePostById] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(500, "[Controller: deletePostById] - Something went wrong")
+    );
+  }
+};
+
+export { createPost, getUserFeed, getPostsByUserId, deletePostById };
