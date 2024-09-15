@@ -99,7 +99,7 @@ const deletePostById = async (
     const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
     const { postId } = req.params;
 
-    const result = await postServices.deletePost({ user, postId });
+    const result = await postServices.deletePostById({ user, postId });
 
     return res.status(result.getStatus()).json(result.getResponse());
   } catch (error) {
