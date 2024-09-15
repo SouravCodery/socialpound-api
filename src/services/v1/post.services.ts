@@ -135,3 +135,43 @@ export const getPosts = async ({
     throw new HttpError(500, "Something went wrong in fetching posts");
   }
 };
+
+export const deletePost = async ({ postId }: { postId?: string }) => {
+  try {
+    const post = await Post.findOneAndUpdate(
+      {
+        _id: postId,
+        isDeleted: false,
+      },
+      {
+        $set: {
+          isDeleted: true,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).lean();
+
+    if (post?.user) {
+      await incrementPostsCountForUser({
+        user: post.user.toString(),
+        incrementBy: -1,
+      });
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "Posts deleted successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: deletePost] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "[Service: deletePost] - Something went wrong");
+  }
+};
