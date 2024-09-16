@@ -31,4 +31,10 @@ commentRouter.get(
 //   commentController.getCommentsByCommentId
 // );
 
+commentRouter.delete(
+  "/:commentId",
+  validate(commentValidationSchemas.deleteCommentByIdValidatorSchema),
+  commentController.deleteCommentById
+);
+
 export default commentRouter;
