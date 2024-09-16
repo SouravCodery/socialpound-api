@@ -170,3 +170,34 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
     throw new HttpError(500, "Something went wrong in getting user");
   }
 };
+
+export const incrementPostsCountForUser = async ({
+  user,
+  incrementBy = 1,
+}: {
+  user: string;
+  incrementBy?: number;
+}) => {
+  try {
+    await UserModel.updateOne(
+      { _id: user },
+      {
+        $inc: {
+          postsCount: incrementBy,
+        },
+      },
+      {
+        runValidators: true,
+      }
+    );
+
+    return {
+      message: "Posts count incremented successfully",
+    };
+  } catch (error) {
+    logger.error(
+      "[Service: incrementPostsCountForUser] - Something went wrong",
+      error
+    );
+  }
+};

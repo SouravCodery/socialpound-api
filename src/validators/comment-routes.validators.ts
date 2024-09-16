@@ -24,3 +24,9 @@ export const getCommentsByPostIdValidatorSchema = {
     cursor: Joi.string().alphanum().length(24).optional(),
   }),
 };
+
+export const deleteCommentByIdValidatorSchema = {
+  paramsSchema: Joi.object({
+    commentId: Joi.string().alphanum().length(24).required(),
+  }),
+};

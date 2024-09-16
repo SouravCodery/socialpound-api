@@ -18,9 +18,9 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
     profilePicture: { type: String, required: true },
     bio: { type: String, default: "" },
 
-    postsCount: { type: Number, default: 0, required: true },
-    followersCount: { type: Number, default: 0, required: true },
-    followingCount: { type: Number, default: 0, required: true },
+    postsCount: { type: Number, default: 0, required: true, min: 0 },
+    followersCount: { type: Number, default: 0, required: true, min: 0 },
+    followingCount: { type: Number, default: 0, required: true, min: 0 },
 
     googleAuthUser: { type: GoogleAuthUserSchema, default: null },
     githubAuthUser: { type: GitHubAuthUserSchema, default: null },

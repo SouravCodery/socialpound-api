@@ -30,4 +30,10 @@ postRouter.get(
   postController.getPostsByUserId
 );
 
+postRouter.delete(
+  "/:postId",
+  validate(postValidationSchemas.deletePostByIdValidatorSchema),
+  postController.deletePostById
+);
+
 export default postRouter;

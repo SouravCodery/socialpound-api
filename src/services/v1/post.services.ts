@@ -11,6 +11,7 @@ import {
 } from "./../../interfaces/post.interface";
 
 import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
+import { incrementPostsCountForUser } from "./user.services";
 
 export const createPost = async ({
   user,
@@ -29,6 +30,7 @@ export const createPost = async ({
     });
 
     await newPost.save();
+    await incrementPostsCountForUser({ user: user.toString() });
 
     return new HttpResponse({
       status: 201,
@@ -41,7 +43,7 @@ export const createPost = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in post creation");
+    throw new HttpError(500, "[Service: createPost] - Something went wrong");
   }
 };
 
@@ -131,5 +133,62 @@ export const getPosts = async ({
     }
 
     throw new HttpError(500, "Something went wrong in fetching posts");
+  }
+};
+
+export const deletePostById = async ({
+  user,
+  postId,
+}: {
+  user: string;
+  postId: string;
+}) => {
+  try {
+    const post = await Post.findOneAndUpdate(
+      {
+        _id: postId,
+        user,
+        isDeleted: false,
+      },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .select("user")
+      .lean();
+
+    if (!post) {
+      throw new HttpError(404, "[Service: deletePostById] - Post not found");
+    }
+
+    if (post?.user) {
+      await incrementPostsCountForUser({
+        user: post.user.toString(),
+        incrementBy: -1,
+      });
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "Posts deleted successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: deletePostById] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: deletePostById] - Something went wrong"
+    );
   }
 };
