@@ -73,3 +73,34 @@ export const getCommentsByPostId = async (
     );
   }
 };
+
+export const deleteCommentById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const { commentId } = req.params;
+
+    const result = await commentServices.deleteCommentById({ user, commentId });
+
+    return res.status(result.getStatus()).json(result.getResponse());
+  } catch (error) {
+    logger.error(
+      "[Controller: deleteCommentById] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(
+        500,
+        "[Controller: deleteCommentById] - Something went wrong"
+      )
+    );
+  }
+};
