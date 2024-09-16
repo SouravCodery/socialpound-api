@@ -153,6 +153,7 @@ export const deletePostById = async ({
       {
         $set: {
           isDeleted: true,
+          deletedAt: new Date(),
         },
       },
       {
