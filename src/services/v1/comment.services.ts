@@ -18,6 +18,7 @@ import {
 } from "./persistent-redis.services";
 import { addNotificationsToQueue } from "./notification.services";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
+import { PostInterface } from "../../interfaces/post.interface";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -238,5 +239,66 @@ export const getCommentsByPostId = async ({
     }
 
     throw new HttpError(500, "Something went wrong in fetching comments");
+  }
+};
+
+export const deleteCommentById = async ({
+  user,
+  commentId,
+}: {
+  user: string;
+  commentId: string;
+}) => {
+  try {
+    const comment = await Comment.findOne({
+      _id: commentId,
+      isDeleted: false,
+    })
+      .select("user post")
+      .populate<{ post: PostInterface }>("post", "user");
+
+    if (!comment) {
+      throw new HttpError(
+        404,
+        "[Service: deleteCommentById] - Comment not found"
+      );
+    }
+
+    if (
+      (comment.user.toString() === user ||
+        comment.post.user.toString() === user) === false
+    ) {
+      throw new HttpError(
+        403,
+        "[Service: deleteCommentById] - Unauthorized to delete this comment"
+      );
+    }
+
+    await comment.softDelete();
+
+    if (comment?.post) {
+      await incrementLikeOrCommentCountInBulk({
+        entityType: "Post",
+        ids: [comment.post.toString()],
+        countType: "commentsCount",
+        incrementBy: -1,
+      });
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "Comment deleted successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: deleteCommentById] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(
+      500,
+      "[Service: deleteCommentById] - Something went wrong"
+    );
   }
 };
