@@ -28,7 +28,10 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     return next(
-      new HttpError(500, "[Controller: createPost] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: createPost] - Something went wrong",
+      })
     );
   }
 };
@@ -51,7 +54,10 @@ const getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     return next(
-      new HttpError(500, "[Controller: getUserFeed] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: getUserFeed] - Something went wrong",
+      })
     );
   }
 };
@@ -82,10 +88,10 @@ const getPostsByUserId = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: getPostsByUserId] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: getPostsByUserId] - Something went wrong",
+      })
     );
   }
 };
@@ -110,7 +116,10 @@ const deletePostById = async (
     }
 
     return next(
-      new HttpError(500, "[Controller: deletePostById] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: deletePostById] - Something went wrong",
+      })
     );
   }
 };

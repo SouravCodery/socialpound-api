@@ -1,3 +1,4 @@
+import { AuthenticatedUserRequestInterface } from "./../../interfaces/extended-request.interface";
 import { AuthenticatedRequestInterface } from "../../interfaces/extended-request.interface";
 
 import { Request, Response, NextFunction } from "express";
@@ -27,7 +28,9 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in Sign-In"));
+    return next(
+      new HttpError({ status: 500, message: "Something went wrong in Sign-In" })
+    );
   }
 };
 
@@ -56,8 +59,38 @@ const getUserByUsername = async (
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in getting user"));
+    return next(
+      new HttpError({
+        status: 500,
+        message: "Something went wrong in getting user",
+      })
+    );
   }
 };
 
-export { signIn, getUserByUsername };
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (
+      req as AuthenticatedUserRequestInterface
+    ).user._id.toString();
+
+    const result = await userServices.deleteUser({ userId });
+
+    return res.status(result.getStatus()).json(result.getResponse());
+  } catch (error) {
+    logger.error("[Controller: deleteUser] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 500,
+        message: "[Controller: deleteUser] - Something went wrong",
+      })
+    );
+  }
+};
+
+export { signIn, getUserByUsername, deleteUser };

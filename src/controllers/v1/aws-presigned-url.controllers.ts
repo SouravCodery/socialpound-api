@@ -32,7 +32,10 @@ const getPresignedUrl = async (
     }
 
     return next(
-      new HttpError(500, "[Controller: getPresignedUrl] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: getPresignedUrl] - Something went wrong",
+      })
     );
   }
 };

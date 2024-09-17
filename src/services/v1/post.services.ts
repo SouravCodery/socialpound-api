@@ -43,7 +43,10 @@ export const createPost = async ({
       throw error;
     }
 
-    throw new HttpError(500, "[Service: createPost] - Something went wrong");
+    throw new HttpError({
+      status: 500,
+      message: "[Service: createPost] - Something went wrong",
+    });
   }
 };
 
@@ -108,7 +111,11 @@ export const getPosts = async ({
     const posts = await Post.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "username fullName profilePicture -_id")
+      .populate({
+        path: "user",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
       .select("-createdAt -updatedAt -__v")
       .lean();
 
@@ -132,7 +139,10 @@ export const getPosts = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in fetching posts");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in fetching posts",
+    });
   }
 };
 
@@ -165,7 +175,10 @@ export const deletePostById = async ({
       .lean();
 
     if (!post) {
-      throw new HttpError(404, "[Service: deletePostById] - Post not found");
+      throw new HttpError({
+        status: 404,
+        message: "[Service: deletePostById] - Post not found",
+      });
     }
 
     if (post?.user) {
@@ -186,9 +199,9 @@ export const deletePostById = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: deletePostById] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: deletePostById] - Something went wrong",
+    });
   }
 };

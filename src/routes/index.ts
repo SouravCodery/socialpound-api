@@ -17,6 +17,7 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     return res.status(err.status).json({
       message: err.message,
       toastMessage:
+        err.toastMessage ||
         "Something went wrong processing your request. Please try again later. 🤒",
     });
   }

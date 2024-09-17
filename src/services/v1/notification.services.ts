@@ -35,10 +35,10 @@ export const addNotificationsToQueue = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: addNotificationsToQueue] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: addNotificationsToQueue] - Something went wrong",
+    });
   }
 };
 
@@ -54,7 +54,6 @@ export const addMarkNotificationAsReadToQueue = async ({
       notificationId,
       recipient,
     });
-    console.log({ addBulkResult });
 
     return new HttpResponse({
       status: 202,
@@ -70,10 +69,11 @@ export const addMarkNotificationAsReadToQueue = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: addMarkNotificationAsReadToQueue] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message:
+        "[Service: addMarkNotificationAsReadToQueue] - Something went wrong",
+    });
   }
 };
 
@@ -102,10 +102,10 @@ export const createNotifications = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: createNotifications] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: createNotifications] - Something went wrong",
+    });
   }
 };
 
@@ -130,9 +130,22 @@ export const getNotificationsByUser = async ({
     const notifications = await Notification.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("sender", "username fullName profilePicture -_id")
-      .populate("post", "content")
-      .populate("comment", "text")
+
+      .populate({
+        path: "sender",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
+      .populate({
+        path: "post",
+        select: "content",
+        match: { isDeleted: false },
+      })
+      .populate({
+        path: "comment",
+        select: "text",
+        match: { isDeleted: false },
+      })
       .select("sender type post comment read createdAt")
       .lean();
 
@@ -159,10 +172,10 @@ export const getNotificationsByUser = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: getNotificationsByUser] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: getNotificationsByUser] - Something went wrong",
+    });
   }
 };
 
@@ -213,9 +226,9 @@ export const markNotificationsAsRead = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: markNotificationsAsRead] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: markNotificationsAsRead] - Something went wrong",
+    });
   }
 };

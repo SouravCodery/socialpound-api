@@ -48,10 +48,10 @@ export const addLikeToQueue = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: addLikeToQueue] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: addLikeToQueue] - Something went wrong",
+    });
   }
 };
 
@@ -127,7 +127,10 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
       throw error;
     }
 
-    throw new HttpError(500, "[Service: likePosts] - Something went wrong");
+    throw new HttpError({
+      status: 500,
+      message: "[Service: likePosts] - Something went wrong",
+    });
   }
 };
 
@@ -154,7 +157,11 @@ export const getLikesByPostId = async ({
     const likes = await Like.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("liker", "username fullName profilePicture -_id")
+      .populate({
+        path: "liker",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
       .select("liker")
       .lean();
 
@@ -176,10 +183,10 @@ export const getLikesByPostId = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: getLikesByPostId] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: getLikesByPostId] - Something went wrong",
+    });
   }
 };
 
@@ -213,10 +220,10 @@ export const getPostLikedByUser = async ({ user }: { user: string }) => {
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: getPostLikedByUser] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: getPostLikedByUser] - Something went wrong",
+    });
   }
 };
 
@@ -257,6 +264,9 @@ export const unlikePost = async ({
       throw error;
     }
 
-    throw new HttpError(500, "[Service: unlikePost] - Something went wrong");
+    throw new HttpError({
+      status: 500,
+      message: "[Service: unlikePost] - Something went wrong",
+    });
   }
 };

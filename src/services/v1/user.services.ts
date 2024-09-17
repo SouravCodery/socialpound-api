@@ -25,7 +25,7 @@ export const signIn = async ({
     const userDataOAuth = decodeSignedUserDataJWT({ signedUserDataJWT });
 
     if (decodedAuthToken.email !== userDataOAuth.user.email) {
-      throw new HttpError(401, "User is not authorized");
+      throw new HttpError({ status: 401, message: "User is not authorized" });
     }
 
     const userDataGoogle =
@@ -40,6 +40,7 @@ export const signIn = async ({
 
     const existingUser: UserDocumentInterface | null = await UserModel.findOne({
       email: decodedAuthToken.email,
+      isDeleted: false,
     });
 
     //creating a new user if the user does not exist
@@ -118,7 +119,10 @@ export const signIn = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in Sign-In");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in Sign-In",
+    });
   }
 };
 
@@ -128,7 +132,11 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
       throw new Error("[Service: getUserByEmail] - email is required");
     }
 
-    const user = await UserModel.findOne({ email }).lean<UserWithIdInterface>();
+    const user = await UserModel.findOne({
+      email,
+      isDeleted: false,
+    }).lean<UserWithIdInterface>();
+
     if (!user) {
       throw new Error("[Service: getUserByEmail] - User not found");
     }
@@ -145,6 +153,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
   try {
     const user = await UserModel.findOne({
       username,
+      isDeleted: false,
     })
       .select(
         "username email fullName bio profilePicture bio postsCount followersCount followingCount"
@@ -152,7 +161,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       .lean<UserWithIdInterface>();
 
     if (!user) {
-      throw new HttpError(404, "User not found");
+      throw new HttpError({ status: 404, message: "User not found" });
     }
 
     return new HttpResponse({
@@ -167,7 +176,10 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in getting user");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in getting user",
+    });
   }
 };
 
@@ -199,5 +211,51 @@ export const incrementPostsCountForUser = async ({
       "[Service: incrementPostsCountForUser] - Something went wrong",
       error
     );
+  }
+};
+
+export const deleteUser = async ({ userId }: { userId: string }) => {
+  try {
+    const user = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+        isDeleted: false,
+      },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .select("_id")
+      .lean();
+
+    if (!user) {
+      throw new HttpError({
+        status: 404,
+        message: "[Service: deleteUser] - User not found",
+      });
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: deleteUser] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError({
+      status: 500,
+      message: "[Service: deleteUser] - Something went wrong",
+    });
   }
 };
