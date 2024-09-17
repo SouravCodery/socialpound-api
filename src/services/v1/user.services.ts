@@ -145,6 +145,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
   try {
     const user = await UserModel.findOne({
       username,
+      isDeleted: false,
     })
       .select(
         "username email fullName bio profilePicture bio postsCount followersCount followingCount"
@@ -199,5 +200,45 @@ export const incrementPostsCountForUser = async ({
       "[Service: incrementPostsCountForUser] - Something went wrong",
       error
     );
+  }
+};
+
+export const deleteUser = async ({ userId }: { userId: string }) => {
+  try {
+    const user = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+        isDeleted: false,
+      },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .select("_id")
+      .lean();
+
+    if (!user) {
+      throw new HttpError(404, "[Service: deleteUser] - User not found");
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: deleteUser] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(500, "[Service: deleteUser] - Something went wrong");
   }
 };
