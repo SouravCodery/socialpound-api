@@ -40,6 +40,7 @@ export const signIn = async ({
 
     const existingUser: UserDocumentInterface | null = await UserModel.findOne({
       email: decodedAuthToken.email,
+      isDeleted: false,
     });
 
     //creating a new user if the user does not exist
@@ -128,7 +129,10 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
       throw new Error("[Service: getUserByEmail] - email is required");
     }
 
-    const user = await UserModel.findOne({ email }).lean<UserWithIdInterface>();
+    const user = await UserModel.findOne({
+      email,
+      isDeleted: false,
+    }).lean<UserWithIdInterface>();
     if (!user) {
       throw new Error("[Service: getUserByEmail] - User not found");
     }
