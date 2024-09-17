@@ -21,4 +21,6 @@ userRouter.use(userMiddleware);
 
 userRouter.get("/:username", userController.getUserByUsername);
 
+userRouter.delete("/", userController.deleteUser);
+
 export default userRouter;
