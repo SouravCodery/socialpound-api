@@ -1,3 +1,4 @@
+import { AuthenticatedUserRequestInterface } from "./../../interfaces/extended-request.interface";
 import { AuthenticatedRequestInterface } from "../../interfaces/extended-request.interface";
 
 import { Request, Response, NextFunction } from "express";
@@ -60,4 +61,26 @@ const getUserByUsername = async (
   }
 };
 
-export { signIn, getUserByUsername };
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (
+      req as AuthenticatedUserRequestInterface
+    ).user._id.toString();
+
+    const result = await userServices.deleteUser({ userId });
+
+    return res.status(result.getStatus()).json(result.getResponse());
+  } catch (error) {
+    logger.error("[Controller: deleteUser] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError(500, "[Controller: deleteUser] - Something went wrong")
+    );
+  }
+};
+
+export { signIn, getUserByUsername, deleteUser };
