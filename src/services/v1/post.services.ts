@@ -108,7 +108,11 @@ export const getPosts = async ({
     const posts = await Post.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "username fullName profilePicture -_id")
+      .populate({
+        path: "user",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
       .select("-createdAt -updatedAt -__v")
       .lean();
 

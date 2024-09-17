@@ -154,7 +154,11 @@ export const getLikesByPostId = async ({
     const likes = await Like.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("liker", "username fullName profilePicture -_id")
+      .populate({
+        path: "liker",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
       .select("liker")
       .lean();
 

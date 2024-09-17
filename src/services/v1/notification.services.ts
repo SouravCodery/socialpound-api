@@ -130,9 +130,21 @@ export const getNotificationsByUser = async ({
     const notifications = await Notification.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("sender", "username fullName profilePicture -_id")
-      .populate("post", "content")
-      .populate("comment", "text")
+      .populate({
+        path: "sender",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
+      .populate({
+        path: "post",
+        select: "content",
+        match: { isDeleted: false },
+      })
+      .populate({
+        path: "comment",
+        select: "text",
+        match: { isDeleted: false },
+      })
       .select("sender type post comment read createdAt")
       .lean();
 

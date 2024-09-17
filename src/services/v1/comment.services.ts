@@ -209,7 +209,11 @@ export const getCommentsByPostId = async ({
     const comments = await Comment.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .populate("user", "username fullName profilePicture -_id")
+      .populate({
+        path: "user",
+        select: "username fullName profilePicture -_id",
+        match: { isDeleted: false },
+      })
       .lean();
 
     const nextCursor =
@@ -255,7 +259,11 @@ export const deleteCommentById = async ({
       isDeleted: false,
     })
       .select("user post")
-      .populate<{ post: PostInterface }>("post", "user");
+      .populate<{ post: PostInterface }>({
+        path: "post",
+        select: "user",
+        match: { isDeleted: false },
+      });
 
     if (!comment) {
       throw new HttpError(

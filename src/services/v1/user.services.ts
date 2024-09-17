@@ -133,6 +133,7 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
       email,
       isDeleted: false,
     }).lean<UserWithIdInterface>();
+
     if (!user) {
       throw new Error("[Service: getUserByEmail] - User not found");
     }
