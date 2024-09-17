@@ -1,6 +1,6 @@
 export class HttpError extends Error {
   public status: number;
-  public toastMessage: string;
+  public toastMessage?: string;
 
   constructor({
     status,
@@ -13,7 +13,7 @@ export class HttpError extends Error {
   }) {
     super(message);
     this.status = status;
-    this.toastMessage = message;
+    this.toastMessage = toastMessage;
 
     Object.setPrototypeOf(this, HttpError.prototype);
   }
