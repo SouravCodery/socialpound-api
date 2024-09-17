@@ -35,6 +35,16 @@ export const userMiddleware = async (
   } catch (error) {
     logger.error("[Middleware: userMiddleware] - Something went wrong", error);
 
-    return next(new HttpError({ status: 401, message: "Invalid Token" }));
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 401,
+        message: "Invalid Token",
+        toastMessage: "Please sign in again",
+      })
+    );
   }
 };

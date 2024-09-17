@@ -38,6 +38,16 @@ export const authMiddleware = (
   } catch (error) {
     logger.error("Something went wrong in authMiddleware", error);
 
-    return next(new HttpError({ status: 401, message: "Invalid Token" }));
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 401,
+        message: "Invalid Token",
+        toastMessage: "Please sign in again",
+      })
+    );
   }
 };
