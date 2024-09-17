@@ -21,7 +21,9 @@ export const validate = ({
         req.headers = value;
 
         if (error) {
-          return next(new HttpError(422, error.details[0].message));
+          return next(
+            new HttpError({ status: 422, message: error.details[0].message })
+          );
         }
       }
 
@@ -30,7 +32,9 @@ export const validate = ({
         req.body = value;
 
         if (error) {
-          return next(new HttpError(422, error.details[0].message));
+          return next(
+            new HttpError({ status: 422, message: error.details[0].message })
+          );
         }
       }
 
@@ -39,7 +43,9 @@ export const validate = ({
         req.query = value;
 
         if (error) {
-          return next(new HttpError(422, error.details[0].message));
+          return next(
+            new HttpError({ status: 422, message: error.details[0].message })
+          );
         }
       }
 
@@ -48,7 +54,9 @@ export const validate = ({
         req.params = value;
 
         if (error) {
-          return next(new HttpError(422, error.details[0].message));
+          return next(
+            new HttpError({ status: 422, message: error.details[0].message })
+          );
         }
       }
 
@@ -56,7 +64,9 @@ export const validate = ({
     } catch (error) {
       logger.error("Something went wrong in validate middleware", error);
 
-      return next(new HttpError(500, "Internal Server Error"));
+      return next(
+        new HttpError({ status: 500, message: "Internal Server Error" })
+      );
     }
   };
 };

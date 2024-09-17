@@ -28,7 +28,9 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in Sign-In"));
+    return next(
+      new HttpError({ status: 500, message: "Something went wrong in Sign-In" })
+    );
   }
 };
 
@@ -57,7 +59,12 @@ const getUserByUsername = async (
       return next(error);
     }
 
-    return next(new HttpError(500, "Something went wrong in getting user"));
+    return next(
+      new HttpError({
+        status: 500,
+        message: "Something went wrong in getting user",
+      })
+    );
   }
 };
 
@@ -78,7 +85,10 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     return next(
-      new HttpError(500, "[Controller: deleteUser] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: deleteUser] - Something went wrong",
+      })
     );
   }
 };

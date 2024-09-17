@@ -21,7 +21,9 @@ export const userMiddleware = async (
     }
 
     if (!(req as AuthenticatedRequestInterface).decodedAuthToken) {
-      return next(new HttpError(401, "Decoded token not found"));
+      return next(
+        new HttpError({ status: 401, message: "Decoded token not found" })
+      );
     }
 
     const { email } = (req as AuthenticatedRequestInterface).decodedAuthToken;
@@ -33,6 +35,6 @@ export const userMiddleware = async (
   } catch (error) {
     logger.error("[Middleware: userMiddleware] - Something went wrong", error);
 
-    return next(new HttpError(401, "Invalid Token"));
+    return next(new HttpError({ status: 401, message: "Invalid Token" }));
   }
 };

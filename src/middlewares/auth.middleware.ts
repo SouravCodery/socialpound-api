@@ -22,7 +22,9 @@ export const authMiddleware = (
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      return next(new HttpError(401, "User is not authorized"));
+      return next(
+        new HttpError({ status: 401, message: "User is not authorized" })
+      );
     }
 
     const decodedAuthToken = jwt.verify(
@@ -36,6 +38,6 @@ export const authMiddleware = (
   } catch (error) {
     logger.error("Something went wrong in authMiddleware", error);
 
-    return next(new HttpError(401, "Invalid Token"));
+    return next(new HttpError({ status: 401, message: "Invalid Token" }));
   }
 };

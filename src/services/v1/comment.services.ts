@@ -60,7 +60,10 @@ export const addCommentToQueue = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in comment addition");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in comment addition",
+    });
   }
 };
 
@@ -146,7 +149,10 @@ export const addCommentsOnPosts = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong while adding comments");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong while adding comments",
+    });
   }
 };
 
@@ -242,7 +248,10 @@ export const getCommentsByPostId = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in fetching comments");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in fetching comments",
+    });
   }
 };
 
@@ -266,20 +275,21 @@ export const deleteCommentById = async ({
       });
 
     if (!comment) {
-      throw new HttpError(
-        404,
-        "[Service: deleteCommentById] - Comment not found"
-      );
+      throw new HttpError({
+        status: 404,
+        message: "[Service: deleteCommentById] - Comment not found",
+      });
     }
 
     if (
       (comment.user.toString() === user ||
         comment.post.user.toString() === user) === false
     ) {
-      throw new HttpError(
-        403,
-        "[Service: deleteCommentById] - Unauthorized to delete this comment"
-      );
+      throw new HttpError({
+        status: 403,
+        message:
+          "[Service: deleteCommentById] - Unauthorized to delete this comment",
+      });
     }
 
     await comment.softDelete();
@@ -304,9 +314,9 @@ export const deleteCommentById = async ({
       throw error;
     }
 
-    throw new HttpError(
-      500,
-      "[Service: deleteCommentById] - Something went wrong"
-    );
+    throw new HttpError({
+      status: 500,
+      message: "[Service: deleteCommentById] - Something went wrong",
+    });
   }
 };

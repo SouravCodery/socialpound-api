@@ -35,10 +35,10 @@ export const likePostOrComment = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: likePostOrComment] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: likePostOrComment] - Something went wrong",
+      })
     );
   }
 };
@@ -69,10 +69,10 @@ export const getLikesByPostId = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: getLikesByPostId] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: getLikesByPostId] - Something went wrong",
+      })
     );
   }
 };
@@ -101,10 +101,10 @@ export const getPostsLikedByUser = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: getPostsLikedByUser] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: getPostsLikedByUser] - Something went wrong",
+      })
     );
   }
 };
@@ -137,7 +137,10 @@ export const unlikePost = async (
     }
 
     return next(
-      new HttpError(500, "[Controller: unlikePost] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: unlikePost] - Something went wrong",
+      })
     );
   }
 };

@@ -25,7 +25,7 @@ export const signIn = async ({
     const userDataOAuth = decodeSignedUserDataJWT({ signedUserDataJWT });
 
     if (decodedAuthToken.email !== userDataOAuth.user.email) {
-      throw new HttpError(401, "User is not authorized");
+      throw new HttpError({ status: 401, message: "User is not authorized" });
     }
 
     const userDataGoogle =
@@ -119,7 +119,10 @@ export const signIn = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in Sign-In");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in Sign-In",
+    });
   }
 };
 
@@ -158,7 +161,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       .lean<UserWithIdInterface>();
 
     if (!user) {
-      throw new HttpError(404, "User not found");
+      throw new HttpError({ status: 404, message: "User not found" });
     }
 
     return new HttpResponse({
@@ -173,7 +176,10 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in getting user");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in getting user",
+    });
   }
 };
 
@@ -230,7 +236,10 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
       .lean();
 
     if (!user) {
-      throw new HttpError(404, "[Service: deleteUser] - User not found");
+      throw new HttpError({
+        status: 404,
+        message: "[Service: deleteUser] - User not found",
+      });
     }
 
     return new HttpResponse({
@@ -244,6 +253,9 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
       throw error;
     }
 
-    throw new HttpError(500, "[Service: deleteUser] - Something went wrong");
+    throw new HttpError({
+      status: 500,
+      message: "[Service: deleteUser] - Something went wrong",
+    });
   }
 };

@@ -35,7 +35,10 @@ export const addComment = async (
     }
 
     return next(
-      new HttpError(500, "[Controller: addComment] - Something went wrong")
+      new HttpError({
+        status: 500,
+        message: "[Controller: addComment] - Something went wrong",
+      })
     );
   }
 };
@@ -66,10 +69,10 @@ export const getCommentsByPostId = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: getCommentsByPostId] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: getCommentsByPostId] - Something went wrong",
+      })
     );
   }
 };
@@ -97,10 +100,10 @@ export const deleteCommentById = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: deleteCommentById] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: deleteCommentById] - Something went wrong",
+      })
     );
   }
 };

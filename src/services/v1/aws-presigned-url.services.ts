@@ -46,6 +46,9 @@ export const getPresignedUrl = async ({
       throw error;
     }
 
-    throw new HttpError(500, "Something went wrong in generating signed url");
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in generating signed url",
+    });
   }
 };

@@ -36,10 +36,11 @@ export const addMarkNotificationAsRead = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: addMarkNotificationAsRead] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message:
+          "[Controller: addMarkNotificationAsRead] - Something went wrong",
+      })
     );
   }
 };
@@ -74,10 +75,10 @@ export const getNotificationsByUser = async (
     }
 
     return next(
-      new HttpError(
-        500,
-        "[Controller: getNotificationsByUser] - Something went wrong"
-      )
+      new HttpError({
+        status: 500,
+        message: "[Controller: getNotificationsByUser] - Something went wrong",
+      })
     );
   }
 };

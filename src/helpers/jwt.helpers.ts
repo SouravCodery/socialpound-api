@@ -26,6 +26,6 @@ export const decodeSignedUserDataJWT = ({
     return decodedSignedUserData as GoogleAuthUserInterface;
   } catch (error) {
     logger.error("Something went wrong in decodedSignedUserDataJWT", error);
-    throw new HttpError(401, "Invalid User Data");
+    throw new HttpError({ status: 401, message: "Invalid User Data" });
   }
 };
