@@ -306,6 +306,7 @@ export const deleteCommentById = async ({
     return new HttpResponse({
       status: 200,
       message: "Comment deleted successfully",
+      toastMessage: "Comment deleted successfully",
     });
   } catch (error) {
     logger.error("[Service: deleteCommentById] - Something went wrong", error);

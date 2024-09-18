@@ -191,6 +191,7 @@ export const deletePostById = async ({
     return new HttpResponse({
       status: 200,
       message: "Posts deleted successfully",
+      toastMessage: "Post deleted successfully",
     });
   } catch (error) {
     logger.error("[Service: deletePostById] - Something went wrong", error);
