@@ -18,7 +18,7 @@ import {
 } from "./persistent-redis.services";
 import { addNotificationsToQueue } from "./notification.services";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
-import { PostInterface } from "../../interfaces/post.interface";
+import { PostWithIdInterface } from "../../interfaces/post.interface";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -268,7 +268,7 @@ export const deleteCommentById = async ({
       isDeleted: false,
     })
       .select("user post")
-      .populate<{ post: PostInterface }>({
+      .populate<{ post: PostWithIdInterface }>({
         path: "post",
         select: "user",
         match: { isDeleted: false },
@@ -297,7 +297,7 @@ export const deleteCommentById = async ({
     if (comment?.post) {
       await incrementLikeOrCommentCountInBulk({
         entityType: "Post",
-        ids: [comment.post.toString()],
+        ids: [comment.post._id.toString()],
         countType: "commentsCount",
         incrementBy: -1,
       });
