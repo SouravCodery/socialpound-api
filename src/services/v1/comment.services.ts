@@ -217,7 +217,7 @@ export const getCommentsByPostId = async ({
       .sort({ _id: -1 })
       .populate({
         path: "user",
-        select: "username fullName profilePicture -_id",
+        select: "username fullName profilePicture",
         match: { isDeleted: false },
       })
       .lean();
