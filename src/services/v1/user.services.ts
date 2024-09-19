@@ -161,7 +161,11 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       .lean<UserWithIdInterface>();
 
     if (!user) {
-      throw new HttpError({ status: 404, message: "User not found" });
+      throw new HttpError({
+        status: 404,
+        message: "User not found",
+        toastMessage: "User not found",
+      });
     }
 
     return new HttpResponse({
