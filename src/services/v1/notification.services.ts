@@ -9,7 +9,6 @@ import Notification from "../../models/notification.model";
 import {
   NotificationInterface,
   NotificationJobInterface,
-  NotificationWithIdInterface,
 } from "../../interfaces/notification.interface";
 import { notificationQueue } from "../../mq/bull-mq/index.bull-mq";
 
