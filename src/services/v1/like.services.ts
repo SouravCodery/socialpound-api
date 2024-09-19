@@ -99,7 +99,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
     successfullyInsertedLikes.forEach((like) => {
       const recipient = existingPostsMap.get(like.post.toString())?.user;
 
-      if (recipient && like.liker !== recipient) {
+      if (recipient && like.liker.toString() !== recipient.toString()) {
         notificationJobs.push({
           name: "add-notification",
           data: {

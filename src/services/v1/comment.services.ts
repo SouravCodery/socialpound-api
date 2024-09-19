@@ -120,7 +120,7 @@ export const addCommentsOnPosts = async ({
     successfullyInsertedComments.forEach((comment) => {
       const recipient = existingPostsMap.get(comment.post.toString())?.user;
 
-      if (recipient && comment.user !== recipient) {
+      if (recipient && comment.user.toString() !== recipient.toString()) {
         notificationJobs.push({
           name: "add-notification",
           data: {
