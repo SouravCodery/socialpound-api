@@ -37,6 +37,8 @@ const getEnvironmentVariable = <TKey extends keyof TypeMap>(
 };
 
 export const Config = {
+  NODE_ENV: getEnvironmentVariable("NODE_ENV", "string"),
+
   MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
   PORT: getEnvironmentVariable("PORT", "number"),
 
