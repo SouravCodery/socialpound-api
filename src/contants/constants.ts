@@ -1,4 +1,4 @@
-export const CONSTANTS = {
+export const Constants = {
   DURATION: {
     ONE_MINUTE: 60,
     FIVE_MINUTES: 300,

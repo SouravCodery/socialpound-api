@@ -1,6 +1,6 @@
 import { promisify } from "util";
 
-import { CONSTANTS } from "../../contants/constants";
+import { Constants } from "../../contants/constants";
 import { redisCacheClient } from "../../config/redis-cache.config";
 import { logger } from "../../logger/index.logger";
 
@@ -27,7 +27,7 @@ export const getCache = async ({
 export const setCache = async ({
   key,
   value,
-  ttl = CONSTANTS.DURATION.ONE_HOUR,
+  ttl = Constants.DURATION.ONE_HOUR,
 }: {
   key: string;
   value: Object;
