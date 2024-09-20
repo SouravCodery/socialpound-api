@@ -2,8 +2,8 @@ import app from "./app";
 import connectToDatabase from "./src/config/database.config";
 import { Config } from "./src/config/config";
 
-import { persistentRedisClient } from "./src/config/redis-persistent.config";
-import { cacheRedisClient } from "./src/config/redis-cache.config";
+import { redisKeyValueStoreClient } from "./src/config/redis-key-value-store.config";
+import { redisCacheClient } from "./src/config/redis-cache.config";
 
 import { logger } from "./src/logger/index.logger";
 
@@ -15,8 +15,8 @@ const port = Config.PORT;
   try {
     await Promise.all([
       connectToDatabase(),
-      persistentRedisClient.connect(),
-      cacheRedisClient.connect(),
+      redisKeyValueStoreClient.connect(),
+      redisCacheClient.connect(),
     ]);
 
     logger.info("Connected to persistentRedis and cacheRedis");
