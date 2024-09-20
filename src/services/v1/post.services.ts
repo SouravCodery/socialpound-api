@@ -113,7 +113,7 @@ export const getPosts = async ({
       .sort({ _id: -1 })
       .populate({
         path: "user",
-        select: "username fullName profilePicture -_id",
+        select: "username fullName profilePicture",
         match: { isDeleted: false },
       })
       .select("-createdAt -updatedAt -__v")
@@ -191,6 +191,7 @@ export const deletePostById = async ({
     return new HttpResponse({
       status: 200,
       message: "Posts deleted successfully",
+      toastMessage: "Post deleted successfully",
     });
   } catch (error) {
     logger.error("[Service: deletePostById] - Something went wrong", error);

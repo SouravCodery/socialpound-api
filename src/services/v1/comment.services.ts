@@ -18,7 +18,7 @@ import {
 } from "./persistent-redis.services";
 import { addNotificationsToQueue } from "./notification.services";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
-import { PostInterface } from "../../interfaces/post.interface";
+import { PostWithIdInterface } from "../../interfaces/post.interface";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -120,7 +120,7 @@ export const addCommentsOnPosts = async ({
     successfullyInsertedComments.forEach((comment) => {
       const recipient = existingPostsMap.get(comment.post.toString())?.user;
 
-      if (recipient && comment.user !== recipient) {
+      if (recipient && comment.user.toString() !== recipient.toString()) {
         notificationJobs.push({
           name: "add-notification",
           data: {
@@ -217,7 +217,7 @@ export const getCommentsByPostId = async ({
       .sort({ _id: -1 })
       .populate({
         path: "user",
-        select: "username fullName profilePicture -_id",
+        select: "username fullName profilePicture",
         match: { isDeleted: false },
       })
       .lean();
@@ -268,7 +268,7 @@ export const deleteCommentById = async ({
       isDeleted: false,
     })
       .select("user post")
-      .populate<{ post: PostInterface }>({
+      .populate<{ post: PostWithIdInterface }>({
         path: "post",
         select: "user",
         match: { isDeleted: false },
@@ -297,7 +297,7 @@ export const deleteCommentById = async ({
     if (comment?.post) {
       await incrementLikeOrCommentCountInBulk({
         entityType: "Post",
-        ids: [comment.post.toString()],
+        ids: [comment.post._id.toString()],
         countType: "commentsCount",
         incrementBy: -1,
       });
@@ -306,6 +306,7 @@ export const deleteCommentById = async ({
     return new HttpResponse({
       status: 200,
       message: "Comment deleted successfully",
+      toastMessage: "Comment deleted successfully",
     });
   } catch (error) {
     logger.error("[Service: deleteCommentById] - Something went wrong", error);

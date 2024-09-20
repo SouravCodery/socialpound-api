@@ -99,7 +99,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
     successfullyInsertedLikes.forEach((like) => {
       const recipient = existingPostsMap.get(like.post.toString())?.user;
 
-      if (recipient && like.liker !== recipient) {
+      if (recipient && like.liker.toString() !== recipient.toString()) {
         notificationJobs.push({
           name: "add-notification",
           data: {
@@ -159,7 +159,7 @@ export const getLikesByPostId = async ({
       .sort({ _id: -1 })
       .populate({
         path: "liker",
-        select: "username fullName profilePicture -_id",
+        select: "username fullName profilePicture",
         match: { isDeleted: false },
       })
       .select("liker")

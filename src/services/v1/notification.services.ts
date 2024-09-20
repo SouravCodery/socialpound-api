@@ -9,7 +9,6 @@ import Notification from "../../models/notification.model";
 import {
   NotificationInterface,
   NotificationJobInterface,
-  NotificationWithIdInterface,
 } from "../../interfaces/notification.interface";
 import { notificationQueue } from "../../mq/bull-mq/index.bull-mq";
 
@@ -133,7 +132,7 @@ export const getNotificationsByUser = async ({
 
       .populate({
         path: "sender",
-        select: "username fullName profilePicture -_id",
+        select: "username fullName profilePicture",
         match: { isDeleted: false },
       })
       .populate({
