@@ -46,8 +46,8 @@ export const Config = {
     "string"
   ),
 
-  REDIS_PERSISTENT_URL: getEnvironmentVariable(
-    "REDIS_PERSISTENT_URL",
+  REDIS_KEY_VALUE_STORE_URL: getEnvironmentVariable(
+    "REDIS_KEY_VALUE_STORE_URL",
     "string"
   ),
   REDIS_CACHE_URL: getEnvironmentVariable("REDIS_CACHE_URL", "string"),
