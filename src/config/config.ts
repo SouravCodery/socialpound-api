@@ -57,4 +57,6 @@ export const Config = {
 
   AWS_REGION: getEnvironmentVariable("AWS_REGION", "string"),
   AWS_BUCKET_NAME: getEnvironmentVariable("AWS_BUCKET_NAME", "string"),
+
+  REDIS_CACHE_ENABLED: getEnvironmentVariable("REDIS_CACHE_URL", "boolean"),
 } as const;
