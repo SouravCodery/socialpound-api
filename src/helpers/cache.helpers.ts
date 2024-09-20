@@ -9,7 +9,7 @@ export const getCacheKey = ({
   url: string;
   params: object;
   query: object;
-  authenticatedUserId?: string;
+  authenticatedUserId: string | null;
 }): string => {
   const processedUrl = url.replaceAll("/", ":");
 
