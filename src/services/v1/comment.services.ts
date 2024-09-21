@@ -105,19 +105,19 @@ export const addCommentsOnPosts = async ({
     }
 
     //kv increment begins
-    const postIsForCounterIncrements = successfullyInsertedComments.map(
+    const successfullyInsertedCommentsPostId = successfullyInsertedComments.map(
       (comment) => comment.post.toString()
     );
 
     await incrementLikeOrCommentCountInBulk({
       entityType: "Post",
-      ids: postIsForCounterIncrements,
+      ids: successfullyInsertedCommentsPostId,
       countType: "commentsCount",
     });
 
     //cache purge
     await deleteAPICache({
-      keys: postIsForCounterIncrements.map((postId) => ({
+      keys: successfullyInsertedCommentsPostId.map((postId) => ({
         url: "/v1/comment",
         params: { postId },
         query: {},
