@@ -4,10 +4,10 @@ import { HttpError } from "../classes/http-error.class";
 import { logger } from "../logger/index.logger";
 
 export const validate = ({
-  bodySchema,
+  bodySchema = Joi.object({}),
   headersSchema,
-  querySchema,
-  paramsSchema,
+  querySchema = Joi.object({}),
+  paramsSchema = Joi.object({}),
 }: {
   bodySchema?: Joi.ObjectSchema;
   headersSchema?: Joi.ObjectSchema;
