@@ -15,6 +15,7 @@ import {
 } from "../../interfaces/like.interface";
 import { incrementLikeOrCommentCountInBulk } from "./redis-key-value-store.services";
 import { addNotificationsToQueue } from "./notification.services";
+import { deleteAPICache } from "./redis-cache.services";
 
 export const addLikeToQueue = async ({
   likeOn,
@@ -83,14 +84,36 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
     }
 
     //kv increment begins
-    const postIsForCounterIncrements = successfullyInsertedLikes.map((like) =>
-      like.post.toString()
+    const successfullyInsertedLikesPostIds = successfullyInsertedLikes.map(
+      (like) => like.post.toString()
     );
 
     await incrementLikeOrCommentCountInBulk({
       entityType: "Post",
-      ids: postIsForCounterIncrements,
+      ids: successfullyInsertedLikesPostIds,
       countType: "likesCount",
+    });
+
+    //cache purge
+    const successfullyInsertedLikesLikerIds = successfullyInsertedLikes.map(
+      (like) => like.liker.toString()
+    );
+
+    await deleteAPICache({
+      keys: [
+        ...successfullyInsertedLikesPostIds.map((postId) => ({
+          url: "/v1/like",
+          params: { postId },
+          query: {},
+          authenticatedUserId: null,
+        })),
+        ...successfullyInsertedLikesLikerIds.map((userId) => ({
+          url: "/v1/like",
+          params: {},
+          query: {},
+          authenticatedUserId: userId,
+        })),
+      ],
     });
 
     //notification addition begins
@@ -250,6 +273,24 @@ export const unlikePost = async ({
         ids: [post],
         countType: "likesCount",
         incrementBy: -1,
+      });
+
+      //cache purge
+      await deleteAPICache({
+        keys: [
+          {
+            url: "/v1/like",
+            params: { postId: post },
+            query: {},
+            authenticatedUserId: null,
+          },
+          {
+            url: "/v1/like",
+            params: {},
+            query: {},
+            authenticatedUserId: liker,
+          },
+        ],
       });
     }
 
