@@ -1,5 +1,7 @@
-import { Constants } from "../../constants/constants";
 import { redisCacheClient } from "../../config/redis-cache.config";
+import { getCacheKey } from "../../helpers/cache.helpers";
+
+import { Constants } from "../../constants/constants";
 import { logger } from "../../logger/index.logger";
 
 export const getCache = async ({
@@ -42,7 +44,11 @@ export const setCache = async ({
   }
 };
 
-export const delCache = async ({ key }: { key: string }): Promise<boolean> => {
+export const deleteCache = async ({
+  key,
+}: {
+  key: string;
+}): Promise<boolean> => {
   try {
     const result = await redisCacheClient.del(key);
 
@@ -50,6 +56,90 @@ export const delCache = async ({ key }: { key: string }): Promise<boolean> => {
     return true;
   } catch (error) {
     logger.error(`[Service: delCache] - Something went wrong`, error);
+    return false;
+  }
+};
+
+export const getAPICache = async ({
+  url,
+  params,
+  query,
+  authenticatedUserId,
+}: {
+  url: string;
+  params: object;
+  query: object;
+  authenticatedUserId: string | null;
+}) => {
+  try {
+    const cacheKey = getCacheKey({
+      url,
+      params,
+      query,
+      authenticatedUserId,
+    });
+
+    return await getCache({ key: cacheKey });
+  } catch (error) {
+    logger.error(`[Service: getAPICache] - Something went wrong`, error);
+    return null;
+  }
+};
+
+export const setAPICache = async ({
+  url,
+  params,
+  query,
+  authenticatedUserId,
+
+  value,
+  ttl = "ONE_HOUR",
+}: {
+  url: string;
+  params: object;
+  query: object;
+  authenticatedUserId: string | null;
+
+  value: Object;
+  ttl?: "ONE_MINUTE" | "FIVE_MINUTES" | "ONE_HOUR" | "ONE_DAY";
+}) => {
+  try {
+    const cacheKey = getCacheKey({
+      url,
+      params,
+      query,
+      authenticatedUserId,
+    });
+
+    return await setCache({ key: cacheKey, value, ttl });
+  } catch (error) {
+    logger.error(`[Service: setAPICache] - Something went wrong`, error);
+    return false;
+  }
+};
+
+export const deleteAPICache = async ({
+  url,
+  params,
+  query,
+  authenticatedUserId,
+}: {
+  url: string;
+  params: object;
+  query: object;
+  authenticatedUserId: string | null;
+}) => {
+  try {
+    const cacheKey = getCacheKey({
+      url,
+      params,
+      query,
+      authenticatedUserId,
+    });
+
+    return await deleteCache({ key: cacheKey });
+  } catch (error) {
+    logger.error(`[Service: deleteAPICache] - Something went wrong`, error);
     return false;
   }
 };
