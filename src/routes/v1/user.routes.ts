@@ -6,6 +6,7 @@ import * as userValidationSchemas from "../../validators/user-routes.validators"
 import { validate } from "../../middlewares/validate.middleware";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { userMiddleware } from "../../middlewares/user.middleware";
+import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 const userRouter = express.Router();
 
@@ -19,7 +20,11 @@ userRouter.post(
 userRouter.use(authMiddleware);
 userRouter.use(userMiddleware);
 
-userRouter.get("/:username", userController.getUserByUsername);
+userRouter.get(
+  "/:username",
+  cacheMiddleware({ isAuthenticatedUserSpecificRequest: false }),
+  userController.getUserByUsername
+);
 
 userRouter.delete("/", userController.deleteUser);
 
