@@ -3,6 +3,7 @@ import { getCacheKey } from "../../helpers/cache.helpers";
 
 import { Constants } from "../../constants/constants";
 import { logger } from "../../logger/index.logger";
+import { APICacheKeyParamsInterface } from "../../interfaces/redis-cache.interface";
 
 export const getCache = async ({
   key,
@@ -26,8 +27,8 @@ export const setCache = async ({
   ttl = "ONE_HOUR",
 }: {
   key: string;
-  value: Object;
-  ttl?: "ONE_MINUTE" | "FIVE_MINUTES" | "ONE_HOUR" | "ONE_DAY";
+  value: APICacheKeyParamsInterface["value"];
+  ttl?: APICacheKeyParamsInterface["ttl"];
 }): Promise<boolean> => {
   try {
     const stringValue = JSON.stringify(value);
@@ -94,15 +95,7 @@ export const setAPICache = async ({
 
   value,
   ttl = "ONE_HOUR",
-}: {
-  url: string;
-  params: object;
-  query: object;
-  authenticatedUserId: string | null;
-
-  value: Object;
-  ttl?: "ONE_MINUTE" | "FIVE_MINUTES" | "ONE_HOUR" | "ONE_DAY";
-}) => {
+}: APICacheKeyParamsInterface) => {
   try {
     const cacheKey = getCacheKey({
       url,
@@ -123,12 +116,7 @@ export const deleteAPICache = async ({
   params,
   query,
   authenticatedUserId,
-}: {
-  url: string;
-  params: object;
-  query: object;
-  authenticatedUserId: string | null;
-}) => {
+}: APICacheKeyParamsInterface) => {
   try {
     const cacheKey = getCacheKey({
       url,
