@@ -1,16 +1,17 @@
 import { Request, Response, NextFunction } from "express";
-import { getCache } from "../services/v1/redis-cache.services";
-import { getCacheKey } from "../helpers/cache.helpers";
+import { getAPICache } from "../services/v1/redis-cache.services";
+
+import { AuthenticatedUserRequestInterface } from "./../interfaces/extended-request.interface";
 import { Config } from "../config/config";
 import { logger } from "../logger/index.logger";
 
 export function cacheMiddleware({
-  authenticatedUserId,
+  isAuthenticatedUserSpecificRequest,
 }: {
-  authenticatedUserId: string | null;
+  isAuthenticatedUserSpecificRequest: boolean;
 }) {
   return async function (req: Request, res: Response, next: NextFunction) {
-    if (req.method === "OPTIONS") {
+    if (req.method === "OPTIONS" || req.method !== "GET") {
       return next();
     }
 
@@ -19,23 +20,21 @@ export function cacheMiddleware({
     }
 
     try {
-      const cacheKey = getCacheKey({
+      const authenticatedUserId = isAuthenticatedUserSpecificRequest
+        ? (req as AuthenticatedUserRequestInterface)?.userId
+        : null;
+
+      const cachedData = await getAPICache({
         url: req.baseUrl,
         params: req.params,
         query: req.query,
         authenticatedUserId,
       });
 
-      const cachedData = await getCache({ key: cacheKey });
-
       if (cachedData) {
-        logger.info(`[Cache Hit] - Cache found for ${cacheKey}`);
-
         res.setHeader("Accelerated", "true");
         return res.status(200).json(cachedData);
       }
-
-      logger.info(`[Cache Miss] - No cache found for ${cacheKey}`);
     } catch (error) {
       logger.error(
         `[Middleware: cacheMiddleware] - Error fetching cache for ${req.originalUrl}`,
