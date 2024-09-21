@@ -37,6 +37,8 @@ const getEnvironmentVariable = <TKey extends keyof TypeMap>(
 };
 
 export const Config = {
+  NODE_ENV: getEnvironmentVariable("NODE_ENV", "string"),
+
   MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
   PORT: getEnvironmentVariable("PORT", "number"),
 
@@ -46,8 +48,8 @@ export const Config = {
     "string"
   ),
 
-  REDIS_PERSISTENT_URL: getEnvironmentVariable(
-    "REDIS_PERSISTENT_URL",
+  REDIS_KEY_VALUE_STORE_URL: getEnvironmentVariable(
+    "REDIS_KEY_VALUE_STORE_URL",
     "string"
   ),
   REDIS_CACHE_URL: getEnvironmentVariable("REDIS_CACHE_URL", "string"),
@@ -57,4 +59,6 @@ export const Config = {
 
   AWS_REGION: getEnvironmentVariable("AWS_REGION", "string"),
   AWS_BUCKET_NAME: getEnvironmentVariable("AWS_BUCKET_NAME", "string"),
+
+  REDIS_CACHE_ENABLED: getEnvironmentVariable("REDIS_CACHE_ENABLED", "boolean"),
 } as const;

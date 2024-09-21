@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { logger } from "../../logger/index.logger";
 
-import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
 import * as likeServices from "../../services/v1/like.services";
+import { setAPICache } from "../../services/v1/redis-cache.services";
+import { logger } from "../../logger/index.logger";
 import { HttpError } from "../../classes/http-error.class";
+import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
 
 export const likePostOrComment = async (
   req: Request,
@@ -52,12 +53,20 @@ export const getLikesByPostId = async (
     const postId = req.params.postId;
     const { cursor } = req.query;
 
-    const comments = await likeServices.getLikesByPostId({
+    const likes = await likeServices.getLikesByPostId({
       postId,
       cursor: cursor?.toString(),
     });
 
-    return res.status(comments.getStatus()).json(comments.getResponse());
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: null,
+      value: likes.getResponse(),
+    });
+
+    return res.status(likes.getStatus()).json(likes.getResponse());
   } catch (error) {
     logger.error(
       "[Controller: getLikesByPostId] - Something went wrong",
@@ -83,10 +92,18 @@ export const getPostsLikedByUser = async (
   next: NextFunction
 ) => {
   try {
-    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const user = (req as AuthenticatedUserRequestInterface).userId;
 
     const likes = await likeServices.getPostLikedByUser({
       user,
+    });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: user,
+      value: likes.getResponse(),
     });
 
     return res.status(likes.getStatus()).json(likes.getResponse());

@@ -11,12 +11,12 @@ import { Config } from "./config";
 
 import { logger } from "../logger/index.logger";
 
-export const persistentRedisClient = createClient({
-  url: Config.REDIS_PERSISTENT_URL,
+export const redisKeyValueStoreClient = createClient({
+  url: Config.REDIS_KEY_VALUE_STORE_URL,
 });
 
-persistentRedisClient.on("error", (err) => {
-  logger.error("Persistent Redis Client Error", err);
+redisKeyValueStoreClient.on("error", (err) => {
+  logger.error("Redis Key Value Store Error", err);
 
   if (err.code === "ECONNREFUSED") {
     process.exit(1);

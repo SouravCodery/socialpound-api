@@ -13,7 +13,7 @@ import {
   LikeDocumentInterface,
   LikeInterface,
 } from "../../interfaces/like.interface";
-import { incrementLikeOrCommentCountInBulk } from "./persistent-redis.services";
+import { incrementLikeOrCommentCountInBulk } from "./redis-key-value-store.services";
 import { addNotificationsToQueue } from "./notification.services";
 
 export const addLikeToQueue = async ({

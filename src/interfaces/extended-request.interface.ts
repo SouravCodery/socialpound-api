@@ -10,4 +10,5 @@ export interface AuthenticatedRequestInterface extends Request {
 export interface AuthenticatedUserRequestInterface
   extends AuthenticatedRequestInterface {
   user: UserWithIdInterface;
+  userId: string;
 }

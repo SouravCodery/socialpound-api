@@ -6,6 +6,7 @@ import * as notificationValidationSchemas from "../../validators/notification-ro
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { userMiddleware } from "../../middlewares/user.middleware";
 import { validate } from "../../middlewares/validate.middleware";
+import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 const notificationRouter = express.Router();
 
@@ -15,6 +16,7 @@ notificationRouter.use(userMiddleware);
 notificationRouter.get(
   "/",
   validate(notificationValidationSchemas.getNotificationsByUserValidatorSchema),
+  cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
   notificationController.getNotificationsByUser
 );
 

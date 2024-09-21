@@ -10,7 +10,7 @@ import {
   PostWithIdInterface,
 } from "./../../interfaces/post.interface";
 
-import { getLikeAndCommentsCountInBulk } from "./persistent-redis.services";
+import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services";
 import { incrementPostsCountForUser } from "./user.services";
 
 export const createPost = async ({

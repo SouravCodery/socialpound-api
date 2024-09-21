@@ -15,7 +15,7 @@ import {
 import {
   getLikeAndCommentsCountInBulk,
   incrementLikeOrCommentCountInBulk,
-} from "./persistent-redis.services";
+} from "./redis-key-value-store.services";
 import { addNotificationsToQueue } from "./notification.services";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
 import { PostWithIdInterface } from "../../interfaces/post.interface";

@@ -11,12 +11,12 @@ import { Config } from "./config";
 
 import { logger } from "../logger/index.logger";
 
-export const cacheRedisClient = createClient({
+export const redisCacheClient = createClient({
   url: Config.REDIS_CACHE_URL,
 });
 
-cacheRedisClient.on("error", (err) => {
-  logger.error("Cache Redis Client Error", err);
+redisCacheClient.on("error", (err) => {
+  logger.error("Redis Cache Client Error", err);
 
   if (err.code === "ECONNREFUSED") {
     process.exit(1);

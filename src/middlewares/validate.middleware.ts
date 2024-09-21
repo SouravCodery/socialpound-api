@@ -4,10 +4,10 @@ import { HttpError } from "../classes/http-error.class";
 import { logger } from "../logger/index.logger";
 
 export const validate = ({
-  bodySchema,
+  bodySchema = Joi.object({}),
   headersSchema,
-  querySchema,
-  paramsSchema,
+  querySchema = Joi.object({}),
+  paramsSchema = Joi.object({}),
 }: {
   bodySchema?: Joi.ObjectSchema;
   headersSchema?: Joi.ObjectSchema;
@@ -17,8 +17,7 @@ export const validate = ({
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       if (headersSchema) {
-        const { error, value } = headersSchema.validate(req.headers);
-        req.headers = value;
+        const { error } = headersSchema.validate(req.headers);
 
         if (error) {
           return next(
@@ -39,8 +38,7 @@ export const validate = ({
       }
 
       if (querySchema) {
-        const { error, value } = querySchema.validate(req.query);
-        req.query = value;
+        const { error } = querySchema.validate(req.query);
 
         if (error) {
           return next(
@@ -50,8 +48,7 @@ export const validate = ({
       }
 
       if (paramsSchema) {
-        const { error, value } = paramsSchema.validate(req.params);
-        req.params = value;
+        const { error } = paramsSchema.validate(req.params);
 
         if (error) {
           return next(

@@ -5,6 +5,7 @@ import * as postServices from "../../services/v1/post.services";
 import { HttpError } from "../../classes/http-error.class";
 
 import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
+import { setAPICache } from "../../services/v1/redis-cache.services";
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,6 +46,15 @@ const getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
       cursor: cursor?.toString(),
     });
 
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: null,
+      value: posts.getResponse(),
+      ttl: "FIVE_MINUTES",
+    });
+
     return res.status(posts.getStatus()).json(posts.getResponse());
   } catch (error) {
     logger.error("[Controller: getUserFeed] - Something went wrong", error);
@@ -74,6 +84,15 @@ const getPostsByUserId = async (
     const posts = await postServices.getPosts({
       userId,
       cursor: cursor?.toString(),
+    });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: null,
+      value: posts.getResponse(),
+      ttl: "ONE_HOUR",
     });
 
     return res.status(posts.getStatus()).json(posts.getResponse());

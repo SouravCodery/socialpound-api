@@ -1,12 +1,13 @@
-import { AuthenticatedUserRequestInterface } from "./../../interfaces/extended-request.interface";
-import { AuthenticatedRequestInterface } from "../../interfaces/extended-request.interface";
-
 import { Request, Response, NextFunction } from "express";
 
+import * as userServices from "../../services/v1/user.services";
+import { setAPICache } from "../../services/v1/redis-cache.services";
+import {
+  AuthenticatedRequestInterface,
+  AuthenticatedUserRequestInterface,
+} from "./../../interfaces/extended-request.interface";
 import { logger } from "../../logger/index.logger";
 import { HttpError } from "../../classes/http-error.class";
-
-import * as userServices from "../../services/v1/user.services";
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -44,6 +45,14 @@ const getUserByUsername = async (
 
     const getUserResponse = await userServices.getUserByUsername({
       username,
+    });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: null,
+      value: getUserResponse.getResponse(),
     });
 
     return res

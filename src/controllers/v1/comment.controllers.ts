@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { logger } from "../../logger/index.logger";
 
 import * as commentServices from "../../services/v1/comment.services";
-
+import { setAPICache } from "../../services/v1/redis-cache.services";
+import { logger } from "../../logger/index.logger";
 import { HttpError } from "../../classes/http-error.class";
-
 import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
 
 export const addComment = async (
@@ -55,6 +54,14 @@ export const getCommentsByPostId = async (
     const comments = await commentServices.getCommentsByPostId({
       postId,
       cursor: cursor?.toString(),
+    });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: null,
+      value: comments.getResponse(),
     });
 
     return res.status(comments.getStatus()).json(comments.getResponse());

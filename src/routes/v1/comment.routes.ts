@@ -6,6 +6,7 @@ import * as commentValidationSchemas from "../../validators/comment-routes.valid
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { userMiddleware } from "../../middlewares/user.middleware";
 import { validate } from "../../middlewares/validate.middleware";
+import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 const commentRouter = express.Router();
 
@@ -21,6 +22,7 @@ commentRouter.post(
 commentRouter.get(
   "/post/:postId",
   validate(commentValidationSchemas.getCommentsByPostIdValidatorSchema),
+  cacheMiddleware({ isAuthenticatedUserSpecificRequest: false }),
   commentController.getCommentsByPostId
 );
 

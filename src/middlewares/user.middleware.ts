@@ -30,6 +30,7 @@ export const userMiddleware = async (
     const user = await getUserByEmail({ email });
 
     (req as AuthenticatedUserRequestInterface).user = user;
+    (req as AuthenticatedUserRequestInterface).userId = user?._id?.toString();
 
     next();
   } catch (error) {

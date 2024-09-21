@@ -1,4 +1,4 @@
-import { persistentRedisClient } from "../../config/redis-persistent.config";
+import { redisKeyValueStoreClient } from "../../config/redis-key-value-store.config";
 import { logger } from "../../logger/index.logger";
 
 export const incrementLikeOrCommentCountInBulk = async ({
@@ -13,7 +13,7 @@ export const incrementLikeOrCommentCountInBulk = async ({
   incrementBy?: number;
 }) => {
   try {
-    const multi = persistentRedisClient.multi();
+    const multi = redisKeyValueStoreClient.multi();
 
     ids.forEach((id) => {
       const hashKey = `${entityType}:${id}:counter`;
@@ -38,7 +38,7 @@ export const getLikeAndCommentsCountInBulk = async ({
   ids: string[];
 }) => {
   try {
-    const multi = persistentRedisClient.multi();
+    const multi = redisKeyValueStoreClient.multi();
 
     ids.forEach((id) => {
       const hashKey = `${entityType}:${id}:counter`;
