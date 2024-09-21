@@ -19,6 +19,7 @@ import {
 import { addNotificationsToQueue } from "./notification.services";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
 import { PostWithIdInterface } from "../../interfaces/post.interface";
+import { deleteAPICache } from "./redis-cache.services";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -112,6 +113,16 @@ export const addCommentsOnPosts = async ({
       entityType: "Post",
       ids: postIsForCounterIncrements,
       countType: "commentsCount",
+    });
+
+    //cache purge
+    await deleteAPICache({
+      keys: postIsForCounterIncrements.map((postId) => ({
+        url: "/v1/comment",
+        params: { postId },
+        query: {},
+        authenticatedUserId: null,
+      })),
     });
 
     //notification addition begins
@@ -282,8 +293,8 @@ export const deleteCommentById = async ({
     }
 
     if (
-      (comment.user.toString() === user ||
-        comment.post.user.toString() === user) === false
+      (comment?.user?.toString() === user ||
+        comment?.post?.user.toString() === user) === false
     ) {
       throw new HttpError({
         status: 403,
@@ -295,11 +306,25 @@ export const deleteCommentById = async ({
     await comment.softDelete();
 
     if (comment?.post) {
+      const postId = comment.post._id.toString();
+
       await incrementLikeOrCommentCountInBulk({
         entityType: "Post",
-        ids: [comment.post._id.toString()],
+        ids: [postId],
         countType: "commentsCount",
         incrementBy: -1,
+      });
+
+      // cache purge
+      await deleteAPICache({
+        keys: [
+          {
+            url: "/v1/comment",
+            params: { postId },
+            query: {},
+            authenticatedUserId: null,
+          },
+        ],
       });
     }
 
