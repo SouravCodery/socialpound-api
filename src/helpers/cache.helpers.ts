@@ -22,7 +22,7 @@ export const getCacheKey = ({
     .join(":");
 
   const authenticatedUserPart = authenticatedUserId
-    ? `${authenticatedUserId}`
+    ? `userId:${authenticatedUserId}`
     : "";
 
   let cacheKey = `${Config.NODE_ENV}:api-cache${processedUrl}`;
@@ -31,14 +31,14 @@ export const getCacheKey = ({
     cacheKey += `:${processedParam}`;
   }
 
+  if (authenticatedUserId) {
+    cacheKey += `:${authenticatedUserPart}`;
+  }
+
   if (processedQuery) {
     cacheKey += `:${processedQuery}`;
   } else {
     cacheKey += `:cursor:none`;
-  }
-
-  if (authenticatedUserId) {
-    cacheKey += `:${authenticatedUserPart}`;
   }
 
   return cacheKey;

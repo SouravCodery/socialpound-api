@@ -46,14 +46,14 @@ export const setCache = async ({
 };
 
 export const deleteCache = async ({
-  key,
+  keys,
 }: {
-  key: string;
+  keys: string[];
 }): Promise<boolean> => {
   try {
-    const result = await redisCacheClient.del(key);
+    const result = await redisCacheClient.del(keys);
 
-    logger.info(`Cache deleted for key ${key}:`, result);
+    logger.info(`Cache deleted for key ${keys}:`, result);
     return true;
   } catch (error) {
     logger.error(`[Service: delCache] - Something went wrong`, error);
@@ -112,20 +112,26 @@ export const setAPICache = async ({
 };
 
 export const deleteAPICache = async ({
-  url,
-  params,
-  query,
-  authenticatedUserId,
-}: APICacheKeyParamsInterface) => {
+  keys,
+}: {
+  keys: {
+    url: string;
+    params: object;
+    query: object;
+    authenticatedUserId: string | null;
+  }[];
+}) => {
   try {
-    const cacheKey = getCacheKey({
-      url,
-      params,
-      query,
-      authenticatedUserId,
-    });
+    const cacheKeys = keys.map(({ url, params, query, authenticatedUserId }) =>
+      getCacheKey({
+        url,
+        params,
+        query,
+        authenticatedUserId,
+      })
+    );
 
-    return await deleteCache({ key: cacheKey });
+    return await deleteCache({ keys: cacheKeys });
   } catch (error) {
     logger.error(`[Service: deleteAPICache] - Something went wrong`, error);
     return false;

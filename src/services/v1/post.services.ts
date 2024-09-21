@@ -12,13 +12,16 @@ import {
 
 import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services";
 import { incrementPostsCountForUser } from "./user.services";
+import { deleteAPICache } from "./redis-cache.services";
 
 export const createPost = async ({
   user,
+  username,
   content,
   caption,
 }: {
   user: PostInterface["user"];
+  username: string;
   content: PostInterface["content"];
   caption: PostInterface["caption"];
 }) => {
@@ -28,9 +31,30 @@ export const createPost = async ({
       content,
       caption,
     });
+    const userId = user.toString();
 
     await newPost.save();
-    await incrementPostsCountForUser({ user: user.toString() });
+    await incrementPostsCountForUser({ user: userId });
+    await deleteAPICache({
+      keys: [
+        {
+          url: "/v1/post",
+          params: {
+            userId,
+          },
+          query: {},
+          authenticatedUserId: null,
+        },
+        {
+          url: "/v1/user",
+          params: {
+            username,
+          },
+          query: {},
+          authenticatedUserId: null,
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 201,
@@ -148,9 +172,11 @@ export const getPosts = async ({
 
 export const deletePostById = async ({
   user,
+  username,
   postId,
 }: {
   user: string;
+  username: string;
   postId: string;
 }) => {
   try {
@@ -182,9 +208,32 @@ export const deletePostById = async ({
     }
 
     if (post?.user) {
+      const userId = post.user.toString();
+
       await incrementPostsCountForUser({
-        user: post.user.toString(),
+        user: userId,
         incrementBy: -1,
+      });
+
+      await deleteAPICache({
+        keys: [
+          {
+            url: "/v1/post",
+            params: {
+              userId,
+            },
+            query: {},
+            authenticatedUserId: null,
+          },
+          {
+            url: "/v1/user",
+            params: {
+              username,
+            },
+            query: {},
+            authenticatedUserId: null,
+          },
+        ],
       });
     }
 
