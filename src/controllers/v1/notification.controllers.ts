@@ -66,6 +66,7 @@ export const getNotificationsByUser = async (
       query: req.query,
       authenticatedUserId: recipient,
       value: notifications.getResponse(),
+      ttl: "FIVE_MINUTES",
     });
 
     return res
