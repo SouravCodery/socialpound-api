@@ -5,9 +5,7 @@ import { logger } from "../logger/index.logger";
 
 const connectToDatabase = async () => {
   try {
-    await mongoose.connect(Config.MONGODB_URI, {
-      autoIndex: true,
-    });
+    await mongoose.connect(Config.MONGODB_URI);
     logger.info("MongoDB connected successfully!");
   } catch (error) {
     if (error instanceof Error) {
