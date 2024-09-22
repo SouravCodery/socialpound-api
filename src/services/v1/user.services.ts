@@ -14,6 +14,7 @@ import {
   UserWithIdInterface,
 } from "../../interfaces/user.interface";
 import Post from "../../models/post.model";
+import { deleteAPICache } from "./redis-cache.services";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -236,7 +237,7 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         runValidators: true,
       }
     )
-      .select("_id")
+      .select("_id username")
       .lean();
 
     if (!user) {
@@ -259,6 +260,27 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         runValidators: true,
       }
     );
+
+    deleteAPICache({
+      keys: [
+        {
+          url: "/v1/post",
+          params: {
+            userId,
+          },
+          query: {},
+          authenticatedUserId: null,
+        },
+        {
+          url: "/v1/user",
+          params: {
+            username: user.username,
+          },
+          query: {},
+          authenticatedUserId: null,
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 200,
