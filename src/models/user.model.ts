@@ -1,15 +1,13 @@
 import { Schema, model } from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
 
 import { UserDocumentInterface } from "../interfaces/user.interface";
-
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
 import { GitHubAuthUserSchema } from "./github-auth-user.model";
 
 import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
-const UserSchema: Schema<UserDocumentInterface> = new Schema(
+const userSchema: Schema<UserDocumentInterface> = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
@@ -30,26 +28,15 @@ const UserSchema: Schema<UserDocumentInterface> = new Schema(
   baseSchemaOptions
 );
 
-UserSchema.methods.softDelete = function () {
-  this.isDeleted = true;
-  this.deletedAt = new Date();
-
-  return this.save();
-};
-
-UserSchema.index(
+userSchema.index(
   { username: 1 },
-  { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
+  { unique: true, partialFilterExpression: { isDeleted: false } }
 );
-UserSchema.index(
+userSchema.index(
   { email: 1 },
-  { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
+  { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 
-UserSchema.plugin(uniqueValidator, {
-  message: "{PATH} must be unique.",
-});
+userSchema.plugin(softDeletePlugin);
 
-UserSchema.plugin(softDeletePlugin);
-
-export const UserModel = model<UserDocumentInterface>("User", UserSchema);
+export const UserModel = model<UserDocumentInterface>("User", userSchema);
