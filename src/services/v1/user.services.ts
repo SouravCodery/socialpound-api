@@ -1,7 +1,13 @@
 import { UserModel } from "../../models/user.model";
 import Post from "../../models/post.model";
 
-import { deleteAPICache } from "./redis-cache.services";
+import {
+  deleteAPICache,
+  deleteCache,
+  getCache,
+  setCache,
+} from "./redis-cache.services";
+import { getCacheKey } from "../../helpers/cache.helpers";
 import { decodeSignedUserDataJWT } from "../../helpers/jwt.helpers";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
@@ -90,19 +96,35 @@ export const signIn = async ({
 
 export const getUserByEmail = async ({ email }: { email: string }) => {
   try {
-    if (!email) {
-      throw new Error("[Service: getUserByEmail] - email is required");
+    const cacheKey = getCacheKey({
+      prefix: "user",
+      params: {
+        email,
+      },
+    });
+    const cachedUser = await getCache({
+      key: cacheKey,
+    });
+    if (cachedUser) {
+      return cachedUser as UserWithIdInterface;
     }
 
     const user = await UserModel.findOne({
       email,
       isDeleted: false,
-    }).lean<UserWithIdInterface>();
+    })
+      .select("username")
+      .lean<UserWithIdInterface>();
 
     if (!user) {
       throw new Error("[Service: getUserByEmail] - User not found");
     }
 
+    await setCache({
+      key: cacheKey,
+      value: user,
+      ttl: "ONE_HOUR",
+    });
     return user;
   } catch (error) {
     logger.error("[Service: getUserByEmail] - Something went wrong", error);
@@ -239,6 +261,17 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
           query: {},
           authenticatedUserId: null,
         },
+      ],
+    });
+
+    deleteCache({
+      keys: [
+        getCacheKey({
+          prefix: "user",
+          params: {
+            email: user.username,
+          },
+        }),
       ],
     });
 
