@@ -38,6 +38,5 @@ const GoogleProfileSchema = {
 
 export const GoogleAuthUserSchema = {
   user: OAuthUserSchema,
-  account: GoogleAccountSchema,
   profile: GoogleProfileSchema,
 };

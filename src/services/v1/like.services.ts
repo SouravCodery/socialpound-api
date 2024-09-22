@@ -62,6 +62,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
     const postExists = await Post.find({
       _id: { $in: likes.map((like) => like.post) },
       isDeleted: false,
+      isUserDeleted: false,
     }).select("_id user");
 
     const existingPostsMap = new Map(

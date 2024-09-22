@@ -122,6 +122,7 @@ export const getPosts = async ({
     //todo: Caching
     const query: FilterQuery<PostInterface> = {
       isDeleted: false,
+      isUserDeleted: false,
     };
 
     if (cursor) {
@@ -185,6 +186,7 @@ export const deletePostById = async ({
         _id: postId,
         user,
         isDeleted: false,
+        isUserDeleted: false,
       },
       {
         $set: {

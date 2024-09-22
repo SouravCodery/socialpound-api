@@ -17,13 +17,9 @@ export const decodeSignedUserDataJWT = ({
       signedUserDataJWT,
 
       Config.USER_DATA_SECRET_KEY || ""
-    ) as GoogleAuthUserInterface | GitHubAuthUserInterface;
+    ) as GoogleAuthUserInterface;
 
-    if (decodedSignedUserData.account.provider === "github") {
-      return decodedSignedUserData as GitHubAuthUserInterface;
-    }
-
-    return decodedSignedUserData as GoogleAuthUserInterface;
+    return decodedSignedUserData;
   } catch (error) {
     logger.error("Something went wrong in decodedSignedUserDataJWT", error);
     throw new HttpError({ status: 401, message: "Invalid User Data" });

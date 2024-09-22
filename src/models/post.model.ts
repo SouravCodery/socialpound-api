@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose";
 
 import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
-
 import { PostDocumentInterface } from "./../interfaces/post.interface";
 
 const postSchema: Schema<PostDocumentInterface> = new Schema(
@@ -23,8 +22,7 @@ const postSchema: Schema<PostDocumentInterface> = new Schema(
 
     caption: { type: String, maxLength: 2200, default: "" },
 
-    likesCount: { type: Number, default: 0, required: true },
-    commentsCount: { type: Number, default: 0, required: true },
+    isUserDeleted: { type: Boolean, default: false },
   },
   baseSchemaOptions
 );

@@ -78,6 +78,7 @@ export const addCommentsOnPosts = async ({
     const postExists = await Post.find({
       _id: { $in: comments.map((comment) => comment.post) },
       isDeleted: false,
+      isUserDeleted: false,
     })
       .select("_id user")
       .lean();
@@ -282,7 +283,7 @@ export const deleteCommentById = async ({
       .populate<{ post: PostWithIdInterface }>({
         path: "post",
         select: "user",
-        match: { isDeleted: false },
+        match: { isDeleted: false, isUserDeleted: false },
       });
 
     if (!comment) {

@@ -1,5 +1,4 @@
 import { OAuthUserInterface } from "./oauth.interface";
-import { GoogleAccountInterface } from "./oauth.interface";
 
 interface GoogleProfileInterface {
   aud: string;
@@ -22,6 +21,5 @@ interface GoogleProfileInterface {
 
 export interface GoogleAuthUserInterface {
   user: OAuthUserInterface;
-  account: GoogleAccountInterface;
   profile: GoogleProfileInterface;
 }

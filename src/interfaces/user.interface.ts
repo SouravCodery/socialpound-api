@@ -16,8 +16,7 @@ export interface UserInterface {
   followersCount: number;
   followingCount: number;
 
-  googleAuthUser: GoogleAuthUserInterface | null;
-  githubAuthUser: GitHubAuthUserInterface | null;
+  googleAuthUser: GoogleAuthUserInterface;
 
   isPrivate: boolean;
 }

@@ -1,55 +1,40 @@
 import { Schema, model } from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
 
 import { UserDocumentInterface } from "../interfaces/user.interface";
-
 import { GoogleAuthUserSchema } from "./google-auth-user.model";
-import { GitHubAuthUserSchema } from "./github-auth-user.model";
 
 import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 
-const UserSchema: Schema<UserDocumentInterface> = new Schema(
+const userSchema: Schema<UserDocumentInterface> = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
-    fullName: { type: String, default: "", required: true },
+    fullName: { type: String, default: "" },
 
-    profilePicture: { type: String, required: true },
+    profilePicture: { type: String, default: "" },
     bio: { type: String, default: "" },
 
     postsCount: { type: Number, default: 0, required: true, min: 0 },
     followersCount: { type: Number, default: 0, required: true, min: 0 },
     followingCount: { type: Number, default: 0, required: true, min: 0 },
 
-    googleAuthUser: { type: GoogleAuthUserSchema, default: null },
-    githubAuthUser: { type: GitHubAuthUserSchema, default: null },
+    googleAuthUser: { type: GoogleAuthUserSchema, required: true },
 
     isPrivate: { type: Boolean, default: true, required: true },
   },
   baseSchemaOptions
 );
 
-UserSchema.methods.softDelete = function () {
-  this.isDeleted = true;
-  this.deletedAt = new Date();
-
-  return this.save();
-};
-
-UserSchema.index(
+userSchema.index(
   { username: 1 },
-  { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
+  { unique: true, partialFilterExpression: { isDeleted: false } }
 );
-UserSchema.index(
+userSchema.index(
   { email: 1 },
-  { unique: true, partialFilterExpression: { isDeleted: { $ne: true } } }
+  { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 
-UserSchema.plugin(uniqueValidator, {
-  message: "{PATH} must be unique.",
-});
+userSchema.plugin(softDeletePlugin);
 
-UserSchema.plugin(softDeletePlugin);
-
-export const UserModel = model<UserDocumentInterface>("User", UserSchema);
+export const UserModel = model<UserDocumentInterface>("User", userSchema);
