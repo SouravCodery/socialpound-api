@@ -13,6 +13,7 @@ import {
   UserDocumentInterface,
   UserWithIdInterface,
 } from "../../interfaces/user.interface";
+import Post from "../../models/post.model";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -232,7 +233,6 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         },
       },
       {
-        new: true,
         runValidators: true,
       }
     )
@@ -245,6 +245,20 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         message: "[Service: deleteUser] - User not found",
       });
     }
+
+    await Post.updateMany(
+      {
+        user: userId,
+      },
+      {
+        $set: {
+          isUserDeleted: true,
+        },
+      },
+      {
+        runValidators: true,
+      }
+    );
 
     return new HttpResponse({
       status: 200,
