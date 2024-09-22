@@ -11,6 +11,7 @@ export interface PostInterface {
   user: ObjectId;
   content: ContentInterface[];
   caption: string;
+  isUserDeleted: boolean;
 }
 
 export interface PostDocumentInterface
