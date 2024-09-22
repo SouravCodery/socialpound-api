@@ -4,6 +4,7 @@ import { getCacheKey } from "../../helpers/cache.helpers";
 import { Constants } from "../../constants/constants";
 import { logger } from "../../logger/index.logger";
 import { APICacheKeyParamsInterface } from "../../interfaces/redis-cache.interface";
+import { Config } from "../../config/config";
 
 export const getCache = async ({
   key,
@@ -11,6 +12,10 @@ export const getCache = async ({
   key: string;
 }): Promise<object | null> => {
   try {
+    if (Config.REDIS_CACHE_ENABLED === false) {
+      return null;
+    }
+
     const data = await redisCacheClient.get(key);
     const parsedData = data ? JSON.parse(data) : null;
 
@@ -31,6 +36,10 @@ export const setCache = async ({
   ttl?: APICacheKeyParamsInterface["ttl"];
 }): Promise<boolean> => {
   try {
+    if (Config.REDIS_CACHE_ENABLED === false) {
+      return false;
+    }
+
     const stringValue = JSON.stringify(value);
     const result = await redisCacheClient.set(key, stringValue, {
       EX: Constants.DURATION[ttl],
@@ -51,6 +60,10 @@ export const deleteCache = async ({
   keys: string[];
 }): Promise<boolean> => {
   try {
+    if (Config.REDIS_CACHE_ENABLED === false) {
+      return false;
+    }
+
     const result = await redisCacheClient.del(keys);
 
     logger.info(`Cache deleted for key ${keys}:`, result);
