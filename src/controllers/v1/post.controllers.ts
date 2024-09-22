@@ -123,7 +123,7 @@ const deletePostById = async (
   next: NextFunction
 ) => {
   try {
-    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const user = (req as AuthenticatedUserRequestInterface).userId;
     const username = (req as AuthenticatedUserRequestInterface).user.username;
     const { postId } = req.params;
 

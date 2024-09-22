@@ -90,7 +90,7 @@ export const deleteCommentById = async (
   next: NextFunction
 ) => {
   try {
-    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const user = (req as AuthenticatedUserRequestInterface).userId;
     const { commentId } = req.params;
 
     const result = await commentServices.deleteCommentById({ user, commentId });
