@@ -78,6 +78,7 @@ export const addCommentsOnPosts = async ({
     const postExists = await Post.find({
       _id: { $in: comments.map((comment) => comment.post) },
       isDeleted: false,
+      isUserDeleted: false,
     })
       .select("_id user")
       .lean();
