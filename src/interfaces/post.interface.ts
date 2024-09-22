@@ -11,8 +11,6 @@ export interface PostInterface {
   user: ObjectId;
   content: ContentInterface[];
   caption: string;
-  likesCount: number;
-  commentsCount: number;
 }
 
 export interface PostDocumentInterface

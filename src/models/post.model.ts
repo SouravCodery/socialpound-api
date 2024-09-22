@@ -22,9 +22,6 @@ const postSchema: Schema<PostDocumentInterface> = new Schema(
     ],
 
     caption: { type: String, maxLength: 2200, default: "" },
-
-    likesCount: { type: Number, default: 0, required: true },
-    commentsCount: { type: Number, default: 0, required: true },
   },
   baseSchemaOptions
 );
