@@ -1,20 +1,13 @@
-import { HttpError } from "../../classes/http-error.class";
-import { decodeSignedUserDataJWT } from "../../helpers/jwt.helpers";
-
-import { logger } from "../../logger/index.logger";
-
-import { OAuthUserInterface } from "../../interfaces/oauth.interface";
-import { GitHubAuthUserInterface } from "../../interfaces/github-auth-user.interface";
-import { GoogleAuthUserInterface } from "./../../interfaces/google-auth-user.interface";
-
 import { UserModel } from "../../models/user.model";
-import { HttpResponse } from "../../classes/http-response.class";
-import {
-  UserDocumentInterface,
-  UserWithIdInterface,
-} from "../../interfaces/user.interface";
 import Post from "../../models/post.model";
+
 import { deleteAPICache } from "./redis-cache.services";
+import { decodeSignedUserDataJWT } from "../../helpers/jwt.helpers";
+import { HttpError } from "../../classes/http-error.class";
+import { HttpResponse } from "../../classes/http-response.class";
+import { OAuthUserInterface } from "../../interfaces/oauth.interface";
+import { UserWithIdInterface } from "../../interfaces/user.interface";
+import { logger } from "../../logger/index.logger";
 
 export const signIn = async ({
   decodedAuthToken,
@@ -24,23 +17,13 @@ export const signIn = async ({
   signedUserDataJWT: string;
 }) => {
   try {
-    const userDataOAuth = decodeSignedUserDataJWT({ signedUserDataJWT });
+    const userDataGoogle = decodeSignedUserDataJWT({ signedUserDataJWT });
 
-    if (decodedAuthToken.email !== userDataOAuth.user.email) {
+    if (decodedAuthToken.email !== userDataGoogle.user.email) {
       throw new HttpError({ status: 401, message: "User is not authorized" });
     }
 
-    const userDataGoogle =
-      userDataOAuth.account.provider === "google"
-        ? (userDataOAuth as GoogleAuthUserInterface)
-        : null;
-
-    const userDataGitHub =
-      userDataOAuth.account.provider === "github"
-        ? (userDataOAuth as GitHubAuthUserInterface)
-        : null;
-
-    const existingUser: UserDocumentInterface | null = await UserModel.findOne({
+    const existingUser = await UserModel.findOne({
       email: decodedAuthToken.email,
       isDeleted: false,
     });
@@ -52,59 +35,36 @@ export const signIn = async ({
         email: decodedAuthToken.email,
         fullName: decodedAuthToken.name,
 
-        profilePicture: decodedAuthToken.image,
-
-        googleAuthUser: userDataGoogle,
-        githubAuthUser: userDataGitHub,
+        googleAuthUser: {
+          user: userDataGoogle.user,
+          profile: userDataGoogle.profile,
+        },
       });
 
       await newUser.save();
 
-      const message = userDataGoogle
-        ? "Google Sign-Up Successful"
-        : "GitHub Sign-Up Successful";
-
       return new HttpResponse({
         status: 201,
-        message,
+        message: "Google Sign-Up Successful",
         toastMessage: "Welcome to Socialpound",
       });
     }
 
-    //updating the existing user with the new auth data
     if (
       userDataGoogle &&
       userDataGoogle.user.email &&
-      userDataGoogle.profile.email &&
-      userDataGoogle.account.providerAccountId
+      userDataGoogle.profile.email
     ) {
-      existingUser.profilePicture = userDataGoogle.user.image;
-      existingUser.googleAuthUser = userDataGoogle;
+      existingUser.googleAuthUser = {
+        user: userDataGoogle.user,
+        profile: userDataGoogle.profile,
+      };
 
       await existingUser.save();
 
       return new HttpResponse({
         status: 200,
         message: "Google Sign-In Successful",
-        data: { user: existingUser },
-        toastMessage: "Welcome back to Socialpound",
-      });
-    }
-
-    if (
-      userDataGitHub &&
-      userDataGitHub.user.email &&
-      userDataGitHub.profile.email &&
-      userDataGitHub.account.providerAccountId
-    ) {
-      existingUser.profilePicture = userDataGitHub.user.image;
-      existingUser.githubAuthUser = userDataGitHub;
-
-      await existingUser.save();
-
-      return new HttpResponse({
-        status: 200,
-        message: "GitHub Sign-In Successful",
         data: { user: existingUser },
         toastMessage: "Welcome back to Socialpound",
       });
