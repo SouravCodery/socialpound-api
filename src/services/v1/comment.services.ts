@@ -283,7 +283,7 @@ export const deleteCommentById = async ({
       .populate<{ post: PostWithIdInterface }>({
         path: "post",
         select: "user",
-        match: { isDeleted: false },
+        match: { isDeleted: false, isUserDeleted: false },
       });
 
     if (!comment) {
