@@ -1,5 +1,5 @@
 import { redisCacheClient } from "../../config/redis-cache.config";
-import { getCacheKey } from "../../helpers/cache.helpers";
+import { getAPICacheKey } from "../../helpers/cache.helpers";
 
 import { Constants } from "../../constants/constants";
 import { logger } from "../../logger/index.logger";
@@ -86,7 +86,7 @@ export const getAPICache = async ({
   authenticatedUserId: string | null;
 }) => {
   try {
-    const cacheKey = getCacheKey({
+    const cacheKey = getAPICacheKey({
       url,
       params,
       query,
@@ -110,7 +110,7 @@ export const setAPICache = async ({
   ttl = "ONE_HOUR",
 }: APICacheKeyParamsInterface) => {
   try {
-    const cacheKey = getCacheKey({
+    const cacheKey = getAPICacheKey({
       url,
       params,
       query,
@@ -136,7 +136,7 @@ export const deleteAPICache = async ({
 }) => {
   try {
     const cacheKeys = keys.map(({ url, params, query, authenticatedUserId }) =>
-      getCacheKey({
+      getAPICacheKey({
         url,
         params,
         query,

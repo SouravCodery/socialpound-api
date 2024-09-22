@@ -1,6 +1,6 @@
 import { Config } from "../config/config";
 
-export const getCacheKey = ({
+export const getAPICacheKey = ({
   url,
   params,
   query,
