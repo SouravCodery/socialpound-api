@@ -10,9 +10,7 @@ import { setAPICache } from "../../services/v1/redis-cache.services";
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = (req as AuthenticatedUserRequestInterface).user._id;
-    const username = (
-      req as AuthenticatedUserRequestInterface
-    ).user.username.split("@")[0];
+    const username = (req as AuthenticatedUserRequestInterface).user.username;
     const { content, caption } = req.body;
 
     const createPostResponse = await postServices.createPost({
@@ -126,9 +124,7 @@ const deletePostById = async (
 ) => {
   try {
     const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
-    const username = (
-      req as AuthenticatedUserRequestInterface
-    ).user.username.split("@")[0];
+    const username = (req as AuthenticatedUserRequestInterface).user.username;
     const { postId } = req.params;
 
     const result = await postServices.deletePostById({

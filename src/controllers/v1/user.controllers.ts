@@ -41,7 +41,7 @@ const getUserByUsername = async (
   next: NextFunction
 ) => {
   try {
-    const username = `${req.params.username}@gmail.com`;
+    const { username } = req.params;
 
     const getUserResponse = await userServices.getUserByUsername({
       username,
