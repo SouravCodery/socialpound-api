@@ -1,10 +1,15 @@
-import { Queue, DefaultJobOptions } from "bullmq";
-import { bullMQConnection } from "../../../config/bull-mq.config";
+import { Queue } from "bullmq";
+import {
+  bullMQConnection,
+  bullMQDefaultJobOptions,
+} from "../../../config/bull-mq.config";
+import { logger } from "../../../logger/index.logger";
 
 export const likeQueue = new Queue("like", {
   connection: bullMQConnection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: 2000,
-  },
+  defaultJobOptions: bullMQDefaultJobOptions,
+});
+
+likeQueue.on("error", (err) => {
+  logger.error(`[Worker: likeQueue] - Error: ${err.message}`);
 });
