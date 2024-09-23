@@ -3,24 +3,18 @@ import { bullMQConnection } from "../../../config/bull-mq.config";
 
 import {
   createNotifications,
-  markNotificationsAsRead,
+  // markNotificationsAsRead,
 } from "../../../services/v1/notification.services";
 import {
   NotificationInterface,
-  MarkNotificationAsReadInterface,
+  // MarkNotificationAsReadInterface,
 } from "../../../interfaces/notification.interface";
 
 import { logger } from "../../../logger/index.logger";
 import { JobBatch } from "../../../classes/job-batch.class";
 
-const notificationAddBatch = new JobBatch<NotificationInterface>({
-  batchInterval: 3000,
-  batchSize: 100,
-});
-const notificationReadBatch = new JobBatch<MarkNotificationAsReadInterface>({
-  batchInterval: 3000,
-  batchSize: 100,
-});
+const notificationAddBatch = new JobBatch<NotificationInterface>({});
+// const notificationReadBatch = new JobBatch<MarkNotificationAsReadInterface>({});
 
 export const notificationWorker = new Worker(
   "notification",
@@ -33,9 +27,9 @@ export const notificationWorker = new Worker(
           notificationAddBatch.addJob({ job: job.data });
           break;
 
-        case "notification-read":
-          notificationReadBatch.addJob({ job: job.data });
-          break;
+        // case "notification-read":
+        //   notificationReadBatch.addJob({ job: job.data });
+        //   break;
 
         default:
           throw new Error(`Unknown job name: ${jobName}`);
@@ -64,30 +58,22 @@ export const notificationBatchProcessor = setInterval(async () => {
     }
     notificationAddBatch.processingEnd();
 
-    const jobsToBeProcessedForRead = notificationReadBatch.getJobs();
-    console.log("read notification batch", jobsToBeProcessedForRead.length);
+    // const jobsToBeProcessedForRead = notificationReadBatch.getJobs();
+    // console.log("read notification batch", jobsToBeProcessedForRead.length);
 
-    if (jobsToBeProcessedForRead.length > 0) {
-      await markNotificationsAsRead({
-        jobs: jobsToBeProcessedForRead,
-      });
+    // if (jobsToBeProcessedForRead.length > 0) {
+    //   await markNotificationsAsRead({
+    //     jobs: jobsToBeProcessedForRead,
+    //   });
 
-      notificationReadBatch.updateLastProcessed();
-    }
-    notificationReadBatch.processingEnd();
+    //   notificationReadBatch.updateLastProcessed();
+    // }
+    // notificationReadBatch.processingEnd();
   } catch (error) {
     logger.error("Error in notification batch processor", error);
   }
 }, 2000);
 
-notificationWorker.on("completed", (job) => {
-  logger.info(
-    `[Worker: notificationWorker] - ${job.name} ${job.id} has completed!`
-  );
-});
-
-notificationWorker.on("failed", (job, err) => {
-  logger.error(
-    `[Worker: notificationWorker] - ${job?.name} ${job?.id} has failed with ${err.message}`
-  );
+notificationWorker.on("error", (err) => {
+  logger.error(`[Worker: notificationWorker] - Error: ${err.message}`);
 });

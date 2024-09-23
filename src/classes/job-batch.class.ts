@@ -7,7 +7,7 @@ export class JobBatch<T> {
   private lastProcessed: number;
 
   constructor({
-    batchSize = 10,
+    batchSize = 1000,
     batchInterval = 1000,
   }: {
     batchSize?: number;

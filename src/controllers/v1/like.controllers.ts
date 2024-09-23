@@ -132,9 +132,7 @@ export const unlikePost = async (
   next: NextFunction
 ) => {
   try {
-    const liker = (
-      req as AuthenticatedUserRequestInterface
-    ).user._id.toString();
+    const liker = (req as AuthenticatedUserRequestInterface).userId;
     const { postId } = req.params;
 
     const likePostResponse = await likeServices.unlikePost({

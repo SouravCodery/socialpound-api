@@ -1,6 +1,6 @@
 import { Config } from "../config/config";
 
-export const getCacheKey = ({
+export const getAPICacheKey = ({
   url,
   params,
   query,
@@ -40,6 +40,22 @@ export const getCacheKey = ({
   } else {
     cacheKey += `:cursor:none`;
   }
+
+  return cacheKey;
+};
+
+export const getCacheKey = ({
+  prefix,
+  params,
+}: {
+  prefix: "user" | "post";
+  params: object;
+}): string => {
+  const processedParam = Object.entries(params)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(":");
+
+  let cacheKey = `${Config.NODE_ENV}:service-cache:${prefix}:${processedParam}`;
 
   return cacheKey;
 };

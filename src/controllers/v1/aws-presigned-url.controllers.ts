@@ -12,7 +12,7 @@ const getPresignedUrl = async (
   next: NextFunction
 ) => {
   try {
-    const user = (req as AuthenticatedUserRequestInterface).user._id.toString();
+    const user = (req as AuthenticatedUserRequestInterface).userId;
     const { size, type } = req.body;
 
     const getSignedUrlResponse = await awsSignedUrlServices.getPresignedUrl({
