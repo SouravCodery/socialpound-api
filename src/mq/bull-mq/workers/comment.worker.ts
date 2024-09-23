@@ -49,12 +49,6 @@ export const commentOnPostBatchTimeout = setInterval(async () => {
   }
 }, 2000);
 
-commentWorker.on("completed", (job) => {
-  logger.info(`[Worker: commentWorker] - ${job.name} ${job.id} has completed!`);
-});
-
-commentWorker.on("failed", (job, err) => {
-  logger.error(
-    `[Worker: commentWorker] - ${job?.name} ${job?.id} has failed with ${err.message}`
-  );
+commentWorker.on("error", (err) => {
+  logger.error(`[Worker: commentWorker] - Error: ${err.message}`);
 });

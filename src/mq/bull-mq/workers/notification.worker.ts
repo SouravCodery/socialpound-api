@@ -80,14 +80,6 @@ export const notificationBatchProcessor = setInterval(async () => {
   }
 }, 2000);
 
-notificationWorker.on("completed", (job) => {
-  logger.info(
-    `[Worker: notificationWorker] - ${job.name} ${job.id} has completed!`
-  );
-});
-
-notificationWorker.on("failed", (job, err) => {
-  logger.error(
-    `[Worker: notificationWorker] - ${job?.name} ${job?.id} has failed with ${err.message}`
-  );
+notificationWorker.on("error", (err) => {
+  logger.error(`[Worker: notificationWorker] - Error: ${err.message}`);
 });

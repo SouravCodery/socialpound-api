@@ -49,12 +49,6 @@ export const likePostBatchTimeout = setInterval(async () => {
   }
 }, 2000);
 
-likeWorker.on("completed", (job) => {
-  logger.info(`[Worker: likeWorker] - ${job.name} ${job.id} has completed!`);
-});
-
-likeWorker.on("failed", (job, err) => {
-  logger.error(
-    `[Worker: likeWorker] - ${job?.name} ${job?.id} has failed with ${err.message}`
-  );
+likeWorker.on("error", (err) => {
+  logger.error(`[Worker: likeWorker] - Error: ${err.message}`);
 });
