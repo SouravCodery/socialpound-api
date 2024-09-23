@@ -21,6 +21,8 @@ const gracefulWorkersShutdown = async (signal: "SIGINT" | "SIGTERM") => {
   clearInterval(likePostBatchTimeout);
   clearInterval(commentOnPostBatchTimeout);
   clearInterval(notificationBatchProcessor);
+
+  logger.info("Workers and job batches interval cleared successfully!");
 };
 
 export {
