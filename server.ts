@@ -40,7 +40,17 @@ const port = Config.PORT;
       });
     }
 
+    let isShuttingDown = false;
+
     const gracefulShutdown = async (signal: "SIGINT" | "SIGTERM") => {
+      if (isShuttingDown) return;
+      isShuttingDown = true;
+
+      const forceShutdownTimer = setTimeout(() => {
+        logger.warn("Forcing shutdown due to timeout.", signal);
+        process.exit(1);
+      }, 10000);
+
       try {
         logger.info("Shutting down server...", signal);
 
@@ -53,11 +63,12 @@ const port = Config.PORT;
           redisCacheClient.disconnect(),
         ]);
 
+        clearTimeout(forceShutdownTimer);
         logger.info("Disconnected from redis cache and redis key-value store");
         logger.info("Server shut down successfully!", signal);
         process.exit(0);
       } catch (error) {
-        logger.error("Error during graceful shutdown", error);
+        logger.error("Error during graceful shutdown", signal, error);
         process.exit(1);
       }
     };
