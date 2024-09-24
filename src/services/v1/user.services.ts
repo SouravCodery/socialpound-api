@@ -1,84 +1,134 @@
+import { OAuth2Client } from "google-auth-library";
+
 import { UserModel } from "../../models/user.model";
 import Post from "../../models/post.model";
-
 import {
   deleteAPICache,
   deleteCache,
   getCache,
   setCache,
 } from "./redis-cache.services";
+import { signAPIToken } from "../../helpers/jwt.helpers";
 import { getCacheKey } from "../../helpers/cache.helpers";
-import { decodeSignedUserDataJWT } from "../../helpers/jwt.helpers";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import { OAuthUserInterface } from "../../interfaces/oauth.interface";
 import { UserWithIdInterface } from "../../interfaces/user.interface";
+import { Config } from "../../config/config";
 import { logger } from "../../logger/index.logger";
 
-export const signIn = async ({
-  decodedAuthToken,
-  signedUserDataJWT,
+const googleClient = new OAuth2Client(Config.GOOGLE_CLIENT_ID);
+
+export const verifyGoogleToken = async ({
+  googleToken,
 }: {
-  decodedAuthToken: OAuthUserInterface;
-  signedUserDataJWT: string;
+  googleToken: string;
 }) => {
   try {
-    const userDataGoogle = decodeSignedUserDataJWT({ signedUserDataJWT });
+    const ticket = await googleClient.verifyIdToken({
+      idToken: googleToken,
+      audience: Config.GOOGLE_CLIENT_ID,
+    });
+    const userPayloadGoogle = ticket.getPayload();
 
-    if (decodedAuthToken.email !== userDataGoogle.user.email) {
-      throw new HttpError({ status: 401, message: "User is not authorized" });
+    if (!userPayloadGoogle) {
+      throw new HttpError({
+        status: 400,
+        message: "Invalid Google Token",
+        toastMessage: "Google Login Failed!",
+      });
     }
+
+    if (userPayloadGoogle.email_verified !== true) {
+      throw new HttpError({
+        status: 400,
+        message: "Email not verified",
+        toastMessage: "Email not verified",
+      });
+    }
+
+    return {
+      userPayloadGoogle,
+    };
+  } catch (error) {
+    logger.error("[Service: verifyGoogleToken] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in Google Token verification",
+      toastMessage: "Something went wrong in Google Token verification",
+    });
+  }
+};
+
+export const signIn = async ({ googleToken }: { googleToken: string }) => {
+  try {
+    const { userPayloadGoogle } = await verifyGoogleToken({ googleToken });
+    const { sub, email, name, picture } = userPayloadGoogle;
 
     const existingUser = await UserModel.findOne({
-      email: decodedAuthToken.email,
+      sub,
       isDeleted: false,
+    }).select("_id email username fullName profilePicture");
+
+    const user =
+      existingUser ??
+      new UserModel({
+        username: email,
+        email: email,
+        fullName: name,
+        sub: sub,
+        profilePicture: picture ?? "",
+      });
+
+    if (existingUser) {
+      if (email && existingUser.email !== email) {
+        existingUser.email = email;
+        existingUser.username = email;
+      }
+
+      if (name && existingUser.fullName !== name) existingUser.fullName = name;
+
+      if (picture && existingUser.profilePicture !== picture)
+        existingUser.profilePicture = picture;
+    }
+
+    await user.save();
+
+    //response
+    const status = existingUser ? 200 : 201;
+
+    const message = existingUser
+      ? "Google Sign in successful"
+      : "Google Sign up successful";
+
+    const toastMessage = existingUser
+      ? "Welcome back to Socialpound"
+      : "Welcome to Socialpound";
+
+    const userData = {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      fullName: user.fullName,
+      profilePicture: user.profilePicture,
+    };
+
+    const serverAPIToken = signAPIToken({
+      user: userData,
     });
 
-    //creating a new user if the user does not exist
-    if (!existingUser) {
-      const newUser = new UserModel({
-        username: decodedAuthToken.email,
-        email: decodedAuthToken.email,
-        fullName: decodedAuthToken.name,
-
-        googleAuthUser: {
-          user: userDataGoogle.user,
-          profile: userDataGoogle.profile,
-        },
-      });
-
-      await newUser.save();
-
-      return new HttpResponse({
-        status: 201,
-        message: "Google Sign-Up Successful",
-        toastMessage: "Welcome to Socialpound",
-      });
-    }
-
-    if (
-      userDataGoogle &&
-      userDataGoogle.user.email &&
-      userDataGoogle.profile.email
-    ) {
-      existingUser.googleAuthUser = {
-        user: userDataGoogle.user,
-        profile: userDataGoogle.profile,
-      };
-
-      await existingUser.save();
-
-      return new HttpResponse({
-        status: 200,
-        message: "Google Sign-In Successful",
-        data: { user: existingUser },
-        toastMessage: "Welcome back to Socialpound",
-      });
-    }
-
     return new HttpResponse({
-      status: 200,
-      message: "Sign-In Successful",
+      status,
+      message,
+      data: {
+        user: btoa(btoa(JSON.stringify(userData))),
+        token: serverAPIToken,
+      },
+      toastMessage,
     });
   } catch (error) {
     logger.error("[Service: signIn] - Something went wrong", error);
@@ -89,17 +139,18 @@ export const signIn = async ({
 
     throw new HttpError({
       status: 500,
-      message: "Something went wrong in Sign-In",
+      message: "Something went wrong in Sign in",
+      toastMessage: "Something went wrong in Sign in",
     });
   }
 };
 
-export const getUserByEmail = async ({ email }: { email: string }) => {
+export const getUserById = async ({ userId }: { userId: string }) => {
   try {
     const cacheKey = getCacheKey({
       prefix: "user",
       params: {
-        email,
+        userId,
       },
     });
     const cachedUser = await getCache({
@@ -110,14 +161,14 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
     }
 
     const user = await UserModel.findOne({
-      email,
+      _id: userId,
       isDeleted: false,
     })
       .select("username")
       .lean<UserWithIdInterface>();
 
     if (!user) {
-      throw new Error("[Service: getUserByEmail] - User not found");
+      throw new Error("[Service: getUserById] - User not found");
     }
 
     await setCache({
@@ -127,7 +178,7 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
     });
     return user;
   } catch (error) {
-    logger.error("[Service: getUserByEmail] - Something went wrong", error);
+    logger.error("[Service: getUserById] - Something went wrong", error);
 
     throw error;
   }
@@ -269,7 +320,7 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         getCacheKey({
           prefix: "user",
           params: {
-            email: user.username,
+            userId: user._id.toString(),
           },
         }),
       ],

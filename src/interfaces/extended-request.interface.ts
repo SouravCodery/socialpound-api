@@ -1,14 +1,7 @@
 import { Request } from "express";
-
 import { UserWithIdInterface } from "./user.interface";
-import { OAuthUserInterface } from "./oauth.interface";
 
-export interface AuthenticatedRequestInterface extends Request {
-  decodedAuthToken: OAuthUserInterface;
-}
-
-export interface AuthenticatedUserRequestInterface
-  extends AuthenticatedRequestInterface {
+export interface AuthenticatedUserRequestInterface extends Request {
   user: UserWithIdInterface;
   userId: string;
 }

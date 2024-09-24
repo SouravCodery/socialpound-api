@@ -138,7 +138,7 @@ export const getPosts = async ({
       .sort({ _id: -1 })
       .populate({
         path: "user",
-        select: "username fullName profilePicture",
+        select: "username email fullName profilePicture",
         match: { isDeleted: false },
       })
       .select("-createdAt -updatedAt -__v")

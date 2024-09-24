@@ -132,7 +132,7 @@ export const getNotificationsByUser = async ({
 
       .populate({
         path: "sender",
-        select: "username fullName profilePicture",
+        select: "username email fullName profilePicture",
         match: { isDeleted: false },
       })
       .populate({

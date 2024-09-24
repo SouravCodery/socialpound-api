@@ -183,7 +183,7 @@ export const getLikesByPostId = async ({
       .sort({ _id: -1 })
       .populate({
         path: "liker",
-        select: "username fullName profilePicture",
+        select: "username email fullName profilePicture",
         match: { isDeleted: false },
       })
       .select("liker")

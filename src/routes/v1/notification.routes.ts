@@ -4,14 +4,11 @@ import * as notificationController from "../../controllers/v1/notification.contr
 import * as notificationValidationSchemas from "../../validators/notification-routes.validators";
 
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { userMiddleware } from "../../middlewares/user.middleware";
 import { validate } from "../../middlewares/validate.middleware";
 import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 const notificationRouter = express.Router();
-
 notificationRouter.use(authMiddleware);
-notificationRouter.use(userMiddleware);
 
 notificationRouter.get(
   "/",

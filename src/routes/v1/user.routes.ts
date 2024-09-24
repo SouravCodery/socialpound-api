@@ -5,20 +5,17 @@ import * as userValidationSchemas from "../../validators/user-routes.validators"
 
 import { validate } from "../../middlewares/validate.middleware";
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { userMiddleware } from "../../middlewares/user.middleware";
 import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 const userRouter = express.Router();
 
 userRouter.post(
   "/sign-in",
-  authMiddleware,
   validate(userValidationSchemas.signInValidatorSchema),
   userController.signIn
 );
 
 userRouter.use(authMiddleware);
-userRouter.use(userMiddleware);
 
 userRouter.get(
   "/:username",

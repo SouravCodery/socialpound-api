@@ -1,13 +1,11 @@
 import { Document, ObjectId } from "mongoose";
-
-import { GoogleAuthUserInterface } from "./google-auth-user.interface";
-import { GitHubAuthUserInterface } from "./github-auth-user.interface";
 import { SoftDeleteInterface } from "./soft-delete.interface";
 
 export interface UserInterface {
   username: string;
   email: string;
   fullName: string;
+  sub: string;
 
   profilePicture: string;
   bio: string;
@@ -15,8 +13,6 @@ export interface UserInterface {
   postsCount: number;
   followersCount: number;
   followingCount: number;
-
-  googleAuthUser: GoogleAuthUserInterface;
 
   isPrivate: boolean;
 }
@@ -28,4 +24,11 @@ export interface UserDocumentInterface
 
 export interface UserWithIdInterface extends UserInterface {
   _id: ObjectId;
+}
+
+export interface UserTokenPayloadInterface {
+  _id: string;
+  email: string;
+  fullName: string;
+  profilePicture: string;
 }

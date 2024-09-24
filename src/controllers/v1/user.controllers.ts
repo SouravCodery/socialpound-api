@@ -2,21 +2,16 @@ import { Request, Response, NextFunction } from "express";
 
 import * as userServices from "../../services/v1/user.services";
 import { setAPICache } from "../../services/v1/redis-cache.services";
-import {
-  AuthenticatedRequestInterface,
-  AuthenticatedUserRequestInterface,
-} from "./../../interfaces/extended-request.interface";
-import { logger } from "../../logger/index.logger";
 import { HttpError } from "../../classes/http-error.class";
+import { AuthenticatedUserRequestInterface } from "./../../interfaces/extended-request.interface";
+import { logger } from "../../logger/index.logger";
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { decodedAuthToken } = req as AuthenticatedRequestInterface;
-    const { signedUserDataJWT } = req.body;
+    const { googleToken } = req.body;
 
     const signInResponse = await userServices.signIn({
-      decodedAuthToken,
-      signedUserDataJWT,
+      googleToken,
     });
 
     return res
