@@ -1,7 +1,7 @@
-export class HttpResponse {
+export class HttpResponse<T> {
   private status: number;
   private message: string;
-  private data?: Object;
+  private data?: T;
   private toastMessage?: string;
 
   constructor({
@@ -12,7 +12,7 @@ export class HttpResponse {
   }: {
     status: number;
     message: string;
-    data?: Object;
+    data?: T;
     toastMessage?: string;
   }) {
     this.message = message;
