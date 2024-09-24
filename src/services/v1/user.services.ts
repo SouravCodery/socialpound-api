@@ -72,7 +72,7 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
     const existingUser = await UserModel.findOne({
       sub,
       isDeleted: false,
-    }).select("_id email fullName profilePicture");
+    }).select("_id email username fullName profilePicture");
 
     const user =
       existingUser ??
@@ -85,7 +85,10 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
       });
 
     if (existingUser) {
-      if (email && existingUser.email !== email) existingUser.email = email;
+      if (email && existingUser.email !== email) {
+        existingUser.email = email;
+        existingUser.username = email;
+      }
 
       if (name && existingUser.fullName !== name) existingUser.fullName = name;
 
@@ -122,7 +125,7 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
       status,
       message,
       data: {
-        user: userData,
+        user: btoa(btoa(JSON.stringify(userData))),
         token: serverAPIToken,
       },
       toastMessage,
