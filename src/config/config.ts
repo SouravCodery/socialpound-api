@@ -42,25 +42,19 @@ export const Config = {
   MONGODB_URI: getEnvironmentVariable("MONGODB_URI", "string"),
   PORT: getEnvironmentVariable("PORT", "number"),
 
-  AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
-  AUTH_JWT_EXPIRES_IN: getEnvironmentVariable("AUTH_JWT_EXPIRES_IN", "string"),
-  GOOGLE_CLIENT_ID: getEnvironmentVariable("GOOGLE_CLIENT_ID", "string"),
-  USER_DATA_SECRET_KEY: getEnvironmentVariable(
-    "USER_DATA_SECRET_KEY",
-    "string"
-  ),
-
   REDIS_KEY_VALUE_STORE_URL: getEnvironmentVariable(
     "REDIS_KEY_VALUE_STORE_URL",
     "string"
   ),
+  REDIS_CACHE_ENABLED: getEnvironmentVariable("REDIS_CACHE_ENABLED", "boolean"),
   REDIS_CACHE_URL: getEnvironmentVariable("REDIS_CACHE_URL", "string"),
-
   REDIS_BULL_MQ_HOST: getEnvironmentVariable("REDIS_BULL_MQ_HOST", "string"),
   REDIS_BULL_MQ_PORT: getEnvironmentVariable("REDIS_BULL_MQ_PORT", "number"),
 
   AWS_REGION: getEnvironmentVariable("AWS_REGION", "string"),
   AWS_BUCKET_NAME: getEnvironmentVariable("AWS_BUCKET_NAME", "string"),
 
-  REDIS_CACHE_ENABLED: getEnvironmentVariable("REDIS_CACHE_ENABLED", "boolean"),
+  AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
+  AUTH_JWT_EXPIRES_IN: getEnvironmentVariable("AUTH_JWT_EXPIRES_IN", "string"),
+  GOOGLE_CLIENT_ID: getEnvironmentVariable("GOOGLE_CLIENT_ID", "string"),
 } as const;
