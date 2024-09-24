@@ -18,9 +18,8 @@ import { Config } from "../../config/config";
 
 const googleClient = new OAuth2Client(Config.GOOGLE_CLIENT_ID);
 
-export const signIn = async ({ token }: { token: string }) => {
+export const verifyGoogleToken = async ({ token }: { token: string }) => {
   try {
-    //verify google token
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
       audience: Config.GOOGLE_CLIENT_ID,
@@ -43,7 +42,27 @@ export const signIn = async ({ token }: { token: string }) => {
       });
     }
 
-    //db updates
+    return {
+      userPayloadGoogle,
+    };
+  } catch (error) {
+    logger.error("[Service: verifyGoogleToken] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError({
+      status: 500,
+      message: "Something went wrong in Google Token verification",
+      toastMessage: "Something went wrong in Google Token verification",
+    });
+  }
+};
+
+export const signIn = async ({ token }: { token: string }) => {
+  try {
+    const { userPayloadGoogle } = await verifyGoogleToken({ token });
     const { sub, email, name, picture } = userPayloadGoogle;
 
     const existingUser = await UserModel.findOne({
@@ -72,6 +91,7 @@ export const signIn = async ({ token }: { token: string }) => {
 
     await user.save();
 
+    //response
     const status = existingUser ? 200 : 201;
 
     const message = existingUser
