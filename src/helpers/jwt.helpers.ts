@@ -1,27 +1,17 @@
 import jwt from "jsonwebtoken";
 
-import { logger } from "../logger/index.logger";
-import { HttpError } from "../classes/http-error.class";
-import { GoogleAuthUserInterface } from "./../interfaces/google-auth-user.interface";
-import { GitHubAuthUserInterface } from "../interfaces/github-auth-user.interface";
-
 import { Config } from "../config/config";
+import { logger } from "../logger/index.logger";
 
-export const decodeSignedUserDataJWT = ({
-  signedUserDataJWT,
-}: {
-  signedUserDataJWT: string;
-}) => {
+export const signAPIToken = ({ user }: { user: Object }) => {
   try {
-    const decodedSignedUserData = jwt.verify(
-      signedUserDataJWT,
+    const signedAPIToken = jwt.sign(user, Config.AUTH_JWT_SECRET_KEY, {
+      expiresIn: Config.AUTH_JWT_EXPIRES_IN,
+    });
 
-      Config.USER_DATA_SECRET_KEY || ""
-    ) as GoogleAuthUserInterface;
-
-    return decodedSignedUserData;
+    return signedAPIToken;
   } catch (error) {
-    logger.error("Something went wrong in decodedSignedUserDataJWT", error);
-    throw new HttpError({ status: 401, message: "Invalid User Data" });
+    logger.error("Something went wrong in signAPIToken", error);
+    throw error;
   }
 };
