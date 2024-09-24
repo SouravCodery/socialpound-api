@@ -109,6 +109,7 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
     const userData = {
       _id: user._id,
       email: user.email,
+      username: user.username,
       fullName: user.fullName,
       profilePicture: user.profilePicture,
     };
@@ -141,12 +142,12 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
   }
 };
 
-export const getUserByEmail = async ({ email }: { email: string }) => {
+export const getUserById = async ({ userId }: { userId: string }) => {
   try {
     const cacheKey = getCacheKey({
       prefix: "user",
       params: {
-        email,
+        userId,
       },
     });
     const cachedUser = await getCache({
@@ -157,14 +158,14 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
     }
 
     const user = await UserModel.findOne({
-      email,
+      _id: userId,
       isDeleted: false,
     })
       .select("username")
       .lean<UserWithIdInterface>();
 
     if (!user) {
-      throw new Error("[Service: getUserByEmail] - User not found");
+      throw new Error("[Service: getUserById] - User not found");
     }
 
     await setCache({
@@ -174,7 +175,7 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
     });
     return user;
   } catch (error) {
-    logger.error("[Service: getUserByEmail] - Something went wrong", error);
+    logger.error("[Service: getUserById] - Something went wrong", error);
 
     throw error;
   }
@@ -316,7 +317,7 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         getCacheKey({
           prefix: "user",
           params: {
-            email: user.username,
+            userId: user._id.toString(),
           },
         }),
       ],
