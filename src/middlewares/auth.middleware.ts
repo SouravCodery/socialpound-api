@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+import { getUserById } from "../services/v1/user.services";
 import { HttpError } from "../classes/http-error.class";
 import { AuthenticatedUserRequestInterface } from "./../interfaces/extended-request.interface";
 import { UserTokenPayloadInterface } from "../interfaces/user.interface";
 import { Config } from "../config/config";
 import { logger } from "../logger/index.logger";
-import { getUserByEmail } from "../services/v1/user.services";
 
 export const authMiddleware = async (
   req: Request,
@@ -31,8 +31,8 @@ export const authMiddleware = async (
       Config.AUTH_JWT_SECRET_KEY
     ) as UserTokenPayloadInterface;
 
-    const { email } = decodedAuthToken;
-    const user = await getUserByEmail({ email });
+    const { _id: userId } = decodedAuthToken;
+    const user = await getUserById({ userId });
 
     (req as AuthenticatedUserRequestInterface).user = user;
     (req as AuthenticatedUserRequestInterface).userId = user?._id?.toString();
