@@ -43,6 +43,8 @@ export const Config = {
   PORT: getEnvironmentVariable("PORT", "number"),
 
   AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
+  AUTH_JWT_EXPIRES_IN: getEnvironmentVariable("AUTH_JWT_EXPIRES_IN", "string"),
+  GOOGLE_CLIENT_ID: getEnvironmentVariable("GOOGLE_CLIENT_ID", "string"),
   USER_DATA_SECRET_KEY: getEnvironmentVariable(
     "USER_DATA_SECRET_KEY",
     "string"
