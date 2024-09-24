@@ -4,13 +4,10 @@ import * as awsSignedUrlController from "../../controllers/v1/aws-presigned-url.
 import * as awsSignedUrlValidationSchemas from "../../validators/aws-presigned-url-routes.validators";
 
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { userMiddleware } from "../../middlewares/user.middleware";
 import { validate } from "../../middlewares/validate.middleware";
 
 const awsPreSignedUrlRouter = express.Router();
-
 awsPreSignedUrlRouter.use(authMiddleware);
-awsPreSignedUrlRouter.use(userMiddleware);
 
 awsPreSignedUrlRouter.post(
   "/",
