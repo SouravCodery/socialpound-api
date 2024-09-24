@@ -1,15 +1,14 @@
-import { AuthenticatedRequestInterface } from "./../interfaces/extended-request.interface";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-import { logger } from "../logger/index.logger";
-
 import { HttpError } from "../classes/http-error.class";
-import { OAuthUserInterface } from "../interfaces/oauth.interface";
-
+import { AuthenticatedUserRequestInterface } from "./../interfaces/extended-request.interface";
+import { UserTokenPayloadInterface } from "../interfaces/user.interface";
 import { Config } from "../config/config";
+import { logger } from "../logger/index.logger";
+import { getUserByEmail } from "../services/v1/user.services";
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -29,10 +28,14 @@ export const authMiddleware = (
 
     const decodedAuthToken = jwt.verify(
       token,
-      Config.AUTH_JWT_SECRET_KEY || ""
-    ) as OAuthUserInterface;
+      Config.AUTH_JWT_SECRET_KEY
+    ) as UserTokenPayloadInterface;
 
-    (req as AuthenticatedRequestInterface).decodedAuthToken = decodedAuthToken;
+    const { email } = decodedAuthToken;
+    const user = await getUserByEmail({ email });
+
+    (req as AuthenticatedUserRequestInterface).user = user;
+    (req as AuthenticatedUserRequestInterface).userId = user?._id?.toString();
 
     next();
   } catch (error) {
