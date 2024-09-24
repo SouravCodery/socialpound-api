@@ -13,15 +13,19 @@ import { getCacheKey } from "../../helpers/cache.helpers";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
 import { UserWithIdInterface } from "../../interfaces/user.interface";
-import { logger } from "../../logger/index.logger";
 import { Config } from "../../config/config";
+import { logger } from "../../logger/index.logger";
 
 const googleClient = new OAuth2Client(Config.GOOGLE_CLIENT_ID);
 
-export const verifyGoogleToken = async ({ token }: { token: string }) => {
+export const verifyGoogleToken = async ({
+  googleToken,
+}: {
+  googleToken: string;
+}) => {
   try {
     const ticket = await googleClient.verifyIdToken({
-      idToken: token,
+      idToken: googleToken,
       audience: Config.GOOGLE_CLIENT_ID,
     });
     const userPayloadGoogle = ticket.getPayload();
@@ -60,9 +64,9 @@ export const verifyGoogleToken = async ({ token }: { token: string }) => {
   }
 };
 
-export const signIn = async ({ token }: { token: string }) => {
+export const signIn = async ({ googleToken }: { googleToken: string }) => {
   try {
-    const { userPayloadGoogle } = await verifyGoogleToken({ token });
+    const { userPayloadGoogle } = await verifyGoogleToken({ googleToken });
     const { sub, email, name, picture } = userPayloadGoogle;
 
     const existingUser = await UserModel.findOne({

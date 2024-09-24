@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export const signInValidatorSchema = {
   bodySchema: Joi.object({
-    token: Joi.string().required(),
+    googleToken: Joi.string().required(),
   }),
 };
 

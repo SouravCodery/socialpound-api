@@ -8,10 +8,10 @@ import { logger } from "../../logger/index.logger";
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { token } = req.body;
+    const { googleToken } = req.body;
 
     const signInResponse = await userServices.signIn({
-      token,
+      googleToken,
     });
 
     return res
