@@ -37,10 +37,12 @@ export const logger = createLogger({
       filename: path.join(logsDir, "error.log"),
       level: "error",
     }),
+
     new transports.File({
       filename: path.join(logsDir, "combined.log"),
       level: "info",
     }),
+
     new transports.File({
       filename: path.join(logsDir, "http.log"),
       level: "http",
@@ -53,6 +55,7 @@ if (process.env.NODE_ENV !== "production") {
   logger.add(
     new transports.Console({
       format: consoleFormat,
+      level: "silly",
     })
   );
 }
