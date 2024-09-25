@@ -59,4 +59,5 @@ export const Config = {
   GOOGLE_CLIENT_ID: getEnvironmentVariable("GOOGLE_CLIENT_ID", "string"),
 
   PAGINATION_LIMIT: getEnvironmentVariable("PAGINATION_LIMIT", "number"),
+  WORKERS_LOG_ENABLED: getEnvironmentVariable("WORKERS_LOG_ENABLED", "boolean"),
 } as const;
