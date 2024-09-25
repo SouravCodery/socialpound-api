@@ -13,6 +13,8 @@ import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services"
 import { deleteAPICache } from "./redis-cache.services";
 import { incrementPostsCountForUser } from "./user.services";
 import { logger } from "../../logger/index.logger";
+import Notification from "../../models/notification.model";
+import { deleteNotifications } from "./notification.services";
 
 export const createPost = async ({
   user,
@@ -208,6 +210,10 @@ export const deletePostById = async ({
         message: "[Service: deletePostById] - Post not found",
       });
     }
+
+    await deleteNotifications({
+      post: postId,
+    });
 
     if (post?.user) {
       const userId = post.user.toString();
