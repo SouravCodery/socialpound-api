@@ -18,8 +18,12 @@ import {
   incrementLikeOrCommentCountInBulk,
 } from "./redis-key-value-store.services";
 import { deleteAPICache } from "./redis-cache.services";
-import { addNotificationsToQueue } from "./notification.services";
+import {
+  addNotificationsToQueue,
+  deleteNotifications,
+} from "./notification.services";
 import { logger } from "../../logger/index.logger";
+import Notification from "../../models/notification.model";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -282,13 +286,7 @@ export const deleteCommentById = async ({
     const comment = await Comment.findOne({
       _id: commentId,
       isDeleted: false,
-    })
-      .select("user post")
-      .populate<{ post: PostWithIdInterface }>({
-        path: "post",
-        select: "user",
-        match: { isDeleted: false, isUserDeleted: false },
-      });
+    }).select("user post postBy");
 
     if (!comment) {
       throw new HttpError({
@@ -299,7 +297,7 @@ export const deleteCommentById = async ({
 
     if (
       (comment?.user?.toString() === user ||
-        comment?.post?.user.toString() === user) === false
+        comment?.postBy?.toString() === user) === false
     ) {
       throw new HttpError({
         status: 403,
