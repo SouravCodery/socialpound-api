@@ -19,6 +19,10 @@ const consoleFormat = format.combine(
   })
 );
 
+const httpFilter = format((info) => {
+  return info.level === "http" ? info : false;
+});
+
 export const logger = createLogger({
   level: "info",
   format: format.combine(
@@ -33,7 +37,15 @@ export const logger = createLogger({
       filename: path.join(logsDir, "error.log"),
       level: "error",
     }),
-    new transports.File({ filename: path.join(logsDir, "combined.log") }),
+    new transports.File({
+      filename: path.join(logsDir, "combined.log"),
+      level: "info",
+    }),
+    new transports.File({
+      filename: path.join(logsDir, "http.log"),
+      level: "http",
+      format: format.combine(httpFilter()),
+    }),
   ],
 });
 
