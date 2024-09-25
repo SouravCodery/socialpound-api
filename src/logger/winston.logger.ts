@@ -1,16 +1,21 @@
 import path from "path";
 import fs from "fs";
 import { createLogger, format, transports } from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
-const logsDir = path.join(process.cwd(), "logs");
+const errorLogsDir = path.join(process.cwd(), "logs", "errors");
+const httpLogsDir = path.join(process.cwd(), "logs", "http");
+const combinedLogsDir = path.join(process.cwd(), "logs", "combined");
 
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir);
-}
+[errorLogsDir, httpLogsDir, combinedLogsDir].forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
 const consoleFormat = format.combine(
-  format.colorize({ all: true }), // Colorize the console output
-  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Add timestamp
+  format.colorize({ all: true }),
+  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
   format.printf(({ timestamp, level, message, ...meta }) => {
     const metaString = Object.keys(meta).length
       ? JSON.stringify(meta, null, 2)
@@ -33,19 +38,31 @@ export const logger = createLogger({
   ),
 
   transports: [
-    new transports.File({
-      filename: path.join(logsDir, "error.log"),
+    new DailyRotateFile({
+      filename: path.join(errorLogsDir, "error.%DATE%.log"),
+      datePattern: "YYYY-MM-DD",
       level: "error",
+      maxSize: "10m",
+      maxFiles: "14d",
+      zippedArchive: true,
     }),
 
-    new transports.File({
-      filename: path.join(logsDir, "combined.log"),
+    new DailyRotateFile({
+      filename: path.join(combinedLogsDir, "combined.%DATE%.log"),
+      datePattern: "YYYY-MM-DD",
       level: "info",
+      maxSize: "20m",
+      maxFiles: "14d",
+      zippedArchive: true,
     }),
 
-    new transports.File({
-      filename: path.join(logsDir, "http.log"),
+    new DailyRotateFile({
+      filename: path.join(httpLogsDir, "http.%DATE%.log"),
+      datePattern: "YYYY-MM-DD",
       level: "http",
+      maxSize: "10m",
+      maxFiles: "14d",
+      zippedArchive: true,
       format: format.combine(httpFilter()),
     }),
   ],
