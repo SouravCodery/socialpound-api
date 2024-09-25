@@ -308,28 +308,29 @@ export const deleteCommentById = async ({
 
     await comment.softDelete();
 
-    if (comment?.post) {
-      const postId = comment.post._id.toString();
+    await deleteNotifications({
+      comment: commentId,
+    });
 
-      await incrementLikeOrCommentCountInBulk({
-        entityType: "Post",
-        ids: [postId],
-        countType: "commentsCount",
-        incrementBy: -1,
-      });
+    const postId = comment.post.toString();
+    await incrementLikeOrCommentCountInBulk({
+      entityType: "Post",
+      ids: [postId],
+      countType: "commentsCount",
+      incrementBy: -1,
+    });
 
-      // cache purge
-      await deleteAPICache({
-        keys: [
-          {
-            url: "/v1/comment",
-            params: { postId },
-            query: {},
-            authenticatedUserId: null,
-          },
-        ],
-      });
-    }
+    // cache purge
+    await deleteAPICache({
+      keys: [
+        {
+          url: "/v1/comment",
+          params: { postId },
+          query: {},
+          authenticatedUserId: null,
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 200,
