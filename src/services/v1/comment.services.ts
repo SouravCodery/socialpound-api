@@ -1,25 +1,25 @@
 import { FilterQuery } from "mongoose";
-import { HttpError } from "../../classes/http-error.class";
-import { HttpResponse } from "../../classes/http-response.class";
 
-import { logger } from "../../logger/index.logger";
-
+import { Config } from "../../config/config";
 import Comment from "../../models/comment.model";
 import Post from "../../models/post.model";
-import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
-
+import { HttpError } from "../../classes/http-error.class";
+import { HttpResponse } from "../../classes/http-response.class";
 import {
   CommentInterface,
   CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
+import { NotificationJobInterface } from "../../interfaces/notification.interface";
+import { PostWithIdInterface } from "../../interfaces/post.interface";
+
+import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 import {
   getLikeAndCommentsCountInBulk,
   incrementLikeOrCommentCountInBulk,
 } from "./redis-key-value-store.services";
-import { addNotificationsToQueue } from "./notification.services";
-import { NotificationJobInterface } from "../../interfaces/notification.interface";
-import { PostWithIdInterface } from "../../interfaces/post.interface";
 import { deleteAPICache } from "./redis-cache.services";
+import { addNotificationsToQueue } from "./notification.services";
+import { logger } from "../../logger/index.logger";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -205,7 +205,7 @@ const getCommentsWithCounters = async ({
 export const getCommentsByPostId = async ({
   postId,
   cursor,
-  limit = 20,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   postId: string;
   cursor?: string;

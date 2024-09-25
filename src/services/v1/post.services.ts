@@ -1,18 +1,18 @@
 import { FilterQuery } from "mongoose";
+
+import { Config } from "../../config/config";
+import Post from "../../models/post.model";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-
-import { logger } from "../../logger/index.logger";
-import Post from "../../models/post.model";
-
 import {
   PostInterface,
   PostWithIdInterface,
 } from "./../../interfaces/post.interface";
 
 import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services";
-import { incrementPostsCountForUser } from "./user.services";
 import { deleteAPICache } from "./redis-cache.services";
+import { incrementPostsCountForUser } from "./user.services";
+import { logger } from "../../logger/index.logger";
 
 export const createPost = async ({
   user,
@@ -112,7 +112,7 @@ const getPostsWithCounters = async ({
 export const getPosts = async ({
   userId,
   cursor,
-  limit = 10,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   userId?: string;
   cursor?: string;

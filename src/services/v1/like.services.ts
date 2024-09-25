@@ -1,21 +1,21 @@
-import { NotificationJobInterface } from "./../../interfaces/notification.interface";
 import { FilterQuery } from "mongoose";
-import { HttpError } from "../../classes/http-error.class";
-import { HttpResponse } from "../../classes/http-response.class";
 
-import { logger } from "../../logger/index.logger";
-
+import { Config } from "../../config/config";
 import Like from "../../models/like.model";
 import Post from "../../models/post.model";
-import { likeQueue } from "../../mq/bull-mq/index.bull-mq";
-
+import { HttpError } from "../../classes/http-error.class";
+import { HttpResponse } from "../../classes/http-response.class";
 import {
   LikeDocumentInterface,
   LikeInterface,
 } from "../../interfaces/like.interface";
+import { NotificationJobInterface } from "./../../interfaces/notification.interface";
+
+import { likeQueue } from "../../mq/bull-mq/index.bull-mq";
 import { incrementLikeOrCommentCountInBulk } from "./redis-key-value-store.services";
-import { addNotificationsToQueue } from "./notification.services";
 import { deleteAPICache } from "./redis-cache.services";
+import { addNotificationsToQueue } from "./notification.services";
+import { logger } from "../../logger/index.logger";
 
 export const addLikeToQueue = async ({
   likeOn,
@@ -161,7 +161,7 @@ export const likePosts = async ({ likes }: { likes: LikeInterface[] }) => {
 export const getLikesByPostId = async ({
   postId,
   cursor,
-  limit = 20,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   postId: string;
   cursor?: string;

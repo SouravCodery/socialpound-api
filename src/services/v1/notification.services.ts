@@ -1,16 +1,17 @@
-import { MarkNotificationAsReadInterface } from "./../../interfaces/notification.interface";
 import { FilterQuery } from "mongoose";
 
+import { Config } from "../../config/config";
+import Notification from "../../models/notification.model";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import { logger } from "../../logger/index.logger";
-
-import Notification from "../../models/notification.model";
+import { MarkNotificationAsReadInterface } from "./../../interfaces/notification.interface";
 import {
   NotificationInterface,
   NotificationJobInterface,
 } from "../../interfaces/notification.interface";
+
 import { notificationQueue } from "../../mq/bull-mq/index.bull-mq";
+import { logger } from "../../logger/index.logger";
 
 export const addNotificationsToQueue = async ({
   jobs,
@@ -111,7 +112,7 @@ export const createNotifications = async ({
 export const getNotificationsByUser = async ({
   recipient,
   cursor,
-  limit = 20,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   recipient: string;
   cursor?: string;
