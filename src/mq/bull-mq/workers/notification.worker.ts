@@ -47,7 +47,7 @@ export const notificationWorker = new Worker(
 export const notificationBatchProcessor = setInterval(async () => {
   try {
     const jobsToBeProcessedForAdd = notificationAddBatch.getJobs();
-    console.log("add notification batch", jobsToBeProcessedForAdd.length);
+    logger.info(`add notification batch: ${jobsToBeProcessedForAdd.length}`);
 
     if (jobsToBeProcessedForAdd.length > 0) {
       await createNotifications({

@@ -36,7 +36,7 @@ export const commentWorker = new Worker(
 export const commentOnPostBatchTimeout = setInterval(async () => {
   try {
     const jobsToBeProcessed = commentOnPostBatch.getJobs();
-    console.log("comment batch", jobsToBeProcessed.length);
+    logger.info(`comment batch: ${jobsToBeProcessed.length}`);
 
     if (jobsToBeProcessed.length > 0) {
       await addCommentsOnPosts({ comments: jobsToBeProcessed });

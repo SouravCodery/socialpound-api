@@ -1,12 +1,15 @@
 import express from "express";
-import router from "./src/routes/";
 import cors from "cors";
 import compression from "compression";
 
+import router from "./src/routes/";
+import { morganMiddleware } from "./src/middlewares/morgan.middleware";
+
 const app = express();
 
-app.use(compression());
 app.disable("x-powered-by");
+app.use(compression());
+app.use(morganMiddleware);
 app.use(cors());
 
 app.use(express.json());
