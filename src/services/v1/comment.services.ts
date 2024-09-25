@@ -86,9 +86,14 @@ export const addCommentsOnPosts = async ({
       postExists.map((post) => [post._id.toString(), post])
     );
 
-    const commentsToBeInserted = comments.filter((comment) =>
-      existingPostsMap.has(comment.post.toString())
-    );
+    const commentsToBeInserted = comments
+      .filter((comment) => existingPostsMap.has(comment.post.toString()))
+      .map((comment) => {
+        return {
+          ...comment,
+          postBy: existingPostsMap.get(comment.post.toString())?.user,
+        };
+      });
 
     let successfullyInsertedComments: CommentWithIdInterface[] = [];
     try {
