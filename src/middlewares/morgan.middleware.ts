@@ -7,6 +7,9 @@ const jsonFormat = (
   req: IncomingMessage,
   res: ServerResponse
 ) => {
+  const tokenPayload =
+    (req.headers.authorization ?? ".")?.split(".")?.[1] ?? "";
+
   return JSON.stringify({
     method: tokens.method(req, res),
     url: tokens.url(req, res),
@@ -14,6 +17,7 @@ const jsonFormat = (
     content_length: tokens.res(req, res, "content-length"),
     response_time: tokens["response-time"](req, res) + " ms",
     timestamp: new Date().toISOString(),
+    user: tokenPayload,
     ip: tokens["remote-addr"](req, res),
   });
 };
