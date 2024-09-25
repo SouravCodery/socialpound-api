@@ -1,8 +1,8 @@
 import { Schema, model } from "mongoose";
 
-import baseSchemaOptions from "./base-schema-options";
-import { softDeletePlugin } from "./plugins/soft-delete-plugin";
 import { PostDocumentInterface } from "./../interfaces/post.interface";
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+import baseSchemaOptions from "./base-schema-options";
 
 const postSchema: Schema<PostDocumentInterface> = new Schema(
   {

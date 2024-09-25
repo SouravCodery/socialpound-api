@@ -1,8 +1,8 @@
 import { Schema, model } from "mongoose";
 
 import { UserDocumentInterface } from "../interfaces/user.interface";
-import baseSchemaOptions from "./base-schema-options";
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+import baseSchemaOptions from "./base-schema-options";
 
 const userSchema: Schema<UserDocumentInterface> = new Schema(
   {

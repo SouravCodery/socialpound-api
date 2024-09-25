@@ -1,9 +1,8 @@
 import { Schema, model } from "mongoose";
 
-import baseSchemaOptions from "./base-schema-options";
-import { softDeletePlugin } from "./plugins/soft-delete-plugin";
-
 import { LikeDocumentInterface } from "./../interfaces/like.interface";
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+import baseSchemaOptions from "./base-schema-options";
 
 const likeSchema: Schema<LikeDocumentInterface> = new Schema(
   {
