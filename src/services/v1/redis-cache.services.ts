@@ -1,10 +1,9 @@
-import { redisCacheClient } from "../../config/redis-cache.config";
-import { getAPICacheKey } from "../../helpers/cache.helpers";
-
-import { Constants } from "../../constants/constants";
-import { logger } from "../../logger/index.logger";
-import { APICacheKeyParamsInterface } from "../../interfaces/redis-cache.interface";
 import { Config } from "../../config/config";
+import { redisCacheClient } from "../../config/redis-cache.config";
+import { Constants } from "../../constants/constants";
+import { APICacheKeyParamsInterface } from "../../interfaces/redis-cache.interface";
+import { getAPICacheKey } from "../../helpers/cache.helpers";
+import { logger } from "../../logger/index.logger";
 
 export const getCache = async ({
   key,
@@ -45,7 +44,6 @@ export const setCache = async ({
       EX: Constants.DURATION[ttl],
     });
 
-    logger.info(`Cache set for key ${key}:`, result);
     return true;
   } catch (error) {
     logger.error(`[Service: setCache] - Something went wrong`, error);
@@ -66,7 +64,6 @@ export const deleteCache = async ({
 
     const result = await redisCacheClient.del(keys);
 
-    logger.info(`Cache deleted for key ${keys}:`, result);
     return true;
   } catch (error) {
     logger.error(`[Service: delCache] - Something went wrong`, error);
