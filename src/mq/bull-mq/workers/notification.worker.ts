@@ -1,17 +1,17 @@
 import { Worker } from "bullmq";
-import { bullMQConnection } from "../../../config/bull-mq.config";
 
-import {
-  createNotifications,
-  // markNotificationsAsRead,
-} from "../../../services/v1/notification.services";
+import { Config } from "../../../config/config";
+import { bullMQConnection } from "../../../config/bull-mq.config";
 import {
   NotificationInterface,
   // MarkNotificationAsReadInterface,
 } from "../../../interfaces/notification.interface";
-
-import { logger } from "../../../logger/index.logger";
+import {
+  createNotifications,
+  // markNotificationsAsRead,
+} from "../../../services/v1/notification.services";
 import { JobBatch } from "../../../classes/job-batch.class";
+import { logger } from "../../../logger/index.logger";
 
 const notificationAddBatch = new JobBatch<NotificationInterface>({});
 // const notificationReadBatch = new JobBatch<MarkNotificationAsReadInterface>({});
@@ -47,7 +47,9 @@ export const notificationWorker = new Worker(
 export const notificationBatchProcessor = setInterval(async () => {
   try {
     const jobsToBeProcessedForAdd = notificationAddBatch.getJobs();
-    logger.info(`add notification batch: ${jobsToBeProcessedForAdd.length}`);
+
+    if (Config.WORKERS_LOG_ENABLED)
+      logger.info(`add notification batch: ${jobsToBeProcessedForAdd.length}`);
 
     if (jobsToBeProcessedForAdd.length > 0) {
       await createNotifications({
