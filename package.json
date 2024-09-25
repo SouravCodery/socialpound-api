@@ -24,7 +24,8 @@
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "winston": "^3.14.2"
   },
   "devDependencies": {
     "@types/compression": "^1.7.5",
