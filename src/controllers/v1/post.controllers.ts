@@ -94,7 +94,6 @@ const getPostsByUserId = async (
       query: req.query,
       authenticatedUserId: null,
       value: posts.getResponse(),
-      ttl: "ONE_HOUR",
     });
 
     return res.status(posts.getStatus()).json(posts.getResponse());

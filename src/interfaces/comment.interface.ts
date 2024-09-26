@@ -8,6 +8,7 @@ export interface CommentInterface {
   parentComment: ObjectId | null;
 
   user: ObjectId;
+  postBy: ObjectId;
 
   text: string;
 }

@@ -1,11 +1,11 @@
 import { Worker } from "bullmq";
 
+import { Config } from "../../../config/config";
 import { bullMQConnection } from "../../../config/bull-mq.config";
-import { addCommentsOnPosts } from "../../../services/v1/comment.services";
-
-import { logger } from "../../../logger/index.logger";
 import { JobBatch } from "../../../classes/job-batch.class";
 import { CommentInterface } from "../../../interfaces/comment.interface";
+import { addCommentsOnPosts } from "../../../services/v1/comment.services";
+import { logger } from "../../../logger/index.logger";
 
 const commentOnPostBatch = new JobBatch<CommentInterface>({});
 
@@ -36,7 +36,9 @@ export const commentWorker = new Worker(
 export const commentOnPostBatchTimeout = setInterval(async () => {
   try {
     const jobsToBeProcessed = commentOnPostBatch.getJobs();
-    logger.info(`comment batch: ${jobsToBeProcessed.length}`);
+
+    if (Config.WORKERS_LOG_ENABLED)
+      logger.info(`comment batch: ${jobsToBeProcessed.length}`);
 
     if (jobsToBeProcessed.length > 0) {
       await addCommentsOnPosts({ comments: jobsToBeProcessed });

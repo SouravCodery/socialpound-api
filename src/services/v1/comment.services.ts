@@ -1,25 +1,29 @@
 import { FilterQuery } from "mongoose";
-import { HttpError } from "../../classes/http-error.class";
-import { HttpResponse } from "../../classes/http-response.class";
 
-import { logger } from "../../logger/index.logger";
-
+import { Config } from "../../config/config";
 import Comment from "../../models/comment.model";
 import Post from "../../models/post.model";
-import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
-
+import { HttpError } from "../../classes/http-error.class";
+import { HttpResponse } from "../../classes/http-response.class";
 import {
   CommentInterface,
   CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
+import { NotificationJobInterface } from "../../interfaces/notification.interface";
+import { PostWithIdInterface } from "../../interfaces/post.interface";
+
+import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 import {
   getLikeAndCommentsCountInBulk,
   incrementLikeOrCommentCountInBulk,
 } from "./redis-key-value-store.services";
-import { addNotificationsToQueue } from "./notification.services";
-import { NotificationJobInterface } from "../../interfaces/notification.interface";
-import { PostWithIdInterface } from "../../interfaces/post.interface";
 import { deleteAPICache } from "./redis-cache.services";
+import {
+  addNotificationsToQueue,
+  deleteNotifications,
+} from "./notification.services";
+import { logger } from "../../logger/index.logger";
+import Notification from "../../models/notification.model";
 
 export const addCommentToQueue = async ({
   commentOn,
@@ -86,9 +90,14 @@ export const addCommentsOnPosts = async ({
       postExists.map((post) => [post._id.toString(), post])
     );
 
-    const commentsToBeInserted = comments.filter((comment) =>
-      existingPostsMap.has(comment.post.toString())
-    );
+    const commentsToBeInserted = comments
+      .filter((comment) => existingPostsMap.has(comment.post.toString()))
+      .map((comment) => {
+        return {
+          ...comment,
+          postBy: existingPostsMap.get(comment.post.toString())?.user,
+        };
+      });
 
     let successfullyInsertedComments: CommentWithIdInterface[] = [];
     try {
@@ -205,7 +214,7 @@ const getCommentsWithCounters = async ({
 export const getCommentsByPostId = async ({
   postId,
   cursor,
-  limit = 20,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   postId: string;
   cursor?: string;
@@ -277,13 +286,7 @@ export const deleteCommentById = async ({
     const comment = await Comment.findOne({
       _id: commentId,
       isDeleted: false,
-    })
-      .select("user post")
-      .populate<{ post: PostWithIdInterface }>({
-        path: "post",
-        select: "user",
-        match: { isDeleted: false, isUserDeleted: false },
-      });
+    }).select("user post postBy");
 
     if (!comment) {
       throw new HttpError({
@@ -294,7 +297,7 @@ export const deleteCommentById = async ({
 
     if (
       (comment?.user?.toString() === user ||
-        comment?.post?.user.toString() === user) === false
+        comment?.postBy?.toString() === user) === false
     ) {
       throw new HttpError({
         status: 403,
@@ -305,28 +308,29 @@ export const deleteCommentById = async ({
 
     await comment.softDelete();
 
-    if (comment?.post) {
-      const postId = comment.post._id.toString();
+    await deleteNotifications({
+      comment: commentId,
+    });
 
-      await incrementLikeOrCommentCountInBulk({
-        entityType: "Post",
-        ids: [postId],
-        countType: "commentsCount",
-        incrementBy: -1,
-      });
+    const postId = comment.post.toString();
+    await incrementLikeOrCommentCountInBulk({
+      entityType: "Post",
+      ids: [postId],
+      countType: "commentsCount",
+      incrementBy: -1,
+    });
 
-      // cache purge
-      await deleteAPICache({
-        keys: [
-          {
-            url: "/v1/comment",
-            params: { postId },
-            query: {},
-            authenticatedUserId: null,
-          },
-        ],
-      });
-    }
+    // cache purge
+    await deleteAPICache({
+      keys: [
+        {
+          url: "/v1/comment",
+          params: { postId },
+          query: {},
+          authenticatedUserId: null,
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 200,

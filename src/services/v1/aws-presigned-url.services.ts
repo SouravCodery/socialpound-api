@@ -6,6 +6,7 @@ import { HttpResponse } from "../../classes/http-response.class";
 
 import { logger } from "../../logger/index.logger";
 import { Config } from "../../config/config";
+import { Constants } from "../../constants/constants";
 
 const client = new S3Client({ region: Config.AWS_REGION });
 
@@ -20,7 +21,10 @@ export const getPresignedUrl = async ({
 }) => {
   try {
     const fileExtension = type.split("/")[1];
-    const key = `${user}/post/images/${Date.now()}.${fileExtension}`;
+    const key = `${
+      Config.NODE_ENV
+    }/v1/user/${user}/post/images/${Date.now()}.${fileExtension}`;
+    //todo: replace Date.now() with uuid
 
     const command = new PutObjectCommand({
       Bucket: Config.AWS_BUCKET_NAME,
@@ -30,7 +34,7 @@ export const getPresignedUrl = async ({
     });
 
     const presignedUrl = await getSignedUrl(client, command, {
-      expiresIn: 60,
+      expiresIn: Constants.DURATION.ONE_MINUTE,
     });
 
     return new HttpResponse({

@@ -1,7 +1,8 @@
 import { Schema, model } from "mongoose";
 
-import baseSchemaOptions from "./base-schema-options";
 import { NotificationDocumentInterface } from "../interfaces/notification.interface";
+import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+import baseSchemaOptions from "./base-schema-options";
 
 const notificationSchema: Schema<NotificationDocumentInterface> = new Schema(
   {
@@ -46,6 +47,8 @@ notificationSchema.pre("validate", function (next) {
     next();
   }
 });
+
+notificationSchema.plugin(softDeletePlugin);
 
 const Notification = model<NotificationDocumentInterface>(
   "Notification",

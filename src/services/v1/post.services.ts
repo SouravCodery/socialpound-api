@@ -1,18 +1,19 @@
 import { FilterQuery } from "mongoose";
+
+import { Config } from "../../config/config";
+import Post from "../../models/post.model";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-
-import { logger } from "../../logger/index.logger";
-import Post from "../../models/post.model";
-
 import {
   PostInterface,
   PostWithIdInterface,
 } from "./../../interfaces/post.interface";
 
 import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services";
-import { incrementPostsCountForUser } from "./user.services";
 import { deleteAPICache } from "./redis-cache.services";
+import { incrementPostsCountForUser } from "./user.services";
+import { logger } from "../../logger/index.logger";
+import { deleteNotifications } from "./notification.services";
 
 export const createPost = async ({
   user,
@@ -37,6 +38,12 @@ export const createPost = async ({
     await incrementPostsCountForUser({ user: userId });
     await deleteAPICache({
       keys: [
+        {
+          url: "/v1/post",
+          params: {},
+          query: {},
+          authenticatedUserId: null,
+        },
         {
           url: "/v1/post",
           params: {
@@ -112,7 +119,7 @@ const getPostsWithCounters = async ({
 export const getPosts = async ({
   userId,
   cursor,
-  limit = 10,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   userId?: string;
   cursor?: string;
@@ -209,6 +216,10 @@ export const deletePostById = async ({
       });
     }
 
+    await deleteNotifications({
+      post: postId,
+    });
+
     if (post?.user) {
       const userId = post.user.toString();
 
@@ -219,6 +230,12 @@ export const deletePostById = async ({
 
       await deleteAPICache({
         keys: [
+          {
+            url: "/v1/post",
+            params: {},
+            query: {},
+            authenticatedUserId: null,
+          },
           {
             url: "/v1/post",
             params: {

@@ -57,4 +57,7 @@ export const Config = {
   AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
   AUTH_JWT_EXPIRES_IN: getEnvironmentVariable("AUTH_JWT_EXPIRES_IN", "string"),
   GOOGLE_CLIENT_ID: getEnvironmentVariable("GOOGLE_CLIENT_ID", "string"),
+
+  PAGINATION_LIMIT: getEnvironmentVariable("PAGINATION_LIMIT", "number"),
+  WORKERS_LOG_ENABLED: getEnvironmentVariable("WORKERS_LOG_ENABLED", "boolean"),
 } as const;

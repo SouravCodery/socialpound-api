@@ -1,9 +1,8 @@
 import { Schema, model } from "mongoose";
 
-import baseSchemaOptions from "./base-schema-options";
 import { CommentDocumentInterface } from "./../interfaces/comment.interface";
-
 import { softDeletePlugin } from "./plugins/soft-delete-plugin";
+import baseSchemaOptions from "./base-schema-options";
 
 const commentSchema: Schema<CommentDocumentInterface> = new Schema(
   {
@@ -17,6 +16,7 @@ const commentSchema: Schema<CommentDocumentInterface> = new Schema(
     },
 
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    postBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
     text: { type: String, maxLength: 2200, required: true },
   },

@@ -1,4 +1,5 @@
 import { ObjectId, Document, Types } from "mongoose";
+import { SoftDeleteInterface } from "./soft-delete.interface";
 
 type NotificationTypes =
   | "like-on-post"
@@ -21,7 +22,8 @@ export interface NotificationInterface {
 
 export interface NotificationDocumentInterface
   extends Document,
-    NotificationInterface {}
+    NotificationInterface,
+    SoftDeleteInterface {}
 
 export interface NotificationWithIdInterface extends NotificationInterface {
   _id: Types.ObjectId;

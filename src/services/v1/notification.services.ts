@@ -1,16 +1,17 @@
-import { MarkNotificationAsReadInterface } from "./../../interfaces/notification.interface";
 import { FilterQuery } from "mongoose";
 
+import { Config } from "../../config/config";
+import Notification from "../../models/notification.model";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import { logger } from "../../logger/index.logger";
-
-import Notification from "../../models/notification.model";
+import { MarkNotificationAsReadInterface } from "./../../interfaces/notification.interface";
 import {
   NotificationInterface,
   NotificationJobInterface,
 } from "../../interfaces/notification.interface";
+
 import { notificationQueue } from "../../mq/bull-mq/index.bull-mq";
+import { logger } from "../../logger/index.logger";
 
 export const addNotificationsToQueue = async ({
   jobs,
@@ -111,7 +112,7 @@ export const createNotifications = async ({
 export const getNotificationsByUser = async ({
   recipient,
   cursor,
-  limit = 20,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   recipient: string;
   cursor?: string;
@@ -120,6 +121,7 @@ export const getNotificationsByUser = async ({
   try {
     const query: FilterQuery<NotificationInterface> = {
       recipient,
+      isDeleted: false,
     };
 
     if (cursor) {
@@ -229,5 +231,56 @@ export const markNotificationsAsRead = async ({
       status: 500,
       message: "[Service: markNotificationsAsRead] - Something went wrong",
     });
+  }
+};
+
+export const deleteNotifications = async ({
+  post,
+  comment,
+}: {
+  post?: string;
+  comment?: string;
+}) => {
+  try {
+    if (!post && !comment) {
+      throw new HttpError({
+        status: 400,
+        message: "Either post or comment must be provided",
+      });
+    }
+
+    const query: FilterQuery<NotificationInterface> = {
+      isDeleted: false,
+    };
+
+    if (post) {
+      query.post = post;
+    }
+    if (comment) {
+      query.comment = comment;
+    }
+
+    const result = await Notification.updateMany(
+      query,
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+      },
+      {
+        runValidators: true,
+      }
+    );
+
+    return new HttpResponse({
+      status: 200,
+      message: `${result.modifiedCount} notifications deleted`,
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: deleteNotifications] - Something went wrong",
+      error
+    );
   }
 };
