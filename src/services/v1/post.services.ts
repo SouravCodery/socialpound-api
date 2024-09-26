@@ -232,6 +232,12 @@ export const deletePostById = async ({
         keys: [
           {
             url: "/v1/post",
+            params: {},
+            query: {},
+            authenticatedUserId: null,
+          },
+          {
+            url: "/v1/post",
             params: {
               userId,
             },
