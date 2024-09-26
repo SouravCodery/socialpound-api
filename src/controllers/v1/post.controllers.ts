@@ -54,7 +54,7 @@ const getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
       query: req.query,
       authenticatedUserId: null,
       value: posts.getResponse(),
-      ttl: "FIVE_MINUTES",
+      ttl: "ONE_HOUR",
     });
 
     return res.status(posts.getStatus()).json(posts.getResponse());
