@@ -13,7 +13,6 @@ import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services"
 import { deleteAPICache } from "./redis-cache.services";
 import { incrementPostsCountForUser } from "./user.services";
 import { logger } from "../../logger/index.logger";
-import Notification from "../../models/notification.model";
 import { deleteNotifications } from "./notification.services";
 
 export const createPost = async ({
@@ -39,6 +38,12 @@ export const createPost = async ({
     await incrementPostsCountForUser({ user: userId });
     await deleteAPICache({
       keys: [
+        {
+          url: "/v1/post",
+          params: {},
+          query: {},
+          authenticatedUserId: null,
+        },
         {
           url: "/v1/post",
           params: {
