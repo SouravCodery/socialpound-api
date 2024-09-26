@@ -34,7 +34,7 @@ export const getPresignedUrl = async ({
     });
 
     const presignedUrl = await getSignedUrl(client, command, {
-      expiresIn: 2 * Constants.DURATION.ONE_MINUTE,
+      expiresIn: Constants.DURATION.ONE_MINUTE,
     });
 
     return new HttpResponse({
