@@ -21,7 +21,7 @@ export const getPresignedUrl = async ({
 }) => {
   try {
     const fileExtension = type.split("/")[1];
-    const key = `${
+    const key = `${Config.AWS_PRESIGNED_URL_PREFIX}/${
       Config.NODE_ENV
     }/v1/user/${user}/post/images/${Date.now()}.${fileExtension}`;
     //todo: replace Date.now() with uuid
