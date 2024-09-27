@@ -19,6 +19,7 @@ userRouter.use(authMiddleware);
 
 userRouter.get(
   "/:username",
+  validate(userValidationSchemas.getUserValidatorSchema),
   cacheMiddleware({ isAuthenticatedUserSpecificRequest: false }),
   userController.getUserByUsername
 );
