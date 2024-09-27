@@ -38,4 +38,5 @@ userSchema.index(
 
 userSchema.plugin(softDeletePlugin);
 
-export const UserModel = model<UserDocumentInterface>("User", userSchema);
+const User = model<UserDocumentInterface>("User", userSchema);
+export default User;
