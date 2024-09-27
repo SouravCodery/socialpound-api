@@ -126,7 +126,6 @@ export const getPosts = async ({
   limit?: number;
 }) => {
   try {
-    //todo: Caching
     const query: FilterQuery<PostInterface> = {
       isDeleted: false,
       isUserDeleted: false,
@@ -178,6 +177,7 @@ export const getPosts = async ({
   }
 };
 
+//todo: Do this via queue in batches
 export const deletePostById = async ({
   user,
   username,

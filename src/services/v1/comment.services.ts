@@ -221,7 +221,6 @@ export const getCommentsByPostId = async ({
   limit?: number;
 }) => {
   try {
-    //todo: Caching and Bringing likesCount and repliesCount from Redis
     const query: FilterQuery<CommentInterface> = {
       post: postId,
       commentOn: "Post",
@@ -275,6 +274,7 @@ export const getCommentsByPostId = async ({
   }
 };
 
+//todo: Do this via queue in batches
 export const deleteCommentById = async ({
   user,
   commentId,

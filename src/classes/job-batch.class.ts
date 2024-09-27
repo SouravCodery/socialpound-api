@@ -1,3 +1,6 @@
+//todo: Replace this JobBatch by using a queue which supports batch processing
+//This JobBatch is a temporary solution for batch processing, this is not a full proof solution
+//Jobs may get loss if the server crashes between the batch processing
 export class JobBatch<T> {
   private jobs: T[];
   private batchSize: number;
