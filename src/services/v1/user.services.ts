@@ -298,6 +298,12 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
       keys: [
         {
           url: "/v1/post",
+          params: {},
+          query: {},
+          authenticatedUserId: null,
+        },
+        {
+          url: "/v1/post",
           params: {
             userId,
           },
