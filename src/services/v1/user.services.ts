@@ -1,6 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 
-import { UserModel } from "../../models/user.model";
+import User from "../../models/user.model";
 import Post from "../../models/post.model";
 import {
   deleteAPICache,
@@ -69,14 +69,14 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
     const { userPayloadGoogle } = await verifyGoogleToken({ googleToken });
     const { sub, email, name, picture } = userPayloadGoogle;
 
-    const existingUser = await UserModel.findOne({
+    const existingUser = await User.findOne({
       sub,
       isDeleted: false,
     }).select("_id email username fullName profilePicture");
 
     const user =
       existingUser ??
-      new UserModel({
+      new User({
         username: email,
         email: email,
         fullName: name,
@@ -160,7 +160,7 @@ export const getUserById = async ({ userId }: { userId: string }) => {
       return cachedUser as UserWithIdInterface;
     }
 
-    const user = await UserModel.findOne({
+    const user = await User.findOne({
       _id: userId,
       isDeleted: false,
     })
@@ -186,7 +186,7 @@ export const getUserById = async ({ userId }: { userId: string }) => {
 
 export const getUserByUsername = async ({ username }: { username: string }) => {
   try {
-    const user = await UserModel.findOne({
+    const user = await User.findOne({
       username,
       isDeleted: false,
     })
@@ -230,7 +230,7 @@ export const incrementPostsCountForUser = async ({
   incrementBy?: number;
 }) => {
   try {
-    await UserModel.updateOne(
+    await User.updateOne(
       { _id: user },
       {
         $inc: {
@@ -255,7 +255,7 @@ export const incrementPostsCountForUser = async ({
 
 export const deleteUser = async ({ userId }: { userId: string }) => {
   try {
-    const user = await UserModel.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(
       {
         _id: userId,
         isDeleted: false,
