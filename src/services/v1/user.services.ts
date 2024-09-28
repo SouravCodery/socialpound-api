@@ -82,6 +82,7 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
         fullName: name,
         sub: sub,
         profilePicture: picture ?? "",
+        lastLogin: new Date(),
       });
 
     if (existingUser) {
@@ -96,6 +97,7 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
         existingUser.profilePicture = picture;
     }
 
+    user.lastLogin = new Date();
     await user.save();
 
     //response
