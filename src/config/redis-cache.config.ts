@@ -1,4 +1,4 @@
-// Cache Redis instance on port 6380
+// Cache Redis instance on port 6379
 
 // docker run -d \
 //   --name redis-cache \

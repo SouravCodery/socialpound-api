@@ -1,4 +1,4 @@
-// Persistent Redis instance on port 6379
+// Persistent Redis instance on port 6380
 
 // docker run -d \
 //   --name redis-key-value-store \
