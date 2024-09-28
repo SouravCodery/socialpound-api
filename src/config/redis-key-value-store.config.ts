@@ -1,7 +1,7 @@
 // Persistent Redis instance on port 6379
 
 // docker run -d \
-//   --name redis-persistent \
+//   --name redis-key-value-store \
 //   -p 6380:6379 \
 //   redis:latest \
 //   redis-server --appendonly yes --appendfsync everysec --maxmemory-policy noeviction
