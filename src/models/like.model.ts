@@ -11,7 +11,12 @@ const likeSchema: Schema<LikeDocumentInterface> = new Schema(
     post: { type: Schema.Types.ObjectId, ref: "Post", required: true },
     comment: { type: Schema.Types.ObjectId, ref: "Comment", default: null },
 
-    liker: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    liker: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
   },
   baseSchemaOptions
 );
