@@ -2,7 +2,7 @@
 
 // docker run -d \
 //   --name redis-persistent \
-//   -p 6379:6379 \
+//   -p 6380:6379 \
 //   redis:latest \
 //   redis-server --appendonly yes --appendfsync everysec --maxmemory-policy noeviction
 

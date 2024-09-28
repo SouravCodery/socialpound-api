@@ -2,7 +2,7 @@
 
 // docker run -d \
 //   --name redis-cache \
-//   -p 6380:6379 \
+//   -p 6379:6379 \
 //   redis:latest \
 //   redis-server --appendonly no --save "" --maxmemory-policy allkeys-lru
 
