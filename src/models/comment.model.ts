@@ -8,7 +8,12 @@ const commentSchema: Schema<CommentDocumentInterface> = new Schema(
   {
     commentOn: { type: String, enum: ["Post", "Comment"], required: true },
 
-    post: { type: Schema.Types.ObjectId, ref: "Post", required: true },
+    post: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+      index: true,
+    },
     parentComment: {
       type: Schema.Types.ObjectId,
       ref: "Comment",

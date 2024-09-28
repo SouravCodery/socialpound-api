@@ -53,6 +53,10 @@ export const Config = {
 
   AWS_REGION: getEnvironmentVariable("AWS_REGION", "string"),
   AWS_BUCKET_NAME: getEnvironmentVariable("AWS_BUCKET_NAME", "string"),
+  AWS_PRESIGNED_URL_PREFIX: getEnvironmentVariable(
+    "AWS_PRESIGNED_URL_PREFIX",
+    "string"
+  ),
 
   AUTH_JWT_SECRET_KEY: getEnvironmentVariable("AUTH_JWT_SECRET_KEY", "string"),
   AUTH_JWT_EXPIRES_IN: getEnvironmentVariable("AUTH_JWT_EXPIRES_IN", "string"),

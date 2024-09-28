@@ -17,12 +17,12 @@ notificationRouter.get(
   notificationController.getNotificationsByUser
 );
 
-notificationRouter.patch(
-  "/:notificationId",
-  validate(
-    notificationValidationSchemas.addMarkNotificationAsReadValidatorSchema
-  ),
-  notificationController.addMarkNotificationAsRead
-);
+// notificationRouter.patch(
+//   "/:notificationId",
+//   validate(
+//     notificationValidationSchemas.addMarkNotificationAsReadValidatorSchema
+//   ),
+//   notificationController.addMarkNotificationAsRead
+// );
 
 export default notificationRouter;

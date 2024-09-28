@@ -19,6 +19,8 @@ const userSchema: Schema<UserDocumentInterface> = new Schema(
     followingCount: { type: Number, default: 0, required: true, min: 0 },
 
     isPrivate: { type: Boolean, default: true, required: true },
+
+    lastLogin: { type: Date, default: Date.now, required: true },
   },
   baseSchemaOptions
 );
@@ -38,4 +40,5 @@ userSchema.index(
 
 userSchema.plugin(softDeletePlugin);
 
-export const UserModel = model<UserDocumentInterface>("User", userSchema);
+const User = model<UserDocumentInterface>("User", userSchema);
+export default User;
