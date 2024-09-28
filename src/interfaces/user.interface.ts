@@ -15,6 +15,8 @@ export interface UserInterface {
   followingCount: number;
 
   isPrivate: boolean;
+
+  lastLogin: Date;
 }
 
 export interface UserDocumentInterface
