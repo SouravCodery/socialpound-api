@@ -23,6 +23,8 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - PAGINATION_LIMIT=${PAGINATION_LIMIT}
       - WORKERS_LOG_ENABLED=${WORKERS_LOG_ENABLED}
+    volumes:
+      - ./logs:/usr/src/app/logs
     depends_on:
       - redis-cache
     networks:
