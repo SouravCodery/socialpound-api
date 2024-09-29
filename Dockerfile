@@ -13,6 +13,8 @@ COPY package*.json ./
 # Install dependencies (for production only)
 RUN npm install --production
 
+RUN npm install -g typescript
+
 # Copy the rest of the application code
 COPY . .
 
