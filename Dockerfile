@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies (for production only)
-RUN npm install --production
+RUN npm install
 
 RUN npm install -g typescript
 
