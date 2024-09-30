@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const supportedImageTypes = ["image/webp"];
+const supportedImageTypes = ["image/webp", "image/jpeg", "image/jpg"];
 
 const MIN_FILE_SIZE = 1024; //1KB
 const MAX_FILE_SIZE = 5 * 1024 * 1024; //5MB
