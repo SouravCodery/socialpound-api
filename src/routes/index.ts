@@ -13,6 +13,8 @@ router.get("/", (req, res) => {
 router.use("/v1", v1Router);
 
 router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error("[Error handling middleware] - Error", err);
+
   if (err instanceof HttpError) {
     return res.status(err.status).json({
       message: err.message,
@@ -21,8 +23,6 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         "Something went wrong processing your request. Please try again later. 🤒",
     });
   }
-
-  logger.error("[Error handling middleware] - Unhandled error", err);
 
   return res.status(500).json({
     message: "Internal Server Error",
