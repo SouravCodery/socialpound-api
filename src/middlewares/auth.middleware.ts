@@ -22,7 +22,11 @@ export const authMiddleware = async (
 
     if (!token) {
       return next(
-        new HttpError({ status: 401, message: "User is not authorized" })
+        new HttpError({
+          status: 401,
+          message: "User is not authorized",
+          toastMessage: "Please sign in again",
+        })
       );
     }
 

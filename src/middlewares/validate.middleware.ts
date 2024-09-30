@@ -21,7 +21,11 @@ export const validate = ({
 
         if (error) {
           return next(
-            new HttpError({ status: 422, message: error.details[0].message })
+            new HttpError({
+              status: 422,
+              message: error.details[0].message,
+              toastMessage: error.details[0].message,
+            })
           );
         }
       }
@@ -32,7 +36,11 @@ export const validate = ({
 
         if (error) {
           return next(
-            new HttpError({ status: 422, message: error.details[0].message })
+            new HttpError({
+              status: 422,
+              message: error.details[0].message,
+              toastMessage: error.details[0].message,
+            })
           );
         }
       }
@@ -42,7 +50,11 @@ export const validate = ({
 
         if (error) {
           return next(
-            new HttpError({ status: 422, message: error.details[0].message })
+            new HttpError({
+              status: 422,
+              message: error.details[0].message,
+              toastMessage: error.details[0].message,
+            })
           );
         }
       }
@@ -52,7 +64,11 @@ export const validate = ({
 
         if (error) {
           return next(
-            new HttpError({ status: 422, message: error.details[0].message })
+            new HttpError({
+              status: 422,
+              message: error.details[0].message,
+              toastMessage: error.details[0].message,
+            })
           );
         }
       }
