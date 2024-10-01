@@ -19,6 +19,7 @@ This project is a work in progress. More features will be added in the future.
 - [API Documentation](#api-documentation)
 - [License](#license)
 - [Contact](#contact)
+- [Support](#support)
 
 ## Frontend
 
@@ -275,3 +276,7 @@ For questions or feedback, feel free to reach out:
 
 - **GitHub**: [github.com/SouravCodery](https://github.com/SouravCodery)
 - **Email**: souravscchoudhary@gmail.com
+
+## Support
+
+If you find this project helpful or interesting, please give it a ⭐ on [GitHub](https://github.com/SouravCodery/socialpound-api)!
