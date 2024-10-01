@@ -1,0 +1,64 @@
+# Run the following command to start the services
+# make sure that you have populate .env.example with AWS and Google client id credentials
+# docker-compose -f docker-compose.local-setup.yml --env-file .env.example up --build
+
+version: "3"
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - MONGODB_URI=${MONGODB_URI}
+      - PORT=${PORT}
+      - REDIS_CACHE_URL=${REDIS_CACHE_URL}
+      - REDIS_KEY_VALUE_STORE_URL=${REDIS_KEY_VALUE_STORE_URL}
+      - REDIS_BULL_MQ_HOST=${REDIS_BULL_MQ_HOST}
+      - REDIS_BULL_MQ_PORT=${REDIS_BULL_MQ_PORT}
+      - REDIS_CACHE_ENABLED=${REDIS_CACHE_ENABLED}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - AWS_PRESIGNED_URL_PREFIX=${AWS_PRESIGNED_URL_PREFIX}
+      - AUTH_JWT_SECRET_KEY=${AUTH_JWT_SECRET_KEY}
+      - AUTH_JWT_EXPIRES_IN=${AUTH_JWT_EXPIRES_IN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - PAGINATION_LIMIT=${PAGINATION_LIMIT}
+      - WORKERS_LOG_ENABLED=${WORKERS_LOG_ENABLED}
+    volumes:
+      - ./logs:/usr/src/app/logs
+    depends_on:
+      - redis-cache
+      - redis-key-value-store
+      - mongodb
+    networks:
+      - app-network
+
+  redis-cache:
+    image: redis:latest
+    command: redis-server --appendonly no --save "" --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  redis-key-value-store:
+    image: redis:latest
+    command: redis-server --appendonly yes --appendfsync everysec --maxmemory-policy noeviction
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
