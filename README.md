@@ -4,9 +4,9 @@
 
 Socialpound API is the backend service for Socialpound, a social media platform like Instagram. The API handles core functionalities such as user management, posts, comments, likes, notifications, and more, built with a focus on scalability and performance.
 
-This project is intended for learning purposes and showcases various backend development practices using the Node.js and Express.js with additional services such as Redis, MongoDB, BullMQ, etc.
+This project is intended for learning purposes and showcases various backend development practices using Node.js and Express.js, with additional services such as Redis, MongoDB, BullMQ, etc.
 
-This project is a work in progress. More features would be added in the future.
+This project is a work in progress. More features will be added in the future.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ This project is a work in progress. More features would be added in the future.
 
 ## Frontend
 
-The repository of Socialpound Webapp made using Next.js
+The repository of Socialpound Webapp made using Next.js:  
 [socialpound-webapp](https://github.com/SouravCodery/socialpound-webapp)
 
 ## Technologies
@@ -33,7 +33,7 @@ The repository of Socialpound Webapp made using Next.js
 - **Mongoose**: ODM for database interactions
 - **Redis**: Caching and persistent key-value store
 - **AWS S3**: Media storage
-- **AWS Presigned URL**: AWS presigned url to upload images via frontend
+- **AWS Presigned URL**: AWS presigned URL to upload images via frontend
 - **BullMQ**: Job queue for handling asynchronous tasks
 - **TypeScript**: Type-safe JavaScript superset
 - **JWT**: JSON Web Token for user authentication
@@ -49,51 +49,52 @@ The repository of Socialpound Webapp made using Next.js
 - **Post Management**: Create, delete, and retrieve posts
 - **Likes System**: Like/unlike posts
 - **Comment System**: Add, delete, and fetch comments on posts
-- **Notifications**: Notifications for Likes, Comments
-- **Media Upload**: Upload images/videos to AWS S3 via presigned url
+- **Notifications**: Notifications for likes, comments
+- **Media Upload**: Upload images/videos to AWS S3 via presigned URL
 - **Soft Deletion**: User, post, and comment soft delete functionality
 - **Caching**: Redis-based caching for improved performance
-- **Key Value Store**: Redis key value store to store likes/comments counters
+- **Key-Value Store**: Redis key-value store to track likes/comments counters
 - **Queue**: Likes, comments, notifications processed in bulk via BullMQ
 
 ## Installation
 
-To make setup easier, this project provides a Docker Compose file, make sure that you have docker and docker compose setup. Follow the steps below to get started:
+To make setup easier, this project provides a Docker Compose file. Make sure that you have Docker and Docker Compose installed. Follow the steps below to get started:
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/SouravCodery/socialpound-api.git
    cd socialpound-api
    docker-compose -f docker-compose.local-setup.yml --env-file .env.example up --build
    ```
-2. **Populate the .env.example with remaining keys of AWS and Google Client Id**:
+
+2. **Populate the `.env.example` with the remaining keys for AWS and Google Client ID**:
 
    ```
-        AWS_ACCESS_KEY_ID=
-        AWS_SECRET_ACCESS_KEY=
-        AWS_REGION=
-        AWS_BUCKET_NAME=
-        AWS_PRESIGNED_URL_PREFIX=
+   AWS_ACCESS_KEY_ID=
+   AWS_SECRET_ACCESS_KEY=
+   AWS_REGION=
+   AWS_BUCKET_NAME=
+   AWS_PRESIGNED_URL_PREFIX=
 
-        GOOGLE_CLIENT_ID=
+   GOOGLE_CLIENT_ID=
    ```
 
-3. **Populate the .env.example with remaining keys of AWS and Google Client Id**:
+3. **Run Docker Compose to start the API**:
+
    ```bash
    docker-compose -f docker-compose.local-setup.yml --env-file .env.example up --build
    ```
+
 4. **Access the API**:
-   [Socialpound-api](http://localhost:3001)
+   [Socialpound API](http://localhost:3001)
 
-## **Environment Variables**
-
-```markdown
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables to your `.env` file:
-You can find the same in .env.example which can be used along with docker-compose easily get the server up and running, some of the keys have been pre-populated to use with docker-compose.
+To run this project, you will need to add the following environment variables to your `.env` file. You can use `.env.example` as a reference, which has some keys pre-populated for use with Docker Compose to easily get the server up and running.
 
-# ENV Example
+```bash
+# Environment Example
 
 NODE_ENV=development
 
@@ -111,9 +112,6 @@ REDIS_BULL_MQ_PORT=6379
 REDIS_CACHE_ENABLED=true
 
 # AWS Configuration
-
-# Enter your AWS credentials
-
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_REGION=
@@ -121,20 +119,20 @@ AWS_BUCKET_NAME=
 AWS_PRESIGNED_URL_PREFIX=
 
 # JWT Configuration
-
 AUTH_JWT_SECRET_KEY=generateARandomSecretKey
 AUTH_JWT_EXPIRES_IN=30d
 
-# Generate and Add your Google Client Id
-
+# Google Client ID
 GOOGLE_CLIENT_ID=
 
 PAGINATION_LIMIT=10
-
 WORKERS_LOG_ENABLED=false
 ```
 
-## API-Documentation
+## API Documentation
+
+<details>
+  <summary>Click to expand API Documentation</summary>
 
 ### User Endpoints
 
@@ -174,7 +172,7 @@ WORKERS_LOG_ENABLED=false
     {
       "type": "image",
       "url": "https://example.com/image.jpg",
-      "aspectRatio:": 1
+      "aspectRatio": 1
     }
   ],
   "caption": "This is a sample caption."
@@ -264,6 +262,8 @@ WORKERS_LOG_ENABLED=false
 
 - Method: `GET`
 - URL: `{{rootUrl}}/v1/notification`
+
+</details>
 
 ## License
 
