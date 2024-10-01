@@ -275,6 +275,7 @@ This project is for learning purposes and is not licensed for commercial use or 
 For questions or feedback, feel free to reach out:
 
 - **GitHub**: [github.com/SouravCodery](https://github.com/SouravCodery)
+- **LinkedIn**: [linkedin.com/in/SouravCodery](https://www.linkedin.com/in/SouravCodery)
 - **Email**: souravscchoudhary@gmail.com
 
 ## Support
