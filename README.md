@@ -16,7 +16,7 @@ This project is a work in progress. More features would be added in the future.
 - [Features](#features)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
-<!-- - [API Documentation](#api-documentation) -->
+- [API Documentation](#api-documentation)
 - [License](#license)
 - [Contact](#contact)
 
@@ -85,11 +85,7 @@ To make setup easier, this project provides a Docker Compose file, make sure tha
 4. **Access the API**:
    [Socialpound-api](http://localhost:3001)
 
----
-
-### **Environment Variables**
-
-List the necessary environment variables with a brief description of each.
+## **Environment Variables**
 
 ```markdown
 ## Environment Variables
@@ -137,6 +133,137 @@ PAGINATION_LIMIT=10
 
 WORKERS_LOG_ENABLED=false
 ```
+
+## API-Documentation
+
+### User Endpoints
+
+**sign-in**
+
+- Method: `POST`
+- URL: `{{rootUrl}}/v1/user/sign-in`
+- Request Body:
+
+```json
+{
+  "signedUserDataJWT": "{{signedUserDataJWTGoogle}}"
+}
+```
+
+**getUserByUsername**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/user/souravscchoudhary`
+
+**deleteUser**
+
+- Method: `DELETE`
+- URL: `{{rootUrl}}/v1/user`
+
+### Post Endpoints
+
+**createPost**
+
+- Method: `POST`
+- URL: `{{rootUrl}}/v1/post`
+- Request Body:
+
+```json
+{
+  "content": [
+    {
+      "type": "image",
+      "url": "https://example.com/image.jpg",
+      "aspectRatio:": 1
+    }
+  ],
+  "caption": "This is a sample caption."
+}
+```
+
+**getAllPosts**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/post?cursor=66ec5ae6ec50b3ad7e420bb3`
+
+**getPostsByUserId**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/post/:userId?cursor=66ec5ae6ec50b3ad7e420bb3`
+
+**deletePostById**
+
+- Method: `DELETE`
+- URL: `{{rootUrl}}/v1/post/:postId`
+
+### Comment Endpoints
+
+**addComment**
+
+- Method: `POST`
+- URL: `{{rootUrl}}/v1/comment`
+- Request Body:
+
+```json
+{
+  "commentOn": "Post",
+  "post": "66b28d6ae36a984431d2aa83",
+  "parentComment": null,
+  "text": "This is a comment on a post."
+}
+```
+
+**getCommentsByPostId**
+
+- Method: `POST`
+- URL: `{{rootUrl}}/v1/comment/post/:postId?cursor=66b9beb124f866b5162bcb6f`
+
+**deleteCommentById**
+
+- Method: `DELETE`
+- URL: `{{rootUrl}}/v1/comment/:commentId`
+
+### Likes Endpoints
+
+**likePostOrComment**
+
+- Method: `POST`
+- URL: `{{rootUrl}}/v1/like`
+- Request Body:
+
+```json
+{
+  "likeOn": "Post",
+  "post": "66b28d6ae36a984431d2aa83"
+}
+```
+
+**getPostsLikedByUser**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/like/post/:postId?cursor=66b9beb124f866b5162bcb6f`
+
+**unlikePost**
+
+- Method: `DELETE`
+- URL: `{{rootUrl}}/v1/like/post/:postId`
+
+**getLikesByPostId**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/like/post/:postId`
+
+### Notification Endpoints
+
+**addMarkNotificationAsRead**
+
+- Method: `PATCH`
+- URL: `{{rootUrl}}/v1/notification/:notificationId`
+
+**getNotificationsByUser**
+
+- Method: `GET`
+- URL: `{{rootUrl}}/v1/notification`
 
 # License
 
