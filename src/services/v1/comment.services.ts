@@ -10,7 +10,6 @@ import {
   CommentWithIdInterface,
 } from "./../../interfaces/comment.interface";
 import { NotificationJobInterface } from "../../interfaces/notification.interface";
-import { PostWithIdInterface } from "../../interfaces/post.interface";
 
 import { commentQueue } from "../../mq/bull-mq/index.bull-mq";
 import {
@@ -23,7 +22,6 @@ import {
   deleteNotifications,
 } from "./notification.services";
 import { logger } from "../../logger/index.logger";
-import Notification from "../../models/notification.model";
 
 export const addCommentToQueue = async ({
   commentOn,
