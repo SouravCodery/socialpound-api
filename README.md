@@ -265,11 +265,11 @@ WORKERS_LOG_ENABLED=false
 - Method: `GET`
 - URL: `{{rootUrl}}/v1/notification`
 
-# License
+## License
 
 This project is for learning purposes and is not licensed for commercial use or redistribution. Feel free to explore the code for educational reasons.
 
-# Contact
+## Contact
 
 For questions or feedback, feel free to reach out:
 
