@@ -1,0 +1,30 @@
+enum LikeOnEnum {
+    Post
+    Comment
+}
+
+model Like {
+    id     Int        @id @default(autoincrement())
+    likeOn LikeOnEnum
+
+    post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId Int
+
+    comment   Comment? @relation(fields: [commentId], references: [id])
+    commentId Int?
+
+    liker   User @relation(fields: [likerId], references: [id], onDelete: Cascade)
+    likerId Int  @map("liker")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    isDeleted Boolean   @default(false) @map("is_deleted")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@index([likerId])
+    @@map("likes")
+}
+
+// CREATE UNIQUE INDEX unique_like_per_comment ON "Like" (postId, likerId, commentId) WHERE commentId IS NOT NULL;
+// CREATE UNIQUE INDEX unique_like_per_post ON "Like" (postId, likerId) WHERE commentId IS NULL;
