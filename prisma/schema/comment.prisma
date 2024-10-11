@@ -1,0 +1,36 @@
+enum CommentOnEnum {
+    Post
+    Comment
+}
+
+model Comment {
+    id        Int           @id @default(autoincrement())
+    commentOn CommentOnEnum
+
+    post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId Int  @map("post")
+
+    parentComment   Comment? @relation("CommentParent", fields: [parentCommentId], references: [id])
+    parentCommentId Int?
+
+    replies Comment[] @relation("CommentParent")
+
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int  @map("user")
+
+    postById Int @map("post_by")
+
+    text String @db.VarChar(2200)
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    isDeleted Boolean   @default(false) @map("is_deleted")
+    deletedAt DateTime? @map("deleted_at")
+
+    likes         Like[]
+    notifications Notification[]
+
+    @@index([postId])
+    @@index([parentCommentId])
+    @@map("comments")
+}
