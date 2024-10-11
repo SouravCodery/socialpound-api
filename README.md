@@ -4,7 +4,7 @@
 
 Socialpound API is the backend service for Socialpound, a social media platform like Instagram. The API handles core functionalities such as user management, posts, comments, likes, notifications, and more, built with a focus on scalability and performance.
 
-This project is intended for learning purposes and showcases various backend development practices using Node.js and Express.js, with additional services such as Redis, MongoDB, BullMQ, etc.
+This project is intended for learning purposes and showcases various backend development practices using Node.js and Express.js, with additional services such as Redis, PostgreSQL, BullMQ, etc.
 
 This project is a work in progress. More features will be added in the future.
 
@@ -30,8 +30,8 @@ The repository of Socialpound Webapp made using Next.js:
 
 - **Node.js**: Backend runtime environment
 - **Express.js**: Web framework for Node.js
-- **MongoDB**: NoSQL database
-- **Mongoose**: ODM for database interactions
+- **PostgreSQL**: Relational database
+- **Prisma**: ORM for database interactions
 - **Redis**: Caching and persistent key-value store
 - **AWS S3**: Media storage
 - **AWS Presigned URL**: AWS presigned URL to upload images via frontend
@@ -99,7 +99,7 @@ To run this project, you will need to add the following environment variables to
 
 NODE_ENV=development
 
-MONGODB_URI=mongodb://mongodb:27017/socialpound
+POSTGRESQL_DATABASE_URL=
 PORT=3001
 
 # Redis
