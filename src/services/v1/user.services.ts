@@ -233,7 +233,7 @@ export const incrementPostsCountForUser = async ({
   user,
   incrementBy = 1,
 }: {
-  user: string;
+  user: number;
   incrementBy?: number;
 }) => {
   try {
