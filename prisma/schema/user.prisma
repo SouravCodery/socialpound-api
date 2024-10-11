@@ -24,9 +24,11 @@ model User {
   comments             Comment[]
   notifications        Notification[] @relation("Recipient")
   notificationsCreated Notification[] @relation("Sender")
+
+  @@map("users")
 }
 
 //create indexes manually:
-// CREATE UNIQUE INDEX ON "User" (sub) WHERE is_deleted = false;
-// CREATE UNIQUE INDEX ON "User" (username) WHERE is_deleted = false;
-// CREATE UNIQUE INDEX ON "User" (email) WHERE is_deleted = false;
+// CREATE UNIQUE INDEX ON users (sub) WHERE is_deleted = false;
+// CREATE UNIQUE INDEX ON users (username) WHERE is_deleted = false;
+// CREATE UNIQUE INDEX ON users (email) WHERE is_deleted = false;
