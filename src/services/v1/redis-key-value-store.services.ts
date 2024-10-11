@@ -8,7 +8,7 @@ export const incrementLikeOrCommentCountInBulk = async ({
   incrementBy = 1,
 }: {
   entityType: "Post" | "Comment";
-  ids: string[];
+  ids: number[];
   countType: "likesCount" | "commentsCount";
   incrementBy?: number;
 }) => {
@@ -35,7 +35,7 @@ export const getLikeAndCommentsCountInBulk = async ({
   ids,
 }: {
   entityType: "Post" | "Comment";
-  ids: string[];
+  ids: number[];
 }) => {
   try {
     const multi = redisKeyValueStoreClient.multi();

@@ -80,7 +80,7 @@ export const getAPICache = async ({
   url: string;
   params: object;
   query: object;
-  authenticatedUserId: string | null;
+  authenticatedUserId: number | null;
 }) => {
   try {
     const cacheKey = getAPICacheKey({
@@ -128,7 +128,7 @@ export const deleteAPICache = async ({
     url: string;
     params: object;
     query: object;
-    authenticatedUserId: string | null;
+    authenticatedUserId: number | null;
   }[];
 }) => {
   try {

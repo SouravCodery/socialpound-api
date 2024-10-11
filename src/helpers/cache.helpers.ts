@@ -9,7 +9,7 @@ export const getAPICacheKey = ({
   url: string;
   params: object;
   query: object;
-  authenticatedUserId: string | null;
+  authenticatedUserId: number | null;
 }): string => {
   const processedUrl = url.replaceAll("/", ":");
 
