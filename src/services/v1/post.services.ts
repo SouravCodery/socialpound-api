@@ -190,7 +190,7 @@ export const deletePostById = async ({
   postId: string;
 }) => {
   try {
-    const post = await prisma.post.update({
+    const post = await prisma.post.findFirst({
       where: {
         id: Number(postId),
         userId: Number(user),
