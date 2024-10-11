@@ -29,7 +29,7 @@ export interface UserWithIdInterface extends UserInterface {
 }
 
 export interface UserTokenPayloadInterface {
-  _id: string;
+  id: number;
   email: string;
   fullName: string;
   profilePicture: string;
