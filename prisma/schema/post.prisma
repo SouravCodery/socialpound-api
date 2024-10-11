@@ -1,0 +1,35 @@
+model Post {
+    id     Int  @id @default(autoincrement())
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int  @map("user")
+
+    caption       String  @default("") @db.VarChar(2200)
+    isUserDeleted Boolean @default(false)
+
+    contents PostContent[]
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    isDeleted Boolean   @default(false) @map("is_deleted")
+    deletedAt DateTime? @map("deleted_at")
+
+    likes         Like[]
+    comments      Comment[]
+    notifications Notification[]
+
+    @@index([userId])
+    @@map("posts")
+}
+
+model PostContent {
+    id     Int  @id @default(autoincrement())
+    post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId Int  @map("post")
+
+    type        String @map("type")
+    url         String @map("url")
+    aspectRatio Float  @default(1.0) @map("aspect_ratio")
+
+    @@map("post_contents")
+}
