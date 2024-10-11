@@ -1,0 +1,35 @@
+enum NotificationType {
+    like_on_post
+    like_on_comment
+    comment
+    reply
+    add_friend
+}
+
+model Notification {
+    id Int @id @default(autoincrement())
+
+    recipient   User @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+    recipientId Int  @map("recipient")
+
+    sender   User @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+    senderId Int  @map("sender")
+
+    type NotificationType
+
+    post   Post? @relation(fields: [postId], references: [id])
+    postId Int?  @map("post")
+
+    comment   Comment? @relation(fields: [commentId], references: [id])
+    commentId Int?     @map("comment")
+
+    read Boolean @default(false)
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    isDeleted Boolean   @default(false) @map("is_deleted")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@index([recipientId, read])
+    @@map("notifications")
+}
