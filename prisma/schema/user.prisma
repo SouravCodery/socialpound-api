@@ -1,0 +1,32 @@
+model User {
+  id             Int    @id @default(autoincrement())
+  username       String @map("username")
+  email          String @map("email")
+  fullName       String @default("") @map("full_name")
+  sub            String @map("sub")
+  profilePicture String @default("") @map("profile_picture")
+  bio            String @default("") @map("bio")
+
+  postsCount     Int      @default(0) @map("posts_count")
+  followersCount Int      @default(0) @map("followers_count")
+  followingCount Int      @default(0) @map("following_count")
+  isPrivate      Boolean  @default(true) @map("is_private")
+  lastLogin      DateTime @default(now()) @map("last_login")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  deletedAt DateTime? @map("deleted_at")
+
+  posts                Post[]
+  likes                Like[]
+  comments             Comment[]
+  notifications        Notification[] @relation("Recipient")
+  notificationsCreated Notification[] @relation("Sender")
+}
+
+//create indexes manually:
+// CREATE UNIQUE INDEX ON "User" (sub) WHERE is_deleted = false;
+// CREATE UNIQUE INDEX ON "User" (username) WHERE is_deleted = false;
+// CREATE UNIQUE INDEX ON "User" (email) WHERE is_deleted = false;
