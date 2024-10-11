@@ -15,7 +15,7 @@ export const getPresignedUrl = async ({
   size,
   type,
 }: {
-  user: string;
+  user: number;
   size: number;
   type: string;
 }) => {
