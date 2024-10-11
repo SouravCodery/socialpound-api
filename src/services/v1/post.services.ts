@@ -1,14 +1,11 @@
-import { FilterQuery } from "mongoose";
-
+import { prisma } from "../../config/database.config";
+import {
+  Post as PostType,
+  PostContent as PostContentType,
+} from "@prisma/client";
 import { Config } from "../../config/config";
-import Post from "../../models/post.model";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import {
-  PostInterface,
-  PostWithIdInterface,
-} from "./../../interfaces/post.interface";
-
 import { getLikeAndCommentsCountInBulk } from "./redis-key-value-store.services";
 import { deleteAPICache } from "./redis-cache.services";
 import { incrementPostsCountForUser } from "./user.services";
@@ -21,21 +18,25 @@ export const createPost = async ({
   content,
   caption,
 }: {
-  user: PostInterface["user"];
+  user: PostType["userId"];
   username: string;
-  content: PostInterface["content"];
-  caption: PostInterface["caption"];
+  content: PostContentType;
+  caption: PostType["caption"];
 }) => {
   try {
-    const newPost = new Post({
-      user,
-      content,
-      caption,
+    const newPost = await prisma.post.create({
+      data: {
+        userId: Number(user),
+        content: {
+          createMany: {
+            data: content,
+          },
+        },
+        caption,
+      },
     });
-    const userId = user.toString();
 
-    await newPost.save();
-    await incrementPostsCountForUser({ user: userId });
+    await incrementPostsCountForUser({ user: Number(user) });
     await deleteAPICache({
       keys: [
         {
@@ -47,7 +48,7 @@ export const createPost = async ({
         {
           url: "/v1/post",
           params: {
-            userId,
+            userId: user,
           },
           query: {},
           authenticatedUserId: null,
@@ -81,15 +82,11 @@ export const createPost = async ({
   }
 };
 
-const getPostsWithCounters = async ({
-  posts,
-}: {
-  posts: PostWithIdInterface[];
-}) => {
+const getPostsWithCounters = async ({ posts }: { posts: { id: number }[] }) => {
   try {
     const counters = await getLikeAndCommentsCountInBulk({
       entityType: "Post",
-      ids: posts.map((post) => post._id.toString()),
+      ids: posts.map((post) => post.id),
     });
 
     const postsWithCounters = posts.map((post, index) => {
@@ -126,32 +123,37 @@ export const getPosts = async ({
   limit?: number;
 }) => {
   try {
-    const query: FilterQuery<PostInterface> = {
-      isDeleted: false,
-      isUserDeleted: false,
-    };
-
-    if (cursor) {
-      query._id = { $lt: cursor };
-    }
-
-    if (userId) {
-      query.user = userId;
-    }
-
-    const posts = await Post.find(query)
-      .limit(limit)
-      .sort({ _id: -1 })
-      .populate({
-        path: "user",
-        select: "username email fullName profilePicture",
-        match: { isDeleted: false },
-      })
-      .select("-createdAt -updatedAt -__v")
-      .lean();
+    const posts = await prisma.post.findMany({
+      where: {
+        isDeleted: false,
+        isUserDeleted: false,
+        ...(cursor ? { id: { lt: Number(cursor) } } : {}),
+        ...(userId ? { userId: Number(userId) } : {}),
+        user: {
+          isDeleted: false,
+        },
+      },
+      take: limit,
+      orderBy: {
+        id: "desc",
+      },
+      select: {
+        id: true,
+        caption: true,
+        user: {
+          select: {
+            username: true,
+            email: true,
+            fullName: true,
+            profilePicture: true,
+          },
+        },
+        content: true,
+      },
+    });
 
     const nextCursor =
-      posts.length >= limit ? posts[posts.length - 1]._id.toString() : null;
+      posts.length >= limit ? posts[posts.length - 1].id.toString() : null;
 
     const postsWithCounters = (await getPostsWithCounters({ posts })) ?? posts;
 
@@ -183,31 +185,26 @@ export const deletePostById = async ({
   username,
   postId,
 }: {
-  user: string;
+  user: number;
   username: string;
   postId: string;
 }) => {
   try {
-    const post = await Post.findOneAndUpdate(
-      {
-        _id: postId,
-        user,
+    const post = await prisma.post.update({
+      where: {
+        id: Number(postId),
+        userId: Number(user),
         isDeleted: false,
         isUserDeleted: false,
       },
-      {
-        $set: {
-          isDeleted: true,
-          deletedAt: new Date(),
-        },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
       },
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .select("user")
-      .lean();
+      select: {
+        userId: true,
+      },
+    });
 
     if (!post) {
       throw new HttpError({
@@ -220,45 +217,41 @@ export const deletePostById = async ({
       post: postId,
     });
 
-    if (post?.user) {
-      const userId = post.user.toString();
+    await incrementPostsCountForUser({
+      user: post.userId,
+      incrementBy: -1,
+    });
 
-      await incrementPostsCountForUser({
-        user: userId,
-        incrementBy: -1,
-      });
-
-      await deleteAPICache({
-        keys: [
-          {
-            url: "/v1/post",
-            params: {},
-            query: {},
-            authenticatedUserId: null,
+    await deleteAPICache({
+      keys: [
+        {
+          url: "/v1/post",
+          params: {},
+          query: {},
+          authenticatedUserId: null,
+        },
+        {
+          url: "/v1/post",
+          params: {
+            userId: post.userId,
           },
-          {
-            url: "/v1/post",
-            params: {
-              userId,
-            },
-            query: {},
-            authenticatedUserId: null,
+          query: {},
+          authenticatedUserId: null,
+        },
+        {
+          url: "/v1/user",
+          params: {
+            username,
           },
-          {
-            url: "/v1/user",
-            params: {
-              username,
-            },
-            query: {},
-            authenticatedUserId: null,
-          },
-        ],
-      });
-    }
+          query: {},
+          authenticatedUserId: null,
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 200,
-      message: "Posts deleted successfully",
+      message: "Post deleted successfully",
       toastMessage: "Post deleted successfully",
     });
   } catch (error) {
