@@ -1,7 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
-
-import User from "../../models/user.model";
-import Post from "../../models/post.model";
+import { prisma } from "../../config/database.config";
 import {
   deleteAPICache,
   deleteCache,
@@ -12,7 +10,6 @@ import { signAPIToken } from "../../helpers/jwt.helpers";
 import { getCacheKey } from "../../helpers/cache.helpers";
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import { UserWithIdInterface } from "../../interfaces/user.interface";
 import { Config } from "../../config/config";
 import { logger } from "../../logger/index.logger";
 
@@ -69,50 +66,49 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
     const { userPayloadGoogle } = await verifyGoogleToken({ googleToken });
     const { sub, email, name, picture } = userPayloadGoogle;
 
-    const existingUser = await User.findOne({
-      sub,
-      isDeleted: false,
-    }).select("_id email username fullName profilePicture");
+    const existingUser = await prisma.user.findFirst({
+      where: { sub, isDeleted: false },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        fullName: true,
+        profilePicture: true,
+      },
+    });
 
-    const user =
-      existingUser ??
-      new User({
-        username: email,
-        email: email,
-        fullName: name,
-        sub: sub,
-        profilePicture: picture ?? "",
-        lastLogin: new Date(),
-      });
+    const user = existingUser
+      ? await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            email: email ?? existingUser.email,
+            username: email ?? existingUser.username,
+            fullName: name ?? existingUser.fullName,
+            profilePicture: picture ?? existingUser.profilePicture,
+            lastLogin: new Date(),
+          },
+        })
+      : await prisma.user.create({
+          data: {
+            username: email ?? "",
+            email: email ?? "",
+            fullName: name,
+            sub: sub,
+            profilePicture: picture ?? "",
+            lastLogin: new Date(),
+          },
+        });
 
-    if (existingUser) {
-      if (email && existingUser.email !== email) {
-        existingUser.email = email;
-        existingUser.username = email;
-      }
-
-      if (name && existingUser.fullName !== name) existingUser.fullName = name;
-
-      if (picture && existingUser.profilePicture !== picture)
-        existingUser.profilePicture = picture;
-    }
-
-    user.lastLogin = new Date();
-    await user.save();
-
-    //response
     const status = existingUser ? 200 : 201;
-
     const message = existingUser
       ? "Google Sign in successful"
       : "Google Sign up successful";
-
     const toastMessage = existingUser
       ? "Welcome back to Socialpound"
       : "Welcome to Socialpound";
 
     const userData = {
-      _id: user._id,
+      id: user.id,
       email: user.email,
       username: user.username,
       fullName: user.fullName,
@@ -147,27 +143,32 @@ export const signIn = async ({ googleToken }: { googleToken: string }) => {
   }
 };
 
-export const getUserById = async ({ userId }: { userId: string }) => {
+export const getUserById = async ({ userId }: { userId: number }) => {
   try {
     const cacheKey = getCacheKey({
       prefix: "user",
-      params: {
-        userId,
-      },
+      params: { userId },
     });
-    const cachedUser = await getCache({
-      key: cacheKey,
-    });
+    const cachedUser = (await getCache({ key: cacheKey })) as {
+      id: number;
+      username: string;
+      email: string;
+      fullName: string;
+    } | null;
+
     if (cachedUser) {
-      return cachedUser as UserWithIdInterface;
+      return cachedUser;
     }
 
-    const user = await User.findOne({
-      _id: userId,
-      isDeleted: false,
-    })
-      .select("username")
-      .lean<UserWithIdInterface>();
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        fullName: true,
+      },
+    });
 
     if (!user) {
       throw new Error("[Service: getUserById] - User not found");
@@ -181,21 +182,25 @@ export const getUserById = async ({ userId }: { userId: string }) => {
     return user;
   } catch (error) {
     logger.error("[Service: getUserById] - Something went wrong", error);
-
     throw error;
   }
 };
 
 export const getUserByUsername = async ({ username }: { username: string }) => {
   try {
-    const user = await User.findOne({
-      username,
-      isDeleted: false,
-    })
-      .select(
-        "username email fullName bio profilePicture bio postsCount followersCount followingCount"
-      )
-      .lean<UserWithIdInterface>();
+    const user = await prisma.user.findFirst({
+      where: { username, isDeleted: false },
+      select: {
+        username: true,
+        email: true,
+        fullName: true,
+        bio: true,
+        profilePicture: true,
+        postsCount: true,
+        followersCount: true,
+        followingCount: true,
+      },
+    });
 
     if (!user) {
       throw new HttpError({
@@ -232,17 +237,14 @@ export const incrementPostsCountForUser = async ({
   incrementBy?: number;
 }) => {
   try {
-    await User.updateOne(
-      { _id: user },
-      {
-        $inc: {
-          postsCount: incrementBy,
+    await prisma.user.update({
+      where: { id: Number(user) },
+      data: {
+        postsCount: {
+          increment: incrementBy,
         },
       },
-      {
-        runValidators: true,
-      }
-    );
+    });
 
     return {
       message: "Posts count incremented successfully",
@@ -255,25 +257,19 @@ export const incrementPostsCountForUser = async ({
   }
 };
 
-export const deleteUser = async ({ userId }: { userId: string }) => {
+export const deleteUser = async ({ userId }: { userId: number }) => {
   try {
-    const user = await User.findOneAndUpdate(
-      {
-        _id: userId,
-        isDeleted: false,
+    const user = await prisma.user.update({
+      where: { id: Number(userId) },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
       },
-      {
-        $set: {
-          isDeleted: true,
-          deletedAt: new Date(),
-        },
+      select: {
+        id: true,
+        username: true,
       },
-      {
-        runValidators: true,
-      }
-    )
-      .select("_id username")
-      .lean();
+    });
 
     if (!user) {
       throw new HttpError({
@@ -282,19 +278,14 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
       });
     }
 
-    await Post.updateMany(
-      {
-        user: userId,
+    await prisma.post.updateMany({
+      where: {
+        userId: Number(userId),
       },
-      {
-        $set: {
-          isUserDeleted: true,
-        },
+      data: {
+        isUserDeleted: true,
       },
-      {
-        runValidators: true,
-      }
-    );
+    });
 
     deleteAPICache({
       keys: [
@@ -328,7 +319,7 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
         getCacheKey({
           prefix: "user",
           params: {
-            userId: user._id.toString(),
+            userId: user.id,
           },
         }),
       ],
