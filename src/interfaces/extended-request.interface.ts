@@ -5,6 +5,7 @@ export interface AuthenticatedUserRequestInterface extends Request {
     id: number;
     email: string;
     fullName: string;
+    username: string;
   };
   userId: number;
 }
