@@ -20,7 +20,7 @@ export const createPost = async ({
 }: {
   user: PostType["userId"];
   username: string;
-  content: PostContentType;
+  content: PostContentType[];
   caption: PostType["caption"];
 }) => {
   try {
@@ -197,10 +197,6 @@ export const deletePostById = async ({
         isDeleted: false,
         isUserDeleted: false,
       },
-      data: {
-        isDeleted: true,
-        deletedAt: new Date(),
-      },
       select: {
         userId: true,
       },
@@ -209,9 +205,18 @@ export const deletePostById = async ({
     if (!post) {
       throw new HttpError({
         status: 404,
-        message: "[Service: deletePostById] - Post not found",
+        message:
+          "[Service: deletePostById] - Post not found or already deleted",
       });
     }
+
+    await prisma.post.update({
+      where: { id: Number(postId) },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    });
 
     await deleteNotifications({
       post: postId,
