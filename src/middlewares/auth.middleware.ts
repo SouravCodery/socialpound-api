@@ -35,11 +35,11 @@ export const authMiddleware = async (
       Config.AUTH_JWT_SECRET_KEY
     ) as UserTokenPayloadInterface;
 
-    const { _id: userId } = decodedAuthToken;
+    const { id: userId } = decodedAuthToken;
     const user = await getUserById({ userId });
 
     (req as AuthenticatedUserRequestInterface).user = user;
-    (req as AuthenticatedUserRequestInterface).userId = user?._id?.toString();
+    (req as AuthenticatedUserRequestInterface).userId = user?.id;
 
     next();
   } catch (error) {
