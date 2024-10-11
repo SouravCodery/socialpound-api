@@ -191,6 +191,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
     const user = await prisma.user.findFirst({
       where: { username, isDeleted: false },
       select: {
+        id: true,
         username: true,
         email: true,
         fullName: true,
