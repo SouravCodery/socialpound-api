@@ -2,15 +2,15 @@ import Joi from "joi";
 
 export const getNotificationsByUserValidatorSchema = {
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().length(24).optional(),
+    cursor: Joi.number().optional(),
   }),
 };
 
 export const addMarkNotificationAsReadValidatorSchema = {
   paramsSchema: Joi.object({
-    notificationId: Joi.string().alphanum().length(24).required(),
+    notificationId: Joi.number().required(),
   }),
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().length(24).optional(),
+    cursor: Joi.number().optional(),
   }),
 };

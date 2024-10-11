@@ -3,10 +3,10 @@ import Joi from "joi";
 export const likePostOrCommentValidatorSchema = {
   bodySchema: Joi.object({
     likeOn: Joi.string().valid("Post", "Comment").required(),
-    post: Joi.string().alphanum().length(24).required(),
+    post: Joi.number().required(),
     comment: Joi.when("likeOn", {
       is: "Comment",
-      then: Joi.string().alphanum().length(24).required(),
+      then: Joi.number().required(),
       otherwise: Joi.string().allow(null),
     }),
   }),
@@ -14,15 +14,15 @@ export const likePostOrCommentValidatorSchema = {
 
 export const getLikesByPostIdValidatorSchema = {
   paramsSchema: Joi.object({
-    postId: Joi.string().alphanum().length(24).required(),
+    postId: Joi.number().required(),
   }),
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().length(24).optional(),
+    cursor: Joi.number().optional(),
   }),
 };
 
 export const unlikePostValidatorSchema = {
   paramsSchema: Joi.object({
-    postId: Joi.string().alphanum().length(24).required(),
+    postId: Joi.number().required(),
   }),
 };

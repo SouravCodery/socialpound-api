@@ -19,21 +19,21 @@ export const createPostValidatorSchema = {
 
 export const getUserFeedValidatorSchema = {
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().optional(),
+    cursor: Joi.number().optional(),
   }),
 };
 
 export const getPostsByUserIdValidatorSchema = {
   paramsSchema: Joi.object({
-    userId: Joi.string().alphanum().length(24).required(),
+    userId: Joi.number().required(),
   }),
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().optional(),
+    cursor: Joi.number().optional(),
   }),
 };
 
 export const deletePostByIdValidatorSchema = {
   paramsSchema: Joi.object({
-    postId: Joi.string().alphanum().length(24).required(),
+    postId: Joi.number().required(),
   }),
 };

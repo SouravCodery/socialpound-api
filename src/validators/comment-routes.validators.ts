@@ -4,12 +4,12 @@ export const addCommentValidatorSchema = {
   bodySchema: Joi.object({
     commentOn: Joi.string().valid("Post", "Comment").required(),
 
-    post: Joi.string().required(),
+    post: Joi.number().required(),
 
     parentComment: Joi.when("commentOn", {
       is: "Comment",
-      then: Joi.string().required(),
-      otherwise: Joi.string().allow(null),
+      then: Joi.number().required(),
+      otherwise: Joi.number().allow(null),
     }),
 
     text: Joi.string().trim().max(2200).required(),
@@ -18,15 +18,15 @@ export const addCommentValidatorSchema = {
 
 export const getCommentsByPostIdValidatorSchema = {
   paramsSchema: Joi.object({
-    postId: Joi.string().alphanum().length(24).required(),
+    postId: Joi.number().required(),
   }),
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().length(24).optional(),
+    cursor: Joi.number().optional(),
   }),
 };
 
 export const deleteCommentByIdValidatorSchema = {
   paramsSchema: Joi.object({
-    commentId: Joi.string().alphanum().length(24).required(),
+    commentId: Joi.number().required(),
   }),
 };
