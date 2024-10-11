@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-
 import * as userServices from "../../services/v1/user.services";
 import { setAPICache } from "../../services/v1/redis-cache.services";
 import { HttpError } from "../../classes/http-error.class";
@@ -74,9 +73,7 @@ const getUserByUsername = async (
 
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = (
-      req as AuthenticatedUserRequestInterface
-    ).user._id.toString();
+    const userId = (req as AuthenticatedUserRequestInterface).userId;
 
     const result = await userServices.deleteUser({ userId });
 
