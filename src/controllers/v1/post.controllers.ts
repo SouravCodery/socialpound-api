@@ -9,7 +9,7 @@ import { setAPICache } from "../../services/v1/redis-cache.services";
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = (req as AuthenticatedUserRequestInterface).user._id;
+    const user = (req as AuthenticatedUserRequestInterface).userId;
     const username = (req as AuthenticatedUserRequestInterface).user.username;
     const { content, caption } = req.body;
 
