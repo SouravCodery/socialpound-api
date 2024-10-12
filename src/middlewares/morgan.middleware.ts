@@ -10,6 +10,11 @@ const jsonFormat = (
   const tokenPayload =
     (req.headers.authorization ?? ".")?.split(".")?.[1] ?? "";
 
+  const forwardedFor = (req.headers["x-forwarded-for"] as string) ?? "";
+  const clientIp = forwardedFor
+    ? forwardedFor?.split(",")?.[0]?.trim()
+    : tokens["remote-addr"](req, res);
+
   return JSON.stringify({
     method: tokens.method(req, res),
     url: tokens.url(req, res),
@@ -18,10 +23,9 @@ const jsonFormat = (
     response_time: tokens["response-time"](req, res) + " ms",
     timestamp: new Date().toISOString(),
     user: tokenPayload,
-    ip: tokens["remote-addr"](req, res),
+    ip: clientIp,
   });
 };
-
 const stream: StreamOptions = {
   write: (message: string) => {
     logger.http("server requests", JSON.parse(message));
