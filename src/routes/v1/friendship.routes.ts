@@ -4,6 +4,7 @@ import * as friendshipController from "../../controllers/v1/friendship.controlle
 import * as friendshipValidationSchemas from "../../validators/friendship-routes.validators";
 
 import { authMiddleware } from "../../middlewares/auth.middleware";
+import { cacheMiddleware } from "../../middlewares/cache.middleware";
 
 import { validate } from "../../middlewares/validate.middleware";
 
@@ -22,10 +23,17 @@ friendshipRouter.put(
   friendshipController.respondToFriendRequest
 );
 
-friendshipRouter.get("/list", friendshipController.getFriendsList);
+friendshipRouter.get(
+  "/list",
+  validate(friendshipValidationSchemas.getFriendsListValidatorSchema),
+  cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
+  friendshipController.getFriendsList
+);
 
 friendshipRouter.get(
   "/requests",
+  validate(friendshipValidationSchemas.getPendingFriendRequestsValidatorSchema),
+  cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
   friendshipController.getPendingFriendRequests
 );
 
