@@ -28,6 +28,14 @@ export interface UserWithIdInterface extends UserInterface {
   _id: ObjectId;
 }
 
+export interface PopulatedUserInterface {
+  _id: string;
+  email: string;
+  username: string;
+  fullName: string;
+  profilePicture: string;
+}
+
 export interface UserTokenPayloadInterface {
   _id: string;
   email: string;
