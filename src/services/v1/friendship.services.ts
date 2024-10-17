@@ -1,9 +1,14 @@
+import { FilterQuery } from "mongoose";
+
+import { Config } from "../../config/config";
 import Friendship from "../../models/friendship.model";
 import User from "../../models/user.model";
-
 import { HttpError } from "../../classes/http-error.class";
 import { HttpResponse } from "../../classes/http-response.class";
-import { PopulatedFriendshipInterface } from "../../interfaces/friendship.interface";
+import {
+  FriendshipInterface,
+  PopulatedFriendshipInterface,
+} from "../../interfaces/friendship.interface";
 
 import { logger } from "../../logger/index.logger";
 
@@ -35,7 +40,6 @@ export const sendFriendRequest = async ({
     });
     await newFriendship.save();
 
-    //todo: send notification to receiver
     return new HttpResponse({
       status: 201,
       message: "Friend request sent successfully",
@@ -107,14 +111,30 @@ export const respondToFriendRequest = async ({
   }
 };
 
-export const getFriendsList = async ({ userId }: { userId: string }) => {
+export const getFriendsList = async ({
+  userId,
+  cursor,
+  limit = Config.PAGINATION_LIMIT,
+}: {
+  userId: string;
+  cursor?: string;
+  limit?: number;
+}) => {
   try {
-    const friends = (await Friendship.find({
+    const query: FilterQuery<FriendshipInterface> = {
       $or: [
         { requester: userId, status: "accepted" },
         { receiver: userId, status: "accepted" },
       ],
-    })
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    const friends = (await Friendship.find(query)
+      .limit(limit)
+      .sort({ _id: -1 })
       .populate({
         path: "requester",
         select: "username email fullName profilePicture",
@@ -126,6 +146,11 @@ export const getFriendsList = async ({ userId }: { userId: string }) => {
         match: { isDeleted: false },
       })
       .lean()) as PopulatedFriendshipInterface[];
+
+    const nextCursor =
+      friends.length >= limit
+        ? friends[friends.length - 1]._id.toString()
+        : null;
 
     const friendList = friends
       .filter((friend) => friend.receiver && friend.requester)
@@ -145,7 +170,10 @@ export const getFriendsList = async ({ userId }: { userId: string }) => {
     return new HttpResponse({
       status: 200,
       message: "Friends list fetched successfully",
-      data: friendList,
+      data: {
+        friends: friendList,
+        nextCursor,
+      },
     });
   } catch (error) {
     logger.error("[Service: getFriendsList] - Something went wrong", error);
@@ -163,14 +191,26 @@ export const getFriendsList = async ({ userId }: { userId: string }) => {
 
 export const getPendingFriendRequests = async ({
   userId,
+  cursor,
+  limit = Config.PAGINATION_LIMIT,
 }: {
   userId: string;
+  cursor?: string;
+  limit?: number;
 }) => {
   try {
-    const pendingRequests = await Friendship.find({
+    const query: FilterQuery<FriendshipInterface> = {
       receiver: userId,
       status: "requested",
-    })
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    const pendingRequests = await Friendship.find(query)
+      .limit(limit)
+      .sort({ _id: -1 })
       .populate({
         path: "requester",
         select: "username email fullName profilePicture",
@@ -178,10 +218,18 @@ export const getPendingFriendRequests = async ({
       })
       .lean();
 
+    const nextCursor =
+      pendingRequests.length >= limit
+        ? pendingRequests[pendingRequests.length - 1]._id.toString()
+        : null;
+
     return new HttpResponse({
       status: 200,
       message: "Pending friend requests fetched successfully",
-      data: pendingRequests.filter((request) => request.requester),
+      data: {
+        requests: pendingRequests.filter((request) => request.requester),
+        nextCursor,
+      },
     });
   } catch (error) {
     logger.error(
