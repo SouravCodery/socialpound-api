@@ -189,7 +189,10 @@ const friendshipStatus = async (
       .status(isFriendResponse.getStatus())
       .json(isFriendResponse.getResponse());
   } catch (error) {
-    logger.error("[Controller: friendshipStatus] - Something went wrong", error);
+    logger.error(
+      "[Controller: friendshipStatus] - Something went wrong",
+      error
+    );
 
     if (error instanceof HttpError) {
       return next(error);
@@ -204,10 +207,77 @@ const friendshipStatus = async (
   }
 };
 
+const cancelFriendRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as AuthenticatedUserRequestInterface).userId;
+    const { userId: receiverId } = req.params;
+
+    const cancelRequestResponse = await friendshipServices.cancelFriendRequest({
+      userId,
+      receiverId,
+    });
+
+    return res
+      .status(cancelRequestResponse.getStatus())
+      .json(cancelRequestResponse.getResponse());
+  } catch (error) {
+    logger.error(
+      "[Controller: cancelFriendRequest] - Something went wrong",
+      error
+    );
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 500,
+        message: "[Controller: cancelFriendRequest] - Something went wrong",
+      })
+    );
+  }
+};
+
+const unfriend = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (req as AuthenticatedUserRequestInterface).userId;
+    const { userId: friendUserId } = req.params;
+
+    const unfriendResponse = await friendshipServices.unfriend({
+      userId,
+      friendUserId,
+    });
+
+    return res
+      .status(unfriendResponse.getStatus())
+      .json(unfriendResponse.getResponse());
+  } catch (error) {
+    logger.error("[Controller: unfriend] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 500,
+        message: "[Controller: unfriend] - Something went wrong",
+      })
+    );
+  }
+};
+
 export {
   sendFriendRequest,
   respondToFriendRequest,
   getFriendsList,
   getPendingFriendRequests,
   friendshipStatus,
+  unfriend,
+  cancelFriendRequest,
 };
