@@ -37,4 +37,10 @@ friendshipRouter.get(
   friendshipController.getPendingFriendRequests
 );
 
+friendshipRouter.get(
+  "/status/:otherUser",
+  validate(friendshipValidationSchemas.isFriendValidatorSchema),
+  friendshipController.friendshipStatus
+);
+
 export default friendshipRouter;

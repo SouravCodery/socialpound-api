@@ -24,3 +24,9 @@ export const getPendingFriendRequestsValidatorSchema = {
     cursor: Joi.string().alphanum().length(24).optional(),
   }),
 };
+
+export const isFriendValidatorSchema = {
+  paramsSchema: Joi.object({
+    otherUser: Joi.string().alphanum().length(24).required(),
+  }),
+};
