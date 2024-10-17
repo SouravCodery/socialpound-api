@@ -13,8 +13,14 @@ export const respondToFriendRequestValidatorSchema = {
   }),
 };
 
+export const getFriendsListValidatorSchema = {
+  querySchema: Joi.object({
+    cursor: Joi.string().alphanum().length(24).optional(),
+  }),
+};
+
 export const getPendingFriendRequestsValidatorSchema = {
   querySchema: Joi.object({
-    cursor: Joi.string().alphanum().optional(),
+    cursor: Joi.string().alphanum().length(24).optional(),
   }),
 };
