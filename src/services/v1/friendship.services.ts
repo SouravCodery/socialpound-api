@@ -277,3 +277,84 @@ export const friendshipStatus = async ({
     });
   }
 };
+
+export const cancelFriendRequest = async ({
+  userId,
+  receiverId,
+}: {
+  userId: string;
+  receiverId: string;
+}) => {
+  try {
+    const friendship = await Friendship.findOneAndDelete({
+      requester: userId,
+      receiver: receiverId,
+      status: "requested",
+    });
+
+    if (!friendship) {
+      throw new HttpError({
+        status: 404,
+        message: "Friend request not found or already canceled",
+      });
+    }
+
+    return new HttpResponse({
+      status: 200,
+      message: "Friend request canceled successfully",
+    });
+  } catch (error) {
+    logger.error(
+      "[Service: cancelFriendRequest] - Something went wrong",
+      error
+    );
+
+    throw new HttpError({
+      status: 500,
+      message: "[Service: cancelFriendRequest] - Something went wrong",
+    });
+  }
+};
+
+export const unfriend = async ({
+  userId,
+  friendUserId,
+}: {
+  userId: string;
+  friendUserId: string;
+}) => {
+  try {
+    const friendship = await Friendship.findOneAndDelete({
+      $or: [
+        { requester: userId, receiver: friendUserId, status: "accepted" },
+        { requester: friendUserId, receiver: userId, status: "accepted" },
+      ],
+    });
+
+    if (!friendship) {
+      throw new HttpError({
+        status: 404,
+        message: "Friendship not found or already unfriended",
+      });
+    }
+
+    await User.updateMany(
+      {
+        _id: { $in: [userId, friendUserId] },
+      },
+      { $inc: { friendsCount: -1 } }
+    );
+
+    return new HttpResponse({
+      status: 200,
+      message: "Unfriended successfully",
+    });
+  } catch (error) {
+    logger.error("[Service: unfriend] - Something went wrong", error);
+
+    throw new HttpError({
+      status: 500,
+      message: "[Service: unfriend] - Something went wrong",
+    });
+  }
+};
