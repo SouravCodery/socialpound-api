@@ -247,3 +247,33 @@ export const getPendingFriendRequests = async ({
     });
   }
 };
+
+export const friendshipStatus = async ({
+  userId,
+  otherUser,
+}: {
+  userId: string;
+  otherUser: string;
+}) => {
+  try {
+    const friendship = await Friendship.findOne({
+      $or: [
+        { requester: userId, receiver: otherUser },
+        { requester: otherUser, receiver: userId },
+      ],
+    }).lean();
+
+    return new HttpResponse({
+      status: 200,
+      message: "Friendship status fetched successfully",
+      data: { friendship },
+    });
+  } catch (error) {
+    logger.error("[Service: friendshipStatus] - Something went wrong", error);
+
+    throw new HttpError({
+      status: 500,
+      message: "[Service: friendshipStatus] - Something went wrong",
+    });
+  }
+};
