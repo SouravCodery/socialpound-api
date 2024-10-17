@@ -30,3 +30,15 @@ export const isFriendValidatorSchema = {
     otherUser: Joi.string().alphanum().length(24).required(),
   }),
 };
+
+export const cancelRequestValidatorSchema = {
+  paramsSchema: Joi.object({
+    userId: Joi.string().alphanum().length(24).required(),
+  }),
+};
+
+export const unfriendValidatorSchema = {
+  paramsSchema: Joi.object({
+    userId: Joi.string().alphanum().length(24).required(),
+  }),
+};

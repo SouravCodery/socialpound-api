@@ -43,4 +43,16 @@ friendshipRouter.get(
   friendshipController.friendshipStatus
 );
 
+friendshipRouter.delete(
+  "/cancel-request/:userId",
+  validate(friendshipValidationSchemas.cancelRequestValidatorSchema),
+  friendshipController.cancelFriendRequest
+);
+
+friendshipRouter.delete(
+  "/unfriend/:userId",
+  validate(friendshipValidationSchemas.unfriendValidatorSchema),
+  friendshipController.unfriend
+);
+
 export default friendshipRouter;
