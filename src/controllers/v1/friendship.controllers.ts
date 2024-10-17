@@ -171,9 +171,43 @@ const getPendingFriendRequests = async (
   }
 };
 
+const friendshipStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as AuthenticatedUserRequestInterface).userId;
+    const { otherUser } = req.params;
+
+    const isFriendResponse = await friendshipServices.friendshipStatus({
+      userId,
+      otherUser,
+    });
+
+    return res
+      .status(isFriendResponse.getStatus())
+      .json(isFriendResponse.getResponse());
+  } catch (error) {
+    logger.error("[Controller: friendshipStatus] - Something went wrong", error);
+
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+
+    return next(
+      new HttpError({
+        status: 500,
+        message: "[Controller: friendshipStatus] - Something went wrong",
+      })
+    );
+  }
+};
+
 export {
   sendFriendRequest,
   respondToFriendRequest,
   getFriendsList,
   getPendingFriendRequests,
+  friendshipStatus,
 };
