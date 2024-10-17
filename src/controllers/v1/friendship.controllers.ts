@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { HttpError } from "../../classes/http-error.class";
 import { AuthenticatedUserRequestInterface } from "../../interfaces/extended-request.interface";
 import * as friendshipServices from "../../services/v1/friendship.services";
+import { setAPICache } from "../../services/v1/redis-cache.services";
+
 import { logger } from "../../logger/index.logger";
 
 const sendFriendRequest = async (
@@ -87,9 +89,20 @@ const getFriendsList = async (
 ) => {
   try {
     const userId = (req as AuthenticatedUserRequestInterface).userId;
+    const { cursor } = req.query;
 
     const friendsListResponse = await friendshipServices.getFriendsList({
       userId,
+      cursor: cursor?.toString(),
+    });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: userId,
+      value: friendsListResponse.getResponse(),
+      ttl: "FIVE_MINUTES",
     });
 
     return res
@@ -118,11 +131,22 @@ const getPendingFriendRequests = async (
 ) => {
   try {
     const userId = (req as AuthenticatedUserRequestInterface).userId;
+    const { cursor } = req.query;
 
     const pendingRequestsResponse =
       await friendshipServices.getPendingFriendRequests({
         userId,
+        cursor: cursor?.toString(),
       });
+
+    await setAPICache({
+      url: req.baseUrl,
+      params: req.params,
+      query: req.query,
+      authenticatedUserId: userId,
+      value: pendingRequestsResponse.getResponse(),
+      ttl: "FIVE_MINUTES",
+    });
 
     return res
       .status(pendingRequestsResponse.getStatus())
