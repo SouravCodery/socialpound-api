@@ -6,6 +6,7 @@ import likeRouter from "./like.routes";
 import commentRouter from "./comment.routes";
 import awsSignedUrlRouter from "./aws-presigned-url.routes";
 import notificationRouter from "./notification.routes";
+import friendshipRouter from "./friendship.routes";
 
 const v1Router = express.Router();
 
@@ -15,5 +16,6 @@ v1Router.use("/like", likeRouter);
 v1Router.use("/comment", commentRouter);
 v1Router.use("/notification", notificationRouter);
 v1Router.use("/aws-presigned-url", awsSignedUrlRouter);
+v1Router.use("/friendship", friendshipRouter);
 
 export default v1Router;
