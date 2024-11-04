@@ -15,7 +15,7 @@ const userSchema: Schema<UserDocumentInterface> = new Schema(
     bio: { type: String, default: "" },
 
     postsCount: { type: Number, default: 0, required: true, min: 0 },
-    followersCount: { type: Number, default: 0, required: true, min: 0 },
+    friendsCount: { type: Number, default: 0, required: true, min: 0 },
 
     isPrivate: { type: Boolean, default: true, required: true },
 

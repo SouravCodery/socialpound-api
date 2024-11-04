@@ -11,7 +11,7 @@ export interface UserInterface {
   bio: string;
 
   postsCount: number;
-  followersCount: number;
+  friendsCount: number;
 
   isPrivate: boolean;
 
