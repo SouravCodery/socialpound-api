@@ -17,7 +17,7 @@ friendshipRouter.post(
   friendshipController.sendFriendRequest
 );
 
-friendshipRouter.put(
+friendshipRouter.patch(
   "/respond",
   validate(friendshipValidationSchemas.respondToFriendRequestValidatorSchema),
   friendshipController.respondToFriendRequest
