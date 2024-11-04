@@ -12,7 +12,6 @@ export interface UserInterface {
 
   postsCount: number;
   followersCount: number;
-  followingCount: number;
 
   isPrivate: boolean;
 
