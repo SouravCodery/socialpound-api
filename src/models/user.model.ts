@@ -16,7 +16,6 @@ const userSchema: Schema<UserDocumentInterface> = new Schema(
 
     postsCount: { type: Number, default: 0, required: true, min: 0 },
     followersCount: { type: Number, default: 0, required: true, min: 0 },
-    followingCount: { type: Number, default: 0, required: true, min: 0 },
 
     isPrivate: { type: Boolean, default: true, required: true },
 
