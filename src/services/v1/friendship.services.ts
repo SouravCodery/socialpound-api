@@ -89,6 +89,10 @@ export const respondToFriendRequest = async ({
         },
         { $inc: { friendsCount: 1 } }
       );
+    } else {
+      await Friendship.deleteOne({
+        _id: friendship._id,
+      });
     }
 
     return new HttpResponse({
