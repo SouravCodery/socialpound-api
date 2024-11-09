@@ -272,7 +272,7 @@ export const friendshipStatus = async ({
     return new HttpResponse({
       status: 200,
       message: "Friendship status fetched successfully",
-      data: { friendship },
+      data: friendship,
     });
   } catch (error) {
     logger.error("[Service: friendshipStatus] - Something went wrong", error);
