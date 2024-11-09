@@ -164,7 +164,7 @@ export const getFriendsList = async ({
         const friendData = isRequester ? friend.receiver : friend.requester;
 
         return {
-          id: friendData._id,
+          _id: friendData._id,
           email: friendData.email,
           username: friendData.username,
           fullName: friendData.fullName,
