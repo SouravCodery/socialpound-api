@@ -21,6 +21,7 @@ export const sendFriendRequest = async ({
 }) => {
   try {
     const existingFriendship = await Friendship.findOne({
+      status: { $in: ["requested", "accepted"] },
       $or: [
         { requester: requesterId, receiver: receiverId },
         { requester: receiverId, receiver: requesterId },
@@ -257,6 +258,7 @@ export const friendshipStatus = async ({
 }) => {
   try {
     const friendship = await Friendship.findOne({
+      status: { $in: ["requested", "accepted"] },
       $or: [
         { requester: userId, receiver: otherUser },
         { requester: otherUser, receiver: userId },
