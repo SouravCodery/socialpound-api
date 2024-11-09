@@ -193,7 +193,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       isDeleted: false,
     })
       .select(
-        "username email fullName bio profilePicture bio postsCount followersCount followingCount"
+        "username email fullName bio profilePicture bio postsCount friendsCount"
       )
       .lean<UserWithIdInterface>();
 
