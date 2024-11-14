@@ -253,7 +253,7 @@ export const getPendingFriendRequests = async ({
   }
 };
 
-export const friendshipStatus = async ({
+export const checkFriendshipStatus = async ({
   userId,
   otherUser,
 }: {
