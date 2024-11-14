@@ -53,6 +53,10 @@ export const callHandlers = ({
         "[Socket Handler: callFriend] - Something went wrong",
         error
       );
+
+      socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+        message: "Call failed, Please try again!",
+      });
     }
   };
 
