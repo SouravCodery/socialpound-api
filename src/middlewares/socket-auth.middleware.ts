@@ -19,7 +19,7 @@ export const socketAuthMiddleware = async (
       return next(
         new HttpError({
           status: 401,
-          message: "User is not authorized",
+          message: "User is not authorized for calls, Refresh to try again",
           toastMessage: "Please sign in again",
         })
       );
