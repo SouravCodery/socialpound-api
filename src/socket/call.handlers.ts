@@ -1,7 +1,11 @@
 import { Server, Socket } from "socket.io";
 
-import { SocketConstants } from "../constants/socket.constants";
 import { checkFriendshipStatus } from "./../services/v1/friendship.services";
+import { SocketConstants } from "../constants/socket.constants";
+import {
+  CallFriendParamInterface,
+  EventAcknowledgementCallbackParam,
+} from "./../interfaces/socket.interface";
 import { logger } from "../logger/winston.logger";
 
 const onlineUsers = new Map<string, string>();
@@ -15,10 +19,12 @@ export const callHandlers = ({
 }) => {
   onlineUsers.set(socket.data.userId, socket.id);
 
-  const callFriend = async (data: {
-    friendId: string;
-    offer: RTCSessionDescriptionInit;
-  }) => {
+  const callFriend = async (
+    { data }: CallFriendParamInterface,
+    eventAcknowledgementCallback: (
+      response: EventAcknowledgementCallbackParam
+    ) => void
+  ) => {
     try {
       const { friendId } = data;
       const { userId, user } = socket.data;
@@ -33,24 +39,35 @@ export const callHandlers = ({
         friendshipStatusResponse.getResponse().data?.status === "accepted";
 
       if (!isFriend) {
-        socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
-          message: "You can only call your friends",
+        eventAcknowledgementCallback({
+          isSuccessful: false,
+          message: "Callback You can only call your friends",
         });
+
         return;
       }
 
       const friendSocketId = onlineUsers.get(friendId);
 
       if (!friendSocketId) {
-        socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+        eventAcknowledgementCallback({
+          isSuccessful: false,
           message: "Friend is not online",
         });
+
         return;
       }
+
+      const roomId = `${userId}-${friendId}-${Date.now()}`;
+      socket.join(roomId);
 
       io.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_CALL, {
         message: `${username.split("@")[0]} is calling!`,
         offer: data.offer,
+
+        callingUserId: userId,
+        roomId,
+        user,
       });
     } catch (error) {
       logger.error(
@@ -58,7 +75,8 @@ export const callHandlers = ({
         error
       );
 
-      socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+      eventAcknowledgementCallback({
+        isSuccessful: false,
         message: "Call failed, Please try again!",
       });
     }
