@@ -15,7 +15,10 @@ export const callHandlers = ({
 }) => {
   onlineUsers.set(socket.data.userId, socket.id);
 
-  const callFriend = async (data: { friendId: string }) => {
+  const callFriend = async (data: {
+    friendId: string;
+    offer: RTCSessionDescriptionInit;
+  }) => {
     try {
       const { friendId } = data;
       const { userId, user } = socket.data;
@@ -47,6 +50,7 @@ export const callHandlers = ({
 
       io.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_CALL, {
         message: `${username.split("@")[0]} is calling!`,
+        offer: data.offer,
       });
     } catch (error) {
       logger.error(
