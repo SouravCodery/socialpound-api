@@ -209,6 +209,26 @@ export const callHandlers = ({
     }
   };
 
+  const callUnanswered = async (data: { friendId: string; roomId: string }) => {
+    try {
+      const { roomId } = data;
+      const { user } = socket.data;
+      const { username } = user;
+
+      socket.to(roomId).emit(SocketConstants.EVENTS.CALL_UNANSWERED, {
+        message: `${username.split("@")[0]} did not answer the call.`,
+        roomId,
+      });
+
+      io.socketsLeave(roomId);
+    } catch (error) {
+      logger.error(
+        "[Socket Handler: callUnanswered] - Something went wrong",
+        error
+      );
+    }
+  };
+
   const disconnect = () => {
     try {
       logger.info(`A user disconnected: ${socket.id}`);
@@ -228,5 +248,6 @@ export const callHandlers = ({
   socket.on(SocketConstants.EVENTS.NEW_ICE_CANDIDATE_SENT, newIceCandidateSent);
   socket.on(SocketConstants.EVENTS.CALL_REJECTED, callRejected);
   socket.on(SocketConstants.EVENTS.CALL_ENDED, callEnded);
+  socket.on(SocketConstants.EVENTS.CALL_UNANSWERED, callUnanswered);
   socket.on(SocketConstants.EVENTS.DISCONNECT, disconnect);
 };
