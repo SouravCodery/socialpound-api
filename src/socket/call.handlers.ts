@@ -41,7 +41,7 @@ export const callHandlers = ({
       if (!isFriend) {
         eventAcknowledgementCallback({
           isSuccessful: false,
-          message: "Callback You can only call your friends",
+          message: "You can only call your friends",
         });
 
         return;
@@ -64,7 +64,6 @@ export const callHandlers = ({
       socket.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_CALL, {
         message: `${username.split("@")[0]} is calling!`,
         offer: data.offer,
-
         callingUserId: userId,
         roomId,
         user,
@@ -144,13 +143,13 @@ export const callHandlers = ({
 
       socket.join(roomId);
       socket.to(roomId).emit(SocketConstants.EVENTS.INCOMING_ANSWER, {
-        message: `${username.split("@")[0]} is answering!`,
+        message: `${username.split("@")[0]} has answered the call!`,
         answer: data.answer,
         roomId,
       });
     } catch (error) {
       logger.error(
-        "[Socket Handler: answerCall] - Something went wrong",
+        "[Socket Handler: callAnswer] - Something went wrong",
         error
       );
 
@@ -181,6 +180,24 @@ export const callHandlers = ({
     }
   };
 
+  const callRejected = async (data: { friendId: string; roomId: string }) => {
+    try {
+      const { roomId } = data;
+      const { user } = socket.data;
+      const { username } = user;
+
+      socket.to(roomId).emit(SocketConstants.EVENTS.CALL_REJECTED, {
+        message: `${username.split("@")[0]} has rejected your call.`,
+        roomId,
+      });
+    } catch (error) {
+      logger.error(
+        "[Socket Handler: callRejected] - Something went wrong",
+        error
+      );
+    }
+  };
+
   const disconnect = () => {
     try {
       logger.info(`A user disconnected: ${socket.id}`);
@@ -198,5 +215,6 @@ export const callHandlers = ({
   socket.on(SocketConstants.EVENTS.CALL_FRIEND, callFriend);
   socket.on(SocketConstants.EVENTS.CALL_ANSWER, callAnswer);
   socket.on(SocketConstants.EVENTS.NEW_ICE_CANDIDATE_SENT, newIceCandidateSent);
+  socket.on(SocketConstants.EVENTS.CALL_REJECTED, callRejected); // Registered the new handler
   socket.on(SocketConstants.EVENTS.DISCONNECT, disconnect);
 };
