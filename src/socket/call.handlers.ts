@@ -2,10 +2,7 @@ import { Server, Socket } from "socket.io";
 
 import { checkFriendshipStatus } from "./../services/v1/friendship.services";
 import { SocketConstants } from "../constants/socket.constants";
-import {
-  CallFriendParamInterface,
-  EventAcknowledgementCallbackParam,
-} from "./../interfaces/socket.interface";
+import { EventAcknowledgementCallbackParam } from "./../interfaces/socket.interface";
 import { logger } from "../logger/winston.logger";
 
 const onlineUsers = new Map<string, string>();
@@ -20,7 +17,10 @@ export const callHandlers = ({
   onlineUsers.set(socket.data.userId, socket.id);
 
   const callFriend = async (
-    { data }: CallFriendParamInterface,
+    data: {
+      friendId: string;
+      offer: RTCSessionDescriptionInit;
+    },
     eventAcknowledgementCallback: (
       response: EventAcknowledgementCallbackParam
     ) => void
@@ -61,7 +61,7 @@ export const callHandlers = ({
       const roomId = `${userId}-${friendId}-${Date.now()}`;
       socket.join(roomId);
 
-      io.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_CALL, {
+      socket.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_CALL, {
         message: `${username.split("@")[0]} is calling!`,
         offer: data.offer,
 
