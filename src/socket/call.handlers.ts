@@ -69,6 +69,12 @@ export const callHandlers = ({
         roomId,
         user,
       });
+
+      eventAcknowledgementCallback({
+        isSuccessful: true,
+        message: "Call initiated",
+        roomId,
+      });
     } catch (error) {
       logger.error(
         "[Socket Handler: callFriend] - Something went wrong",
@@ -140,6 +146,7 @@ export const callHandlers = ({
       socket.to(roomId).emit(SocketConstants.EVENTS.INCOMING_ANSWER, {
         message: `${username.split("@")[0]} is answering!`,
         answer: data.answer,
+        roomId,
       });
     } catch (error) {
       logger.error(
@@ -147,9 +154,30 @@ export const callHandlers = ({
         error
       );
 
-      socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+      eventAcknowledgementCallback({
+        isSuccessful: false,
         message: "Call failed, Please try again!",
       });
+    }
+  };
+
+  const newIceCandidateSent = async (data: {
+    candidate: RTCIceCandidate;
+    roomId: string;
+  }) => {
+    try {
+      const { candidate, roomId } = data;
+
+      socket
+        .to(roomId)
+        .emit(SocketConstants.EVENTS.NEW_ICE_CANDIDATE_RECEIVED, {
+          candidate,
+        });
+    } catch (error) {
+      logger.error(
+        "[Socket Handler: newIceCandidateSent] - Something went wrong",
+        error
+      );
     }
   };
 
@@ -169,5 +197,6 @@ export const callHandlers = ({
 
   socket.on(SocketConstants.EVENTS.CALL_FRIEND, callFriend);
   socket.on(SocketConstants.EVENTS.CALL_ANSWER, callAnswer);
+  socket.on(SocketConstants.EVENTS.NEW_ICE_CANDIDATE_SENT, newIceCandidateSent);
   socket.on(SocketConstants.EVENTS.DISCONNECT, disconnect);
 };
