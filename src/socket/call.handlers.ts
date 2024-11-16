@@ -82,12 +82,18 @@ export const callHandlers = ({
     }
   };
 
-  const callAnswer = async (data: {
-    friendId: string;
-    answer: RTCSessionDescriptionInit;
-  }) => {
+  const callAnswer = async (
+    data: {
+      friendId: string;
+      answer: RTCSessionDescriptionInit;
+      roomId: string;
+    },
+    eventAcknowledgementCallback: (
+      response: EventAcknowledgementCallbackParam
+    ) => void
+  ) => {
     try {
-      const { friendId } = data;
+      const { friendId, roomId } = data;
       const { userId, user } = socket.data;
       const { username } = user;
 
@@ -100,22 +106,38 @@ export const callHandlers = ({
         friendshipStatusResponse.getResponse().data?.status === "accepted";
 
       if (!isFriend) {
-        socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+        eventAcknowledgementCallback({
+          isSuccessful: false,
           message: "You can only call your friends",
         });
+
         return;
       }
 
       const friendSocketId = onlineUsers.get(friendId);
 
       if (!friendSocketId) {
-        socket.emit(SocketConstants.EVENTS.CALL_FAILED, {
+        eventAcknowledgementCallback({
+          isSuccessful: false,
           message: "Friend is not online",
         });
+
         return;
       }
 
-      io.to(friendSocketId).emit(SocketConstants.EVENTS.INCOMING_ANSWER, {
+      const room = io.sockets.adapter.rooms.get(roomId);
+
+      if ((room?.has(friendSocketId) && room.size === 1) === false) {
+        eventAcknowledgementCallback({
+          isSuccessful: false,
+          message: "Friend is not online",
+        });
+
+        return;
+      }
+
+      socket.join(roomId);
+      socket.to(roomId).emit(SocketConstants.EVENTS.INCOMING_ANSWER, {
         message: `${username.split("@")[0]} is answering!`,
         answer: data.answer,
       });
