@@ -7,6 +7,7 @@ export const SocketConstants = {
     CALL_FAILED: "call-failed",
     CALL_ANSWER: "call-answer",
     CALL_REJECTED: "call-rejected",
+    CALL_ENDED: "call-ended",
 
     INCOMING_CALL: "incoming-call",
     INCOMING_ANSWER: "incoming-answer",

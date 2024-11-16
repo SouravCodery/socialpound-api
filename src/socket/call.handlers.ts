@@ -198,6 +198,17 @@ export const callHandlers = ({
     }
   };
 
+  const callEnded = async (data: { roomId: string }) => {
+    try {
+      const { roomId } = data;
+
+      socket.to(roomId).emit(SocketConstants.EVENTS.CALL_ENDED);
+      io.socketsLeave(roomId);
+    } catch (error) {
+      logger.error("[Socket Handler: callEnded] - Something went wrong", error);
+    }
+  };
+
   const disconnect = () => {
     try {
       logger.info(`A user disconnected: ${socket.id}`);
@@ -215,6 +226,7 @@ export const callHandlers = ({
   socket.on(SocketConstants.EVENTS.CALL_FRIEND, callFriend);
   socket.on(SocketConstants.EVENTS.CALL_ANSWER, callAnswer);
   socket.on(SocketConstants.EVENTS.NEW_ICE_CANDIDATE_SENT, newIceCandidateSent);
-  socket.on(SocketConstants.EVENTS.CALL_REJECTED, callRejected); // Registered the new handler
+  socket.on(SocketConstants.EVENTS.CALL_REJECTED, callRejected);
+  socket.on(SocketConstants.EVENTS.CALL_ENDED, callEnded);
   socket.on(SocketConstants.EVENTS.DISCONNECT, disconnect);
 };
