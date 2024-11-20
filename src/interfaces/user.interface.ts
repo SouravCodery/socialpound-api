@@ -11,8 +11,7 @@ export interface UserInterface {
   bio: string;
 
   postsCount: number;
-  followersCount: number;
-  followingCount: number;
+  friendsCount: number;
 
   isPrivate: boolean;
 
@@ -26,6 +25,14 @@ export interface UserDocumentInterface
 
 export interface UserWithIdInterface extends UserInterface {
   _id: ObjectId;
+}
+
+export interface PopulatedUserInterface {
+  _id: string;
+  email: string;
+  username: string;
+  fullName: string;
+  profilePicture: string;
 }
 
 export interface UserTokenPayloadInterface {

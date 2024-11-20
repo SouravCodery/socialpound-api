@@ -166,7 +166,7 @@ export const getUserById = async ({ userId }: { userId: string }) => {
       _id: userId,
       isDeleted: false,
     })
-      .select("username")
+      .select("username email fullName profilePicture")
       .lean<UserWithIdInterface>();
 
     if (!user) {
@@ -193,7 +193,7 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       isDeleted: false,
     })
       .select(
-        "username email fullName bio profilePicture bio postsCount followersCount followingCount"
+        "username email fullName bio profilePicture bio postsCount friendsCount"
       )
       .lean<UserWithIdInterface>();
 
