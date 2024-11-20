@@ -190,6 +190,8 @@ export const callHandlers = ({
         message: `${username.split("@")[0]} has rejected your call.`,
         roomId,
       });
+
+      io.socketsLeave(roomId);
     } catch (error) {
       logger.error(
         "[Socket Handler: callRejected] - Something went wrong",
@@ -246,6 +248,38 @@ export const callHandlers = ({
     }
   };
 
+  const audioToggle = async (data: { isMuted: string; roomId: string }) => {
+    try {
+      const { roomId, isMuted } = data;
+
+      socket.to(roomId).emit(SocketConstants.EVENTS.REMOTE_AUDIO_TOGGLED, {
+        roomId,
+        isMuted,
+      });
+    } catch (error) {
+      logger.error(
+        "[Socket Handler: audioToggle] - Something went wrong",
+        error
+      );
+    }
+  };
+
+  const videoToggle = async (data: { isMuted: string; roomId: string }) => {
+    try {
+      const { roomId, isMuted } = data;
+
+      socket.to(roomId).emit(SocketConstants.EVENTS.REMOTE_VIDEO_TOGGLED, {
+        roomId,
+        isMuted,
+      });
+    } catch (error) {
+      logger.error(
+        "[Socket Handler: videoToggle] - Something went wrong",
+        error
+      );
+    }
+  };
+
   const disconnect = () => {
     try {
       logger.info(`A user disconnected: ${socket.id}`);
@@ -267,5 +301,7 @@ export const callHandlers = ({
   socket.on(SocketConstants.EVENTS.CALL_ENDED, callEnded);
   socket.on(SocketConstants.EVENTS.CALL_UNANSWERED, callUnanswered);
   socket.on(SocketConstants.EVENTS.CALL_BUSY, callBusy);
+  socket.on(SocketConstants.EVENTS.REMOTE_AUDIO_TOGGLED, audioToggle);
+  socket.on(SocketConstants.EVENTS.REMOTE_VIDEO_TOGGLED, videoToggle);
   socket.on(SocketConstants.EVENTS.DISCONNECT, disconnect);
 };

@@ -11,6 +11,9 @@ export const SocketConstants = {
     CALL_UNANSWERED: "call-unanswered",
     CALL_BUSY: "call-busy",
 
+    REMOTE_AUDIO_TOGGLED: "REMOTE_AUDIO_TOGGLED",
+    REMOTE_VIDEO_TOGGLED: "REMOTE_VIDEO_TOGGLED",
+
     INCOMING_CALL: "incoming-call",
     INCOMING_ANSWER: "incoming-answer",
 
