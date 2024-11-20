@@ -166,7 +166,7 @@ export const getUserById = async ({ userId }: { userId: string }) => {
       _id: userId,
       isDeleted: false,
     })
-      .select("username")
+      .select("username email fullName profilePicture")
       .lean<UserWithIdInterface>();
 
     if (!user) {
