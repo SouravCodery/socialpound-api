@@ -180,7 +180,7 @@ const friendshipStatus = async (
     const userId = (req as AuthenticatedUserRequestInterface).userId;
     const { otherUser } = req.params;
 
-    const isFriendResponse = await friendshipServices.friendshipStatus({
+    const isFriendResponse = await friendshipServices.checkFriendshipStatus({
       userId,
       otherUser,
     });

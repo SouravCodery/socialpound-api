@@ -12,6 +12,10 @@ import "./src/mq/bull-mq/index.bull-mq";
 import { logger } from "./src/logger/index.logger";
 import { gracefulWorkersShutdown } from "./src/mq/bull-mq/index.bull-mq";
 
+import { Server as SocketIOServer } from "socket.io";
+import { socketAuthMiddleware } from "./src/middlewares/socket-auth.middleware";
+import { callHandlers } from "./src/socket/call.handlers";
+
 const port = Config.PORT;
 
 (async () => {
@@ -26,6 +30,24 @@ const port = Config.PORT;
 
     const server = app.listen(port, () => {
       logger.info(`Socialpound API listening on: ${port}`);
+    });
+
+    const io = new SocketIOServer(server, {
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+      },
+    });
+
+    io.use(socketAuthMiddleware);
+
+    io.on("connection", (socket) => {
+      try {
+        logger.info(`A user connected: ${socket.id}`, socket.data);
+        callHandlers({ io, socket });
+      } catch (error) {
+        logger.error("Error during socket connection", error);
+      }
     });
 
     function closeServer() {
@@ -53,6 +75,8 @@ const port = Config.PORT;
 
       try {
         logger.info("Shutting down server...", { signal });
+
+        await io.close();
 
         await closeServer();
         await gracefulWorkersShutdown(signal);
