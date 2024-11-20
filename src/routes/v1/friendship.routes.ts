@@ -26,14 +26,14 @@ friendshipRouter.patch(
 friendshipRouter.get(
   "/list",
   validate(friendshipValidationSchemas.getFriendsListValidatorSchema),
-  cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
+  // cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
   friendshipController.getFriendsList
 );
 
 friendshipRouter.get(
   "/requests",
   validate(friendshipValidationSchemas.getPendingFriendRequestsValidatorSchema),
-  cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
+  // cacheMiddleware({ isAuthenticatedUserSpecificRequest: true }),
   friendshipController.getPendingFriendRequests
 );
 

@@ -24,6 +24,11 @@ export function cacheMiddleware({
         ? (req as AuthenticatedUserRequestInterface)?.userId
         : null;
 
+      //todo: Make changes to the cache key
+      //it works for routes like /a/:id but not for /a/b
+      //this results into rewriting the cache for /friendship/list and /friendship/requests
+      //req.baseUrl only returns /a, Example: /friendship not /friendship/list
+
       const cachedData = await getAPICache({
         url: req.baseUrl,
         params: req.params,
