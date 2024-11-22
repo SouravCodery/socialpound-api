@@ -30,15 +30,6 @@ export const addNotificationsToQueue = async ({
       "[Service: addNotificationsToQueue] - Something went wrong",
       error
     );
-
-    if (error instanceof HttpError) {
-      throw error;
-    }
-
-    throw new HttpError({
-      status: 500,
-      message: "[Service: addNotificationsToQueue] - Something went wrong",
-    });
   }
 };
 
