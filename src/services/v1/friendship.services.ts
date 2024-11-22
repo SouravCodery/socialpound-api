@@ -9,6 +9,7 @@ import {
   FriendshipInterface,
   PopulatedFriendshipInterface,
 } from "../../interfaces/friendship.interface";
+import { addNotificationsToQueue } from "./notification.services";
 
 import { logger } from "../../logger/index.logger";
 
@@ -40,6 +41,19 @@ export const sendFriendRequest = async ({
       receiver: receiverId,
     });
     await newFriendship.save();
+
+    addNotificationsToQueue({
+      jobs: [
+        {
+          name: "add-notification",
+          data: {
+            recipient: newFriendship.receiver,
+            sender: newFriendship.requester,
+            type: "add-friend",
+          },
+        },
+      ],
+    });
 
     return new HttpResponse({
       status: 201,
@@ -89,6 +103,19 @@ export const respondToFriendRequest = async ({
         },
         { $inc: { friendsCount: 1 } }
       );
+
+      addNotificationsToQueue({
+        jobs: [
+          {
+            name: "add-notification",
+            data: {
+              recipient: friendship.requester,
+              sender: friendship.receiver,
+              type: "accept-friend-request",
+            },
+          },
+        ],
+      });
     } else {
       await Friendship.deleteOne({
         _id: friendship._id,
