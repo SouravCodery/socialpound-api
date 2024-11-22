@@ -41,3 +41,6 @@ services:
 networks:
   app-network:
     driver: bridge
+# Command to run on server
+# docker-compose build
+# docker-compose up
