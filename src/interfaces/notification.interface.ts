@@ -6,7 +6,8 @@ type NotificationTypes =
   | "like-on-comment"
   | "comment"
   | "reply"
-  | "add-friend";
+  | "add-friend"
+  | "accept-friend-request";
 
 export interface NotificationInterface {
   recipient: ObjectId;
