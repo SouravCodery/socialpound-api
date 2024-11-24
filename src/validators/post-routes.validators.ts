@@ -13,7 +13,7 @@ export const createPostValidatorSchema = {
       .required()
       .max(10),
 
-    caption: Joi.string().trim().max(2200).default(""),
+    caption: Joi.string().trim().max(2200).allow("").default(""),
   }),
 };
 

@@ -16,6 +16,7 @@ const notificationSchema: Schema<NotificationDocumentInterface> = new Schema(
         "comment",
         "reply",
         "add-friend",
+        "accept-friend-request",
       ],
       required: true,
     },
