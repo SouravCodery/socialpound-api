@@ -43,7 +43,9 @@ const port = Config.PORT;
 
     io.on("connection", (socket) => {
       try {
-        logger.info(`A user connected: ${socket.id}`, socket.data);
+        logger.info(
+          `A user connected: ${socket.id} ${socket?.data?.user?.email}`
+        );
         callHandlers({ io, socket });
       } catch (error) {
         logger.error("Error during socket connection", error);

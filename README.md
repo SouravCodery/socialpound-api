@@ -2,11 +2,13 @@
 
 ## Description
 
-Socialpound API is the backend service for Socialpound, a social media platform like Instagram. The API handles core functionalities such as user management, posts, comments, likes, notifications, and more, built with a focus on scalability and performance.
+Socialpound API is the backend repository for Socialpound, a social media platform like Instagram. It powers core functionalities like posts, likes, comments, notifications, call, etc built with a focus on scalability and performance.
 
-This project is intended for learning purposes and showcases various backend development practices using Node.js and Express.js, with additional services such as Redis, MongoDB, BullMQ, etc.
+This project is intended for learning and the fun of it and showcases various backend development practices using Node.js and Express.js, with additional tech such as Redis, MongoDB, BullMQ, WebSocket (Socket.io) etc.
 
 This project is a work in progress. More features will be added in the future.
+
+This repository has been kept public as a small token of gratitude towards the open-source community. From React.js to Node.js, my entire current tech stack is built on open source, without which I wouldn’t have become a developer. It also serves to showcase a small glimpse of my Software Engineering skills and expertise in Full Stack Development.
 
 ## Table of Contents
 
@@ -34,7 +36,7 @@ The repository of Socialpound Webapp made using Next.js:
 - **Mongoose**: ODM for database interactions
 - **Redis**: Caching and persistent key-value store
 - **AWS S3**: Media storage
-- **AWS Presigned URL**: AWS presigned URL to upload images via frontend
+- **AWS Presigned URL**: AWS Presigned URLs for secure image uploads from the frontend.
 - **BullMQ**: Job queue for handling asynchronous tasks
 - **TypeScript**: Type-safe JavaScript superset
 - **JWT**: JSON Web Token for user authentication
@@ -43,19 +45,19 @@ The repository of Socialpound Webapp made using Next.js:
 - **Joi**: Schema description language and validator for JavaScript objects, used for validating request payloads
 - **Google-auth-library**: A library for Google's OAuth 2.0 authentication, used for verifying and managing Google logins
 - **Compression**: Middleware for Express.js that enables Gzip compression for HTTP responses, improving performance by reducing the size of response payloads
+- **WebSocket (Socket.io)**: Facilitates real-time signaling for WebRTC video/audio calls.
 
 ## Features
 
 - **User Authentication**: JWT-based authentication (login via Google OAuth)
-- **Post Management**: Create, delete, and retrieve posts
-- **Likes System**: Like/unlike posts
-- **Comment System**: Add, delete, and fetch comments on posts
-- **Notifications**: Notifications for likes, comments
+- **Posts and Feed**: Create posts with images and captions, and view a personalized feed.
+- **Likes and Comments**: Like and comment on posts to engage with others.
+- **Notifications**: Notifications for likes, comments, friend requests, etc
 - **Media Upload**: Upload images/videos to AWS S3 via presigned URL
-- **Soft Deletion**: User, post, and comment soft delete functionality
 - **Caching**: Redis-based caching for improved performance
 - **Key-Value Store**: Redis key-value store to track likes/comments counters
 - **Queue**: Likes, comments, notifications processed in bulk via BullMQ
+- **WebSocket**: Provides real-time signaling for seamless WebRTC video/audio calls.
 
 ## Installation
 
@@ -276,6 +278,7 @@ For questions or feedback, feel free to reach out:
 
 - **GitHub**: [github.com/SouravCodery](https://github.com/SouravCodery)
 - **LinkedIn**: [linkedin.com/in/SouravCodery](https://www.linkedin.com/in/SouravCodery)
+- **X**: [x.com/souravcodery](https://x.com/souravcodery)
 - **Email**: souravscchoudhary@gmail.com
 
 ## Support
